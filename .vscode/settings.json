@@ -31,5 +31,6 @@
       "args": ["%DOCFILE%"],
       "env": {}
     }
-  ]
+  ],
+  "cSpell.language": "es"
 }
