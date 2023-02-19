@@ -3,35 +3,31 @@
 \usepackage{minted}
 \usepackage{multirow}
 \usepackage{listings}
-
 \usepackage{amssymb,amsmath,amsthm,amsfonts}
-\usepackage{calc}
 \usepackage{graphicx}
-\usepackage{subfigure}
-\usepackage{indentfirst}
 \usepackage{titlesec}
-\newcommand{\sectionbreak}{\clearpage}
-\DeclareGraphicsExtensions{.bmp,.png,.pdf,.jpg}
 \usepackage{gensymb}
-
 \usepackage{url}
-\usepackage{amsmath}
-\usepackage{graphicx}
-\graphicspath{{images/}}
-\usepackage{parskip}
 \usepackage{fancyhdr}
-\usepackage{vmargin}
-\setmarginsrb{2 cm}{2 cm}{2 cm}{2 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
-
 \usepackage[spanish]{babel}
-\usepackage[colorlinks=true, allcolors=blue]{hyperref}
-\hypersetup{
-    colorlinks=true,% make the links colored
-}
 \usepackage[nolist]{acronym}
 \usepackage[table]{xcolor}
 \usepackage{url}
 
+% HYPERLINK CONFIGURATION %
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\hypersetup{
+    colorlinks=true,% make the links colored
+}
+    
+% MARGINS CONFIGURATION %
+\usepackage{vmargin}
+\setmarginsrb{2 cm}{2 cm}{2 cm}{2 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+% GRAPHICS CONFIGURATION %
+\usepackage{graphicx}
+\DeclareGraphicsExtensions{.bmp,.png,.pdf,.jpg}
+\graphicspath{{images/}}
 
 \begin{document}
 
@@ -58,10 +54,6 @@
     \hypersetup{linkcolor=black}
     \tableofcontents
 }
-
-%##########################
-% INTRODUCCION
-%##########################
 
 \section{Introducción}
 
@@ -91,23 +83,13 @@ Los deadlocks son uno de los grandes problemas de los sistemas distribuidos.
 Su aparición puede dejar sistemas enteros fuera de uso y causar graves daños a personas y equipos.
 Numerosas teorías y métodos se han propuesto para prevenir los deadlocks.
 
-
 \subsection{Motivación}
 
 \bigskip
 
-%##########################
-% ESTADO DEL ARTE
-%##########################
-
 \section{Estado del arte / Literatura relacionada}
 
-
 \bigskip
-
-%##########################
-% OBJETIVOS
-%##########################
 
 \section{Objetivos}
 
@@ -127,25 +109,13 @@ Los objetivos particulares son:
 
 \bigskip
 
-%##########################
-% METODOLOGIA
-%##########################
-
 \section{Metodologías propuestas}
 
 \bigskip
 
-%##########################
-% DATOS
-%##########################
-
 \section{Conjuntos de datos (dependiendo del área de la tesis)}
 
 \bigskip
-
-%##########################
-% RECURSOS
-%##########################
 
 \section{Recursos informáticos (opcional)}
 
@@ -156,10 +126,6 @@ Los objetivos particulares son:
 \subsubsection{Otras herramientas}
 
 \bigskip
-
-%##########################
-% PLANIFICACIÓN
-%##########################
 
 \section{Cronograma de trabajo}
 
@@ -196,8 +162,6 @@ Cantidad de horas: [768-1000]
 \end{itemize}
 
 \bigskip
-
-%\clearpage
 
 \bibliographystyle{acm}
 \bibliography{bibliography.bib}
