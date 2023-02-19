@@ -23,7 +23,6 @@
 \usepackage{vmargin}
 \setmarginsrb{2 cm}{2 cm}{2 cm}{2 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
 
-
 \usepackage[spanish]{babel}
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \hypersetup{
@@ -33,34 +32,29 @@
 \usepackage[table]{xcolor}
 \usepackage{url}
 
-%% Biblatex
-%\usepackage[style=plain]{biblatex}
-%\addbibresource{bibliography.bib}
 
 \begin{document}
 
 \begin{titlepage}
 
     \title{     \textbf{Propuesta de Tesis de Grado \\ de Ingeniería en Informática}\\[2.5ex]
-        \textit{Título de Tesis \\(Segundo renglón)} }
+        \textit{Detección de Deadlocks en Rust \\en tiempo de compilación \\mediante Redes de Petri} }
 
     \author{
-        \textbf{Director:} Gral. José de San Martín \\[2.5ex]
-        \textbf{Co-director:} Gral. Manuel Belgrano \\[2.5ex]
-        \textbf{Alumno:} Luis A. Huergo, \textit{(Padrón \# 000.001)}                                \\
-        \texttt{ luis.huergo@fi.uba.ar }                                    \\[2.5ex]
+        \textbf{Director:} Ing. Pablo A. Deymonnaz\\[2.5ex]
+        \textbf{Alumno:} Horacio Lisdero Scaffino, \textit{(Padrón \# 100.132)}                                \\
+        \texttt{ hlisdero@fi.uba.ar }                                    \\[2.5ex]
         \normalsize{Facultad de Ingeniería, Universidad de Buenos Aires}        \\
     }
-    \date{}
+
+    \date{17 de febrero de 2023}
 
 \end{titlepage}
 
 \maketitle
 \thispagestyle{empty}
 
-\maketitle
-
-{
+\maketitle{
     \hypersetup{linkcolor=black}
     \tableofcontents
 }
@@ -70,6 +64,33 @@
 %##########################
 
 \section{Introducción}
+
+En el área de computación concurrente, uno de los desafíos principales es probar la correctitud de un programa concurrente.
+A diferencia de un programa secuencial donde para cada entrada se obtiene siempre la misma salida, en un programa concurrente
+la salida puede depender de cómo se intercalaron las instrucciones de los diferentes procesos o threads durante la ejecución.
+
+La correctitud de un programa concurrente se define entonces en términos de propiedades del cómputo realizado y no en términos del
+resultado obtenido. En la literatura se definen dos tipos de propiedades de correctitud\cite{ben-ari2006}\cite{coulouris2012}\cite{tanenbaum2017}:
+
+\begin{itemize}
+    \item Propiedades de \textit{safety}: Propiedades que se deben cumplir \textit{siempre}.
+    \item Propiedades de \textit{liveness}: Propiedades que se deben cumplir \textit{eventualmente}.
+\end{itemize}
+
+Dos de las propiedades de tipo \textit{safety} deseables en un programa concurrente son:
+
+\begin{itemize}
+    \item \textbf{Exclusión mutua}: dos procesos no deben acceder a recursos compartidos al mismo tiempo.
+    \item \textbf{Ausencia de \textit{deadlock}}: un sistema en ejecución debe poder continuar realizando su tarea, es decir, avanzar produciendo trabajo útil.
+\end{itemize}
+
+Usualmente se utilizan primitivas de sincronización tales como mutexes, semáforos, monitores y \textit{condition variables}
+para implementar el acceso coordinado de los procesos o hilos a los recursos compartidos. No obstante, el uso correcto de estas primitivas es difícil de lograr en la práctica.
+
+Los deadlocks son uno de los grandes problemas de los sistemas distribuidos.
+Su aparición puede dejar sistemas enteros fuera de uso y causar graves daños a personas y equipos.
+Numerosas teorías y métodos se han propuesto para prevenir los deadlocks.
+
 
 \subsection{Motivación}
 
@@ -81,7 +102,6 @@
 
 \section{Estado del arte / Literatura relacionada}
 
-Inicialmente este problema fue estudiado por~\cite{knuth2014art}.
 
 \bigskip
 
@@ -179,7 +199,7 @@ Cantidad de horas: [768-1000]
 
 %\clearpage
 
-\bibliographystyle{apalike}
-\bibliography{bibliografia.bib}
+\bibliographystyle{acm}
+\bibliography{bibliography.bib}
 
 \end{document}
