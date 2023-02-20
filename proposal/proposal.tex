@@ -57,6 +57,8 @@
 
 \section{Introducción}
 
+\subsection{El problema de la correctitud en programación concurrente}
+
 En el área de computación concurrente, uno de los desafíos principales es probar la correctitud de un programa concurrente.
 A diferencia de un programa secuencial donde para cada entrada se obtiene siempre la misma salida, en un programa concurrente
 la salida puede depender de cómo se intercalaron las instrucciones de los diferentes procesos o threads durante la ejecución.
@@ -77,17 +79,56 @@ Dos de las propiedades de tipo \textit{safety} deseables en un programa concurre
 \end{itemize}
 
 Usualmente se utilizan primitivas de sincronización tales como mutexes, semáforos, monitores y \textit{condition variables}
-para implementar el acceso coordinado de los procesos o hilos a los recursos compartidos. No obstante, el uso correcto de estas primitivas es difícil de lograr en la práctica.
+para implementar el acceso coordinado de los procesos o hilos a los recursos compartidos.
+No obstante, el uso correcto de estas primitivas es difícil de lograr en la práctica y se pueden introducir errores difíciles de detectar y corregir.
+Actualmente la mayoría de lenguajes de uso general, ya sean compilados o interpretados, no permiten detectar estos errores en todos los casos.
 
-Los deadlocks son uno de los grandes problemas de los sistemas distribuidos.
-Su aparición puede dejar sistemas enteros fuera de uso y causar graves daños a personas y equipos.
-Numerosas teorías y métodos se han propuesto para prevenir los deadlocks.
+Dada la creciente importancia de la programación concurrente debida a la proliferación de sistemas de hardware multihilo y multiproceso,
+reducir el número de \textit{bugs} ligados a la sincronización de los procesos o hilos es de vital importancia para la industria.
+Especialmente en programación de bajo nivel y sistemas de misión crítica, evitar los deadlocks es un requerimiento ineludible en el desarrollo.
 
 \subsection{Motivación}
+
+Uno de los lenguajes de programación modernos más prometedores para programación concurrente es Rust\cite{rust-website}.
+Su modelo de memoria basado en el concepto de \textit{ownership} y su rico sistema de tipos permite eliminar una amplia variedad de
+errores relacionados al manejo de memoria
+(\textit{double free}\cite{rust-book-ownership}, \textit{use-after-free}\cite{rust-book-ownership}, referencia colgante "\textit{dangling pointers}"\cite{rust-book-references}, entre otros)
+y errores relacionados a la programación concurrente
+(\textit{data races}\cite{rust-book-references}, pasaje de variables de tipo \textit{non-thread-safe} entre hilos\cite{rust-book-extensible-concurrency}, entre otros)
+en tiempo de compilación.
+
+La seguridad del código generado es una de los objetivos principales del lenguaje Rust.
+Por un lado la generación de código incluye una serie de mitigaciones a \textit{exploits} de diversos tipos\cite{rustc-mitigations}.
+Por otro lado, si bien la librería estándar no está exenta de errores\cite{davidoff2018},
+los procesos de gobierno open-source y transparentes basados en el modelo RFC (\textit{Requests for Comments})\cite{rust-rfcs} aseguran una mejora continua del lenguaje y su funcionalidad.
+
+
+
+
+En el presente trabajo nos proponemos estudiar la detección de \textit{deadlocks} y \textit{lost signals} en el lenguaje de programación Rust.
+Se utilizará un modelo teórico basado en Redes de Petri para encontrar los errores en el código fuente. Mediante una traducción del código fuente
+en tiempo de compilación, se obtendrá una red de Petri que luego podrá ser analizada métodos de verificación de modelos para garantizar la ausencia de \textit{deadlocks}.
+
+El trabajo contará con una primera implementación del traductor que podrá ser utilizado como \textit{plugin} del gestor de paquetes estándar de Rust \textit{cargo}\cite{cargo-website}.
+El objetivo es contribuir a la comunidad de Rust aportando una primera versión de esta herramienta que podría luego ser extendida para soportar casos más complejos.
+Se busca que el uso de la herramienta sea lo más sencillo y accesible posible para fomentar su uso y aplicación a proyectos reales de software.
+A largo plazo, se podría incorporar la herramienta al compilador como un pase adicional opcional en el proceso de compilación.
+Este pase verificaría que no se pueden producir deadlocks, lo que haría de Rust un lenguaje de programación aún más seguro y confiable.
 
 \bigskip
 
 \section{Estado del arte / Literatura relacionada}
+
+Existen varias herramientas de verificación automática en Rust.
+Una primera aproximación recomendable es el resumen producido por Alastair Reid, investigador en Intel.
+En ella se lista explícitamente que la mayoría de las herramientas formales de verificación no soportan concurrencia\cite{reid2021}.
+
+El intérprete \textit{Miri} desarrollado por el \textit{Rust project} en GitHub es un intérprete experimental para la representación intermedia del lenguaje Rust
+(\textit{mid-level intermediate representation}, conocida comúnmente por la sigla "MIR")
+que permite ejecutar binarios de proyectos de \textit{cargo} de forma granularizada, instrucción a instrucción, para verificar la ausencia de \textit{Undefined Behaviour} (UB) y otros
+errores en el manejo de la memoria.
+Detecta \textit{memory leaks}, accesos no alineados a memoria, \textit{data races} y violaciones de precondiciones o invariantes en código marcado como \textit{unsafe}.\cite{miri-website}
+
 
 \bigskip
 
