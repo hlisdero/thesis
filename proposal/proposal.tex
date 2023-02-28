@@ -85,57 +85,15 @@ Actualmente la mayoría de lenguajes de uso general, ya sean compilados o interp
 
 Dada la creciente importancia de la programación concurrente debida a la proliferación de sistemas de hardware multihilo y multiproceso,
 reducir el número de \textit{bugs} ligados a la sincronización de los procesos o hilos es de vital importancia para la industria.
-Especialmente en programación de bajo nivel y sistemas de misión crítica como vehículos autónomos o aeronaves,
-evitar los deadlocks es un requerimiento ineludible en el desarrollo.
-
-\subsection{El lenguaje de programación Rust}
-
-Uno de los lenguajes de programación modernos más prometedores para programación concurrente es Rust\cite{rust-website}.
-Su modelo de memoria basado en el concepto de \textit{ownership} y su expresivo sistema de tipos permite eliminar una amplia variedad de
-errores relacionados al manejo de memoria y a la programación concurrente en tiempo de compilación:
-
-\begin{itemize}
-    \item \textit{double free}\cite{rust-book-ownership}
-    \item \textit{use-after-free}\cite{rust-book-ownership}
-    \item referencia colgante "\textit{dangling pointers}"\cite{rust-book-references}
-    \item \textit{data races}\cite{rust-book-references}
-    \item pasaje de variables de tipo \textit{non-thread-safe} entre hilos\cite{rust-book-extensible-concurrency}
-\end{itemize}
-
-La importancia de estas ventajas para la industria no puede ser subestimada.
-Diversas investigaciones empíricas han llegado a la conclusión que 70\% de las vulnerabilidades
-encontradas en proyectos grandes en C/C++ ocurren debido a errores en el manejo de la memoria.
-Esta cifra elevada se puede observar en proyectos tales como Android\cite{memory-bugs-android},
-los componentes de Bluetooth y media de Android\cite{memory-bugs-android-media-bluetooth},
-Chrome\cite{memory-bugs-chrome}, el componente CSS de Firefox\cite{memory-bugs-firefox},
-iOS y macOS\cite{memory-bugs-ios-macos}, productos de Microsoft\cite{miller-security-microsoft2019}\cite{memory-bugs-microsoft}
-y Ubuntu\cite{memory-bugs-ubuntu}.
-
-En los últimos años, varios proyectos de gran importancia en el ambiente Open Source han decidido incorporar Rust
-a fin de reducir el número de bugs relacionados al manejo de la memoria.
-Entre ellos podemos nombrar al Android Open Source Project\cite{android-rust} y
-al kernel Linux que desde su versión 6.1 introduce soporte para programar componentes en Rust\cite{infoq-linux-6.1-rust}\cite{lwn-linux-6.1-rust}.
-Por otra parte, Meta aprueba y fomenta el uso de Rust como lenguaje para desarrollo \textit{server-side} desde el 2022\cite{meta-rust-server-side}.
-La popularidad del lenguaje Rust es innegable ya que Rust ha sido elegido durante 7 años consecutivos
-como el lenguaje de programación más querido por los programadores en la encuesta anual de Stack Overflow\cite{so-survey2022}.
-
-Cabe destacar que la generación de código en Rust incluye además una serie de mitigaciones a \textit{exploits} de diversos tipos\cite{rustc-mitigations}.
-Si bien la librería estándar no está exenta de errores\cite{davidoff2018},
-los procesos de gobierno open-source y transparentes basados en el modelo RFC (\textit{Requests for Comments})\cite{rust-rfcs}
-aseguran una mejora continua del lenguaje y su funcionalidad.
-El \textit{release cycle} del compilador oficial de Rust, \textit{rustc}, es sumamente veloz.
-Cada 6 semanas se publica una nueva versión estable del compilador\cite{rust-book-release-cycle}.
-Esto es posible gracias a un complejo sistema automatizado de tests que compila incluso todos los paquetes disponibles en \textit{crates.io}
-mediante un programa llamado \textit{crater} para verificar que
-la nueva versión del compilador no falla al compilar ni causa errores en los paquetes existentes\cite{albini2019}.
+Evitar los \textit{deadlocks} es un requerimiento ineludible en el desarrollo, especialmente en sistemas embebidos y sistemas de misión crítica como vehículos autónomos o aeronaves.
 
 \subsection{Motivación}
 
 En el presente trabajo nos proponemos estudiar la detección de \textit{deadlocks} y \textit{lost signals} en el lenguaje de programación Rust.
 Se utilizará un modelo teórico basado en Redes de Petri para encontrar los errores en el código fuente. Mediante una traducción del código fuente
-en tiempo de compilación, se obtendrá una red de Petri que luego podrá ser analizada métodos de verificación de modelos para garantizar la ausencia de \textit{deadlocks}.
+en tiempo de compilación, se obtendrá una red de Petri que luego podrá ser analizada mediante métodos de verificación de modelos para garantizar la ausencia de \textit{deadlocks}.
 
-El trabajo contará con una primera implementación del traductor que podrá ser utilizado como \textit{plugin} del gestor de paquetes estándar de Rust \textit{cargo}\cite{cargo-website}.
+El trabajo contará con una primera implementación del traductor que podrá ser utilizado como \textit{plugin} del gestor de paquetes estándar de Rust \textit{cargo} \cite{cargo-website}.
 El objetivo es contribuir a la comunidad de Rust aportando una primera versión de esta herramienta que podría luego ser extendida para soportar casos más complejos.
 Se busca que el uso de la herramienta sea lo más sencillo y accesible posible para fomentar su uso y aplicación a proyectos reales de software.
 A largo plazo, se podría incorporar la herramienta al compilador como un pase adicional opcional en el proceso de compilación.
@@ -145,16 +103,65 @@ Este pase verificaría que no se pueden producir deadlocks, lo que haría de Rus
 
 \section{Estado del arte / Literatura relacionada}
 
+\subsection{El lenguaje de programación Rust}
+
+Uno de los lenguajes de programación modernos más prometedores para programación concurrente es Rust \cite{rust-website}.
+Su modelo de memoria basado en el concepto de \textit{ownership} y su expresivo sistema de tipos permite eliminar una amplia variedad de
+errores relacionados al manejo de memoria y a la programación concurrente en tiempo de compilación:
+
+\begin{itemize}
+    \item \textit{double free} \cite{rust-book-ownership}
+    \item \textit{use-after-free} \cite{rust-book-ownership}
+    \item referencia colgante "\textit{dangling pointers}" \cite{rust-book-references}
+    \item \textit{data races} \cite{rust-book-references}
+    \item pasaje de variables de tipo \textit{non-thread-safe} entre hilos \cite{rust-book-extensible-concurrency}
+\end{itemize}
+
+La importancia de estas ventajas para la industria no puede ser subestimada.
+Diversas investigaciones empíricas han llegado a la conclusión que 70\% de las vulnerabilidades
+encontradas en proyectos grandes en C/C++ ocurren debido a errores en el manejo de la memoria.
+Esta cifra elevada se puede observar en proyectos tales como Android \cite{memory-bugs-android},
+los componentes de Bluetooth y media de Android \cite{memory-bugs-android-media-bluetooth},
+Chrome \cite{memory-bugs-chrome}, el componente CSS de Firefox \cite{memory-bugs-firefox},
+iOS y macOS \cite{memory-bugs-ios-macos}, productos de Microsoft \cite{miller-security-microsoft2019}\cite{memory-bugs-microsoft}
+y Ubuntu \cite{memory-bugs-ubuntu}.
+
+En los últimos años, varios proyectos de gran importancia en el ambiente Open Source han decidido incorporar Rust
+a fin de reducir el número de bugs relacionados al manejo de la memoria.
+Entre ellos podemos nombrar al Android Open Source Project \cite{android-rust} y
+al kernel Linux que desde su versión 6.1 introduce soporte para programar componentes en Rust \cite{infoq-linux-6.1-rust}\cite{lwn-linux-6.1-rust}.
+Por otra parte, Meta aprueba y fomenta el uso de Rust como lenguaje para desarrollo \textit{server-side} desde el 2022 \cite{meta-rust-server-side}.
+La popularidad del lenguaje Rust es innegable, ya que Rust ha sido elegido durante 7 años consecutivos
+como el lenguaje de programación más querido por los programadores en la encuesta anual de Stack Overflow \cite{so-survey2022}.
+
+Cabe destacar que la generación de código en Rust incluye además una serie de mitigaciones a \textit{exploits} de diversos tipos \cite{rustc-mitigations}.
+Si bien la librería estándar no está exenta de errores \cite{davidoff2018},
+los procesos de gobierno open-source y transparentes basados en el modelo RFC (\textit{Requests for Comments})\cite{rust-rfcs}
+aseguran una mejora continua del lenguaje y su funcionalidad.
+El \textit{release cycle} del compilador oficial de Rust, \textit{rustc}, es sumamente veloz.
+Cada 6 semanas se publica una nueva versión estable del compilador \cite{rust-book-release-cycle}.
+Esto es posible gracias a un complejo sistema automatizado de tests que compila incluso todos los paquetes disponibles en \textit{crates.io}
+mediante un programa llamado \textit{crater} para verificar que
+la nueva versión del compilador no falla al compilar ni causa errores en los tests de los paquetes existentes \cite{albini2019}.
+
+\subsection{Herramientas de verificación formal de código}
+
 Existen varias herramientas de verificación automática en Rust.
 Una primera aproximación recomendable es el resumen producido por Alastair Reid, investigador en Intel.
-En ella se lista explícitamente que la mayoría de las herramientas formales de verificación no soportan concurrencia\cite{reid2021}.
+En ella se lista explícitamente que la mayoría de las herramientas formales de verificación no soportan concurrencia \cite{reid2021}.
 
 El intérprete \textit{Miri} desarrollado por el \textit{Rust project} en GitHub es un intérprete experimental para la representación intermedia del lenguaje Rust
 (\textit{mid-level intermediate representation}, conocida comúnmente por la sigla "MIR")
 que permite ejecutar binarios de proyectos de \textit{cargo} de forma granularizada, instrucción a instrucción, para verificar la ausencia de \textit{Undefined Behaviour} (UB) y otros
 errores en el manejo de la memoria.
-Detecta \textit{memory leaks}, accesos no alineados a memoria, \textit{data races} y violaciones de precondiciones o invariantes en código marcado como \textit{unsafe}.\cite{miri-website}
+Detecta \textit{memory leaks}, accesos no alineados a memoria, \textit{data races} y violaciones de precondiciones o invariantes en código marcado como \textit{unsafe}. \cite{miri-website}
 
+Es conocido que en la actualidad las herramientas de verificación formal de software son utilizadas en unos pocos ámbitos muy específicos
+donde se requiere una demostración formal de correctitud del sistema. Usualmente se trata de sistemas de seguridad críticos.
+En \cite{reid:hatra:2020} se discute la importancia de acercar las herramientas de verificación a los desarrolladores
+a través de un enfoque que buscar maximizar la relación costo-beneficio de su uso.
+Se propone mejorar la usabilidad de las herramientas existentes e incorporar su uso a la rutina del desarrollador partiendo
+de la base que la verificación puede ser vista como un tipo diferente de test unitario o de integración.
 
 \bigskip
 
