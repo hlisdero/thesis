@@ -87,6 +87,21 @@ Dada la creciente importancia de la programación concurrente debida a la prolif
 reducir el número de \textit{bugs} ligados a la sincronización de los procesos o hilos es de vital importancia para la industria.
 Evitar los \textit{deadlocks} es un requerimiento ineludible en el desarrollo, especialmente en sistemas embebidos y sistemas de misión crítica como vehículos autónomos o aeronaves.
 
+\subsection{Redes de Petri}
+
+Las redes de Petri son una herramienta gráfica y matemática ampliamente utilizada para describir sistemas distribuidos \cite{murata1989}.
+Una red de Petri consiste en un grafo dirigido bipartito, el cual cuenta con dos tipos de nodos: lugares (\textit{places}) y transiciones (\textit{transitions}).
+Únicamente pueden existir arcos dirigidos entre un lugar y una transición o entre una transición y un lugar.
+A los lugares se les asignan marcas (\textit{tokens}) los cuales representan el estado actual del sistema o un recurso en particular.
+
+Las transiciones se disparan siguiendo la siguiente regla:
+\begin{itemize}
+    \item Se consume un \textit{token} de los lugares cuyos arcos entran a la transición
+    \item Se crea un token en cada lugar al cual llega un arco saliente de la transición
+\end{itemize}
+
+Las redes de Petri pueden ser vistas como una versión generalizada de las máquinas de estado.
+
 \subsection{Motivación}
 
 En el presente trabajo nos proponemos estudiar la detección de \textit{deadlocks} y \textit{lost signals} en el lenguaje de programación Rust.
@@ -125,6 +140,9 @@ los componentes de Bluetooth y media de Android \cite{memory-bugs-android-media-
 Chrome \cite{memory-bugs-chrome}, el componente CSS de Firefox \cite{memory-bugs-firefox},
 iOS y macOS \cite{memory-bugs-ios-macos}, productos de Microsoft \cite{miller-security-microsoft2019}\cite{memory-bugs-microsoft}
 y Ubuntu \cite{memory-bugs-ubuntu}.
+
+Numerosas herramientas se han dedicado a tratar de resolver estas vulnerabilidades causadas por el uso incorrecto de la memoria en \textit{codebases} ya establecidas.
+No obstante su utilización conlleva una notable pérdida de performance y no todas las vulnerabilidades se pueden prevenir.\cite{szekeres2013}
 
 En los últimos años, varios proyectos de gran importancia en el ambiente Open Source han decidido incorporar Rust
 a fin de reducir el número de bugs relacionados al manejo de la memoria.
