@@ -1,0 +1,41 @@
+digraph petrinet {
+    rankdir="LR";
+    PLACE_1_A [shape="circle" xlabel="PLACE 1" label=""];
+    PLACE_2_A [shape="circle" xlabel="PLACE 2" label=""];
+    PLACE_3_A [shape="circle" xlabel="PLACE 3" label=""];
+    PLACE_4_A [shape="circle" xlabel="PLACE 4" label="•"];
+    TRANSITION_1_A [shape="box" xlabel="" label="TRANSITION 1"];
+    TRANSITION_2_A [shape="box" xlabel="" label="TRANSITION 2"];
+    PLACE_1_A -> TRANSITION_1_A;
+    TRANSITION_1_A -> PLACE_2_A;
+    TRANSITION_1_A -> PLACE_3_A;
+    PLACE_2_A -> TRANSITION_2_A;
+    PLACE_3_A -> TRANSITION_2_A;
+    TRANSITION_2_A -> PLACE_4_A;
+    
+    PLACE_1_B [shape="circle" xlabel="PLACE 1" label=""];
+    PLACE_2_B [shape="circle" xlabel="PLACE 2" label="•"];
+    PLACE_3_B [shape="circle" xlabel="PLACE 3" label="•"];
+    PLACE_4_B [shape="circle" xlabel="PLACE 4" label=""];
+    TRANSITION_1_B [shape="box" xlabel="" label="TRANSITION 1"];
+    TRANSITION_2_B [shape="box" xlabel="" label="TRANSITION 2"];
+    PLACE_1_B -> TRANSITION_1_B;
+    TRANSITION_1_B -> PLACE_2_B;
+    TRANSITION_1_B -> PLACE_3_B;
+    PLACE_2_B -> TRANSITION_2_B;
+    PLACE_3_B -> TRANSITION_2_B;
+    TRANSITION_2_B -> PLACE_4_B;
+    
+    PLACE_1_C [shape="circle" xlabel="PLACE 1" label="•"];
+    PLACE_2_C [shape="circle" xlabel="PLACE 2" label=""];
+    PLACE_3_C [shape="circle" xlabel="PLACE 3" label=""];
+    PLACE_4_C [shape="circle" xlabel="PLACE 4" label=""];
+    TRANSITION_1_C [shape="box" xlabel="" label="TRANSITION 1"];
+    TRANSITION_2_C [shape="box" xlabel="" label="TRANSITION 2"];
+    PLACE_1_C -> TRANSITION_1_C;
+    TRANSITION_1_C -> PLACE_2_C;
+    TRANSITION_1_C -> PLACE_3_C;
+    PLACE_2_C -> TRANSITION_2_C;
+    PLACE_3_C -> TRANSITION_2_C;
+    TRANSITION_2_C -> PLACE_4_C;
+}

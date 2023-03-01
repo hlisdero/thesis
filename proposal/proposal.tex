@@ -13,6 +13,7 @@
 \usepackage[nolist]{acronym}
 \usepackage[table]{xcolor}
 \usepackage{url}
+\usepackage{float}
 
 % HYPERLINK CONFIGURATION %
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
@@ -26,7 +27,6 @@
 
 % GRAPHICS CONFIGURATION %
 \usepackage{graphicx}
-\DeclareGraphicsExtensions{.bmp,.png,.pdf,.jpg}
 \graphicspath{{images/}}
 
 \begin{document}
@@ -94,11 +94,23 @@ Una red de Petri consiste en un grafo dirigido bipartito, el cual cuenta con dos
 Únicamente pueden existir arcos dirigidos entre un lugar y una transición o entre una transición y un lugar.
 A los lugares se les asignan marcas (\textit{tokens}) los cuales representan el estado actual del sistema o un recurso en particular.
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{petri-net-example.png}
+    \caption{Ejemplo de una red de Petri. \texttt{PLACE 1} contiene un \textit{token}.}
+\end{figure}
+
 Las transiciones se disparan siguiendo la siguiente regla:
 \begin{itemize}
-    \item Se consume un \textit{token} de los lugares cuyos arcos entran a la transición
-    \item Se crea un token en cada lugar al cual llega un arco saliente de la transición
+    \item Se consume un \textit{token} de los lugares cuyos arcos entran a la transición.
+    \item Se crea un token en cada lugar al cual llega un arco saliente de la transición.
 \end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{petri-net-transition-firing-example.png}
+    \caption{Ejemplo de disparo de dos transiciones en una red de Petri. Primero se dispara la transición 1 y luego la transición 2.}
+\end{figure}
 
 Las redes de Petri pueden ser vistas como una versión generalizada de las máquinas de estado.
 
