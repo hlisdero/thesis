@@ -90,6 +90,7 @@ Evitar los \textit{deadlocks} es un requerimiento ineludible en el desarrollo, e
 \subsection{Redes de Petri}
 
 Las redes de Petri son una herramienta gráfica y matemática ampliamente utilizada para describir sistemas distribuidos \cite{murata1989}.
+Fueron introducidas por el investigador alemán Carl Adam Petri en su tesis de doctorado en 1962 \cite{petri1962}.
 Una red de Petri consiste en un grafo dirigido bipartito, el cual cuenta con dos tipos de nodos: lugares (\textit{places}) y transiciones (\textit{transitions}).
 Únicamente pueden existir arcos dirigidos entre un lugar y una transición o entre una transición y un lugar.
 A los lugares se les asignan marcas (\textit{tokens}) los cuales representan el estado actual del sistema o un recurso en particular.
@@ -112,7 +113,7 @@ Las transiciones se disparan siguiendo la siguiente regla:
     \caption{Ejemplo de disparo de transiciones. Primero se dispara la transición 1 y luego la transición 2.}
 \end{figure}
 
-Las redes de Petri pueden ser vistas como una versión generalizada de las máquinas de estado.
+Las redes de Petri pueden ser vistas como una versión generalizada de las máquinas de estado que permite modelar la concurrencia y el paralelismo.
 
 \subsection{Motivación}
 
@@ -192,6 +193,20 @@ En \cite{reid:hatra:2020} se discute la importancia de acercar las herramientas 
 a través de un enfoque que buscar maximizar la relación costo-beneficio de su uso.
 Se propone mejorar la usabilidad de las herramientas existentes e incorporar su uso a la rutina del desarrollador partiendo
 de la base que la verificación puede ser vista como un tipo diferente de test unitario o de integración.
+
+\subsection{Detección de \textit{deadlocks}}
+
+En \cite{kavi-moshtaghi2002} se describe una traducción de algunas de las primitivas
+de sincronización de la librería POSIX de threads (\texttt{pthread}) en C a redes de Petri.
+En particular se modela:
+
+\begin{itemize}
+    \item La creación de threads con la función \texttt{pthread\_create} y el manejo de la variable de tipo \texttt{pthread\_t}.
+    \item La operación de \textit{thread join} con la función \texttt{pthread\_join}.
+    \item La operación de adquisición del lock de un mutex (\texttt{pthread\_mutex\_lock}) y su posterior desbloqueo (\texttt{pthread\_mutex\_unlock}).
+    \item Las funciones \texttt{pthread\_cond\_wait} y \texttt{pthread\_cond\_signal} para manejo de \textit{condition variables}.
+\end{itemize}
+
 
 \bigskip
 
