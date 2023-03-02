@@ -64,7 +64,7 @@ A diferencia de un programa secuencial donde para cada entrada se obtiene siempr
 la salida puede depender de cómo se intercalaron las instrucciones de los diferentes procesos o threads durante la ejecución.
 
 La correctitud de un programa concurrente se define entonces en términos de propiedades del cómputo realizado y no en términos del
-resultado obtenido. En la literatura \cite{ben-ari2006, coulouris2012, tanenbaum2017} se definen dos tipos de propiedades de correctitud:
+resultado obtenido. En la bibliografía \cite{ben-ari2006, coulouris2012, tanenbaum2017} se definen dos tipos de propiedades de correctitud:
 
 \begin{itemize}
     \item Propiedades de \textit{safety}: Propiedades que se deben cumplir \textit{siempre}.
@@ -213,43 +213,27 @@ En particular se modela:
 
 \section{Objetivos}
 
-El objetivo general del trabajo es ...
+El objetivo general del trabajo consiste en estudiar la posibilidad de extender el compilador de Rust
+para detectar deadlocks en tiempo de compilación debidos a un uso incorrecto de mutexes
+y señales perdidas debidas a un uso incorrecto de \textit{condition variables}.
 
 Los objetivos particulares son:
 
 \begin{enumerate}
-    \item 1
-    \item 2
-    \item 3
+    \item 1 Diseñar un sistema de traducción del código Rust a una red de Petri.
+    \item 2 Conectar la salida del sistema con un \textit{model checker} para verificar la ausencia de \textit{deadlocks} y \textit{lost signals}.
+    \item 3 Integrar la herramienta al ecosistema Rust, haciendo su uso lo más simple posible para el usuario.
           \begin{enumerate}
-              \item 3.1
-              \item 3.2
+              \item 3.1 Implementar un plugin para el gestor de paquetes \textit{cargo} y publicarlo.
+              \item 3.2 Documentar la herramienta y sus limitaciones.
           \end{enumerate}
 \end{enumerate}
 
 \bigskip
 
-\section{Metodologías propuestas}
-
-\bigskip
-
-\section{Conjuntos de datos (dependiendo del área de la tesis)}
-
-\bigskip
-
-\section{Recursos informáticos (opcional)}
-
-\subsection{Hardware}
-
-\subsection{Software}
-
-\subsubsection{Otras herramientas}
-
-\bigskip
-
 \section{Cronograma de trabajo}
 
-Cantidad de horas: [768-1000]
+Se establece el siguiente cronograma estimativo para el desarrollo de la tesis:
 
 \bigskip
 
@@ -258,17 +242,17 @@ Cantidad de horas: [768-1000]
     \begin{tabular}{ |l|c|c|c|c|c|c|c|c|c|c|c|c| }
 
         \hline
-        \multirow{2}{1em}{Tareas} & \multicolumn{12}{|c|}{Meses}                                                                                                                                                                      \\  \cline{2-13} &
-        1                         & 2                            & 3                & 4                & 5                & 6                & 7                & 8 & 9 & 10 & 11               & 12                                  \\  \hline
-        Tarea A                   & \cellcolor{gray}             & \cellcolor{gray} &                  &                  &                  &                  &   &   &    &                  &                  &                  \\
+        \multirow{2}{1em}{Tareas}                         & \multicolumn{9}{|c|}{Meses}                                                                                                                                                         \\  \cline{2-10} &
+        1                                                 & 2                           & 3                & 4                & 5                & 6                & 7                & 8                & 9                                   \\  \hline
+        Lectura de bibliografía                           & \cellcolor{gray}            & \cellcolor{gray} &                  &                  &                  &                  &                  &                  &                  \\
         \hline
-        Tarea B                   &                              & \cellcolor{gray} & \cellcolor{gray} &                  &                  &                  &   &   &    &                  &                  &                  \\
+        Diseño del sistema                                &                             & \cellcolor{gray} & \cellcolor{gray} &                  &                  &                  &                  &                  &                  \\
         \hline
-        Tarea C                   &                              & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} &   &   &    &                  &                  &                  \\
+        Implementación de la biblioteca de Redes de Petri &                             & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} &                  &                  &                  &                  &                  \\
         \hline
-        Tarea D                   &                              &                  &                  &                  &                  &                  &   &   &    &                  &                  &                  \\
+        Implementación de la traducción                   &                             &                  &                  & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} &                  &                  \\
         \hline
-        Tarea E                   &                              &                  &                  &                  &                  &                  &   &   &    & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} \\
+        Redacción del manuscrito                          &                             &                  &                  &                  &                  & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} \\
         \hline
     \end{tabular}
 \end{center}
