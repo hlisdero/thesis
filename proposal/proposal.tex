@@ -139,11 +139,11 @@ Su modelo de memoria basado en el concepto de \textit{ownership} y su expresivo 
 errores relacionados al manejo de memoria y a la programación concurrente en tiempo de compilación:
 
 \begin{itemize}
-    \item \textit{double free} \cite{rust-book-ownership}
-    \item \textit{use-after-free} \cite{rust-book-ownership}
-    \item referencia colgante "\textit{dangling pointers}" \cite{rust-book-references}
-    \item \textit{data races} \cite{rust-book-references}
-    \item pasaje de variables de tipo \textit{non-thread-safe} entre hilos \cite{rust-book-extensible-concurrency}
+    \item \textit{double free} \cite[Cap. 4.1]{rust-book}
+    \item \textit{use-after-free} \cite[Cap. 4.1]{rust-book}
+    \item referencia colgante "\textit{dangling pointers}" \cite[Cap. 4.2]{rust-book}
+    \item \textit{data races} \cite[Cap. 4.2]{rust-book}
+    \item pasaje de variables de tipo \textit{non-thread-safe} entre hilos \cite[Cap. 16.4]{rust-book}
 \end{itemize}
 
 La importancia de estas ventajas para la industria no puede ser subestimada.
@@ -171,7 +171,7 @@ Si bien la librería estándar no está exenta de errores \cite{davidoff2018},
 los procesos de gobierno open-source y transparentes basados en el modelo RFC (\textit{Requests for Comments}) \cite{rust-rfcs}
 aseguran una mejora continua del lenguaje y su funcionalidad.
 El \textit{release cycle} del compilador oficial de Rust, \textit{rustc}, es sumamente veloz.
-Cada 6 semanas se publica una nueva versión estable del compilador \cite{rust-book-release-cycle}.
+Cada 6 semanas se publica una nueva versión estable del compilador \cite[Appendix G]{rust-book}.
 Esto es posible gracias a un complejo sistema automatizado de tests que compila incluso todos los paquetes disponibles en \textit{crates.io}
 mediante un programa llamado \textit{crater} para verificar que
 la nueva versión del compilador no falla al compilar ni causa errores en los tests de los paquetes existentes \cite{albini2019}.
