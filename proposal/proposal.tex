@@ -90,7 +90,7 @@ Evitar los \textit{deadlocks} es un requerimiento ineludible en el desarrollo, e
 \subsection{Redes de Petri}
 
 Las redes de Petri son una herramienta gráfica y matemática ampliamente utilizada para describir sistemas distribuidos \cite{murata1989}.
-Fueron introducidas por el investigador alemán Carl Adam Petri en su tesis de doctorado en 1962 \cite{petri1962}.
+Fueron introducidas por el investigador alemán Carl Adam Petri en su tesis de doctorado \cite{petri1962}.
 Una red de Petri consiste en un grafo dirigido bipartito, el cual cuenta con dos tipos de nodos: lugares (\textit{places}) y transiciones (\textit{transitions}).
 Únicamente pueden existir arcos dirigidos entre un lugar y una transición o entre una transición y un lugar.
 A los lugares se les asignan marcas (\textit{tokens}) los cuales representan el estado actual del sistema o un recurso en particular.
@@ -121,7 +121,8 @@ En el presente trabajo nos proponemos estudiar la detección de \textit{deadlock
 Se utilizará un modelo teórico basado en Redes de Petri para encontrar los errores en el código fuente. Mediante una traducción del código fuente
 en tiempo de compilación, se obtendrá una red de Petri que luego podrá ser analizada mediante métodos de verificación de modelos para garantizar la ausencia de \textit{deadlocks}.
 
-El trabajo contará con una primera implementación del traductor que podrá ser utilizado como \textit{plugin} del gestor de paquetes estándar de Rust \textit{cargo} \cite{cargo-website}.
+El trabajo contará con una primera implementación del traductor que podrá ser utilizado como \textit{plugin}
+del gestor de paquetes estándar de Rust \textit{cargo} \cite{cargo-website}.
 El objetivo es contribuir a la comunidad de Rust aportando una primera versión de esta herramienta que podría luego ser extendida para soportar casos más complejos.
 Se busca que el uso de la herramienta sea lo más sencillo y accesible posible para fomentar su uso y aplicación a proyectos reales de software.
 A largo plazo, se podría incorporar la herramienta al compilador como un pase adicional opcional en el proceso de compilación.
@@ -151,23 +152,23 @@ encontradas en proyectos grandes en C/C++ ocurren debido a errores en el manejo 
 Esta cifra elevada se puede observar en proyectos tales como Android \cite{memory-bugs-android},
 los componentes de Bluetooth y media de Android \cite{memory-bugs-android-media-bluetooth},
 Chrome \cite{memory-bugs-chrome}, el componente CSS de Firefox \cite{memory-bugs-firefox},
-iOS y macOS \cite{memory-bugs-ios-macos}, productos de Microsoft \cite{miller-security-microsoft2019}\cite{memory-bugs-microsoft}
+iOS y macOS \cite{memory-bugs-ios-macos}, productos de Microsoft \cite{miller-security-microsoft2019, memory-bugs-microsoft}
 y Ubuntu \cite{memory-bugs-ubuntu}.
 
 Numerosas herramientas se han dedicado a tratar de resolver estas vulnerabilidades causadas por el uso incorrecto de la memoria en \textit{codebases} ya establecidas.
-No obstante su utilización conlleva una notable pérdida de performance y no todas las vulnerabilidades se pueden prevenir.\cite{szekeres2013}
+No obstante su utilización conlleva una notable pérdida de performance y no todas las vulnerabilidades se pueden prevenir \cite{szekeres2013}.
 
 En los últimos años, varios proyectos de gran importancia en el ambiente Open Source han decidido incorporar Rust
 a fin de reducir el número de bugs relacionados al manejo de la memoria.
 Entre ellos podemos nombrar al Android Open Source Project \cite{android-rust} y
-al kernel Linux que desde su versión 6.1 introduce soporte para programar componentes en Rust \cite{infoq-linux-6.1-rust}\cite{lwn-linux-6.1-rust}.
+al kernel Linux que desde su versión 6.1 introduce soporte para programar componentes en Rust \cite{infoq-linux-6.1-rust, lwn-linux-6.1-rust}.
 Por otra parte, Meta aprueba y fomenta el uso de Rust como lenguaje para desarrollo \textit{server-side} desde el 2022 \cite{meta-rust-server-side}.
 La popularidad del lenguaje Rust es innegable, ya que Rust ha sido elegido durante 7 años consecutivos
 como el lenguaje de programación más querido por los programadores en la encuesta anual de Stack Overflow \cite{so-survey2022}.
 
 Cabe destacar que la generación de código en Rust incluye además una serie de mitigaciones a \textit{exploits} de diversos tipos \cite{rustc-mitigations}.
 Si bien la librería estándar no está exenta de errores \cite{davidoff2018},
-los procesos de gobierno open-source y transparentes basados en el modelo RFC (\textit{Requests for Comments})\cite{rust-rfcs}
+los procesos de gobierno open-source y transparentes basados en el modelo RFC (\textit{Requests for Comments}) \cite{rust-rfcs}
 aseguran una mejora continua del lenguaje y su funcionalidad.
 El \textit{release cycle} del compilador oficial de Rust, \textit{rustc}, es sumamente veloz.
 Cada 6 semanas se publica una nueva versión estable del compilador \cite{rust-book-release-cycle}.
@@ -185,7 +186,7 @@ El intérprete \textit{Miri} desarrollado por el \textit{Rust project} en GitHub
 (\textit{mid-level intermediate representation}, conocida comúnmente por la sigla "MIR")
 que permite ejecutar binarios de proyectos de \textit{cargo} de forma granularizada, instrucción a instrucción, para verificar la ausencia de \textit{Undefined Behaviour} (UB) y otros
 errores en el manejo de la memoria.
-Detecta \textit{memory leaks}, accesos no alineados a memoria, \textit{data races} y violaciones de precondiciones o invariantes en código marcado como \textit{unsafe}. \cite{miri-website}
+Detecta \textit{memory leaks}, accesos no alineados a memoria, \textit{data races} y violaciones de precondiciones o invariantes en código marcado como \textit{unsafe} \cite{miri-website}.
 
 Es conocido que en la actualidad las herramientas de verificación formal de software son utilizadas en unos pocos ámbitos muy específicos
 donde se requiere una demostración formal de correctitud del sistema. Usualmente se trata de sistemas de seguridad críticos.
@@ -196,7 +197,7 @@ de la base que la verificación puede ser vista como un tipo diferente de test u
 
 \subsection{Detección de \textit{deadlocks}}
 
-En \cite{kavi-moshtaghi2002} se describe una traducción de algunas de las primitivas
+En \cite{kavi-moshtaghi2002} y \cite{moshtaghi2001} se describe una traducción de algunas de las primitivas
 de sincronización de la librería POSIX de threads (\texttt{pthread}) en C a redes de Petri.
 En particular se modela:
 
