@@ -119,8 +119,8 @@ Las transiciones se disparan siguiendo la siguiente regla:
 Las redes de Petri pueden ser vistas como una versión generalizada de las máquinas de estado que permite modelar la concurrencia y el paralelismo.
 Su uso como método formal de validación de software está establecido desde finales de los años 1980 y
 existen redes de Petri que permiten modelar primitivas de sincronización como enviar un mensaje o esperar a la recepción de un mensaje \cite{heiner1998}.
-Se pueden utilizar también para validar requerimientos de software expresados mediante casos de uso \cite{silva-dossantos2004}
-o para modelar procesos industriales \cite{aalst1994}.
+Se pueden utilizar también para validar requerimientos de software expresados mediante casos de uso \cite{silva-dossantos2004},
+para modelar procesos industriales \cite{aalst1994} o para especificar y analizar sistemas de tiempo real \cite{kavi2011}.
 
 Existen varias técnicas que permiten encontrar \textit{deadlocks} en una red de Petri.
 Mediante un análisis de alcance \cite{murata1989}, se construye un grafo dirigido
@@ -145,6 +145,7 @@ Es, dicho de una forma burda, una estrategia del tipo "divide y vencerás" que v
 en partes de la red para luego ir construyendo la verificación del todo final agregando partes a la red pequeña inicial.
 
 \subsection{Motivación}
+\label{motivation}
 
 En el presente trabajo nos proponemos estudiar la detección de \textit{deadlocks} y \textit{lost signals} en el lenguaje de programación Rust.
 Se utilizará un modelo teórico basado en Redes de Petri para encontrar los errores en el código fuente. Mediante una traducción del código fuente
@@ -157,6 +158,20 @@ del gestor de paquetes estándar de Rust \textit{cargo} \cite{cargo-website}.
 
 A largo plazo se podría incorporar la herramienta al compilador como un pase adicional opcional en el proceso de compilación.
 Este pase verificaría que no se pueden producir ciertas clases de \textit{deadlocks}, lo que haría de Rust un lenguaje de programación aún más seguro y confiable.
+
+Con el propósito de que el trabajo pueda ser leído por el mayor número de personas posible y
+que forme parte de la documentación de los respectivos repositorios de código publicados en \textit{GitHub},
+resulta imprescindible redactar el manuscrito en idioma inglés.
+
+Por otra parte, nos proponemos implementar una funcionalidad de exportado de la red de Petri obtenida a partir del código fuente
+a formatos estandarizados a fin de facilitar la interoperabilidad con otras herramientas de verificación de modelos y visualización de redes de Petri.
+Como parte de la investigación previa se encontró que dos formatos son particularmente relevantes en este sentido:
+
+\begin{itemize}
+    \item DOT: un lenguaje de visualización de gráficos de código abierto, parte de la suite Graphviz \cite{dot2015}.
+    \item Petri Net Markup Language (PNML): un lenguaje estandarizado para redes de Petri basado en XML \cite{pnml2000}.
+          Es parte del estándar ISO/IEC 15909-1:2019 que resultó de un trabajo arduo de muchos años para unificar la notación \cite{hillah:hal-01176335}.
+\end{itemize}
 
 \bigskip
 
@@ -225,7 +240,19 @@ a través de un enfoque que buscar maximizar la relación costo-beneficio de su 
 Se propone mejorar la usabilidad de las herramientas existentes e incorporar su uso a la rutina del desarrollador partiendo
 de la base que la verificación puede ser vista como un tipo diferente de test unitario o de integración.
 
+En \cite{toman2015} se introduce un verificador formal para Rust que no requiere modificaciones en el código fuente sobre el que se lo aplica y
+se lo ejecuta sobre módulos de la librería estándar de Rust.
+Como resultado se detectaron errores en el uso de la memoria en código \textit{unsafe}
+que tardaron meses en ser descubiertos de forma manual por el equipo de desarrollo.
+
 \subsection{Detección de \textit{deadlocks}}
+
+La detección de \textit{deadlocks} es una de las estrategias clásicas para abordar este problema crucial en sistemas distribuidos.
+Las estrategias restantes (\textit{deadlock avoidance} y \textit{deadlock prevention}) y algunos algoritmos se describen brevemente en \cite{singhal1989}.
+El problema principal con el enfoque de detectar los deadlocks antes de su aparición es probar que
+se detecta el tipo de \textit{deadlock} deseado en todos los casos y que no se producen falsos negativos en el proceso.
+El enfoque basado en redes de Petri, tratándose de un método formal, satisface estas condiciones.
+No obstante la dificultad de adopción radica mayoritariamente en la practicabilidad de la solución debido al gran número de estados posibles en un proyecto de software real.
 
 En \cite{kavi-moshtaghi2002} y \cite{moshtaghi2001} se describe una traducción de algunas de las primitivas
 de sincronización de la librería POSIX de threads (\texttt{pthread}) en C a redes de Petri.
@@ -237,6 +264,16 @@ En particular se modela:
     \item La operación de adquisición del lock de un mutex (\texttt{pthread\_mutex\_lock}) y su posterior desbloqueo (\texttt{pthread\_mutex\_unlock}).
     \item Las funciones \texttt{pthread\_cond\_wait} y \texttt{pthread\_cond\_signal} para manejo de \textit{condition variables}.
 \end{itemize}
+
+En \cite{karatkevich-grobelna2014} se propone un método para reducir el número de estados explorados
+durante la detección de \textit{deadlocks} mediante el análisis de alcance.
+Estas heurísticas ayudan a mejorar la performance del enfoque basado en redes de Petri.
+
+En su tesis de máster, \cite{meyer2020} establece las bases para una semántica de redes de Petri para el lenguaje de programación Rust.
+Se concentra no obstante en código con solo un hilo, limitándose a la detección de deadlocks causados
+por ejecutar la operación de \textit{lock} dos veces sobre el mismo mutex en el hilo principal.
+Asimismo, el código disponible como parte del trabajo ya no es válido para la nueva versión del compilador \textit{rustc},
+ya que el funcionamiento interno del compilador cambió significativamente en los últimos dos años.
 
 \subsection{Bibliotecas de redes de Petri disponibles en Rust}
 \label{petri-net-libs}
@@ -252,12 +289,14 @@ y señales perdidas debidas a un uso incorrecto de \textit{condition variables}.
 Los objetivos particulares son:
 
 \begin{enumerate}
-    \item 1 Diseñar un sistema de traducción del código Rust a una red de Petri.
+    \item 1 Diseñar e implementar un sistema de traducción del código Rust a una red de Petri.
     \item 2 Conectar la salida del sistema con un \textit{model checker} para verificar la ausencia de \textit{deadlocks} y \textit{lost signals}.
+          Se utilizarán entre otros los formatos de exportado especificados en \ref{motivation}.
     \item 3 Integrar la herramienta al ecosistema Rust, haciendo su uso lo más simple posible para el usuario.
           \begin{enumerate}
               \item 3.1 Implementar un plugin para el gestor de paquetes \textit{cargo} y publicarlo.
               \item 3.2 Documentar la herramienta y sus limitaciones.
+                    Esto incluye el manuscrito, el cual será redactado en inglés como se enunció en \ref{motivation}.
           \end{enumerate}
 \end{enumerate}
 
