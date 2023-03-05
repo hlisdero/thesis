@@ -14,6 +14,7 @@
 \usepackage[table]{xcolor}
 \usepackage{url}
 \usepackage{float}
+\usepackage{parskip}
 
 % HYPERLINK CONFIGURATION %
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
@@ -89,8 +90,10 @@ Evitar los \textit{deadlocks} es un requerimiento ineludible en el desarrollo, e
 
 \subsection{Redes de Petri}
 
-Las redes de Petri son una herramienta gráfica y matemática ampliamente utilizada para describir sistemas distribuidos \cite{murata1989}.
-Fueron introducidas por el investigador alemán Carl Adam Petri en su tesis de doctorado \cite{petri1962}.
+Las redes de Petri son una herramienta gráfica y matemática ampliamente utilizada para describir sistemas distribuidos,
+introducidas por el investigador alemán Carl Adam Petri en su tesis de doctorado \cite{petri1962}.
+Un resumen conciso de la teoría de redes de Petri, sus propiedades, análisis y aplicaciones se encuentra en \cite{murata1989}.
+
 Una red de Petri consiste en un grafo dirigido bipartito, el cual cuenta con dos tipos de nodos: lugares (\textit{places}) y transiciones (\textit{transitions}).
 Únicamente pueden existir arcos dirigidos entre un lugar y una transición o entre una transición y un lugar.
 A los lugares se les asignan marcas (\textit{tokens}) los cuales representan el estado actual del sistema o un recurso en particular.
@@ -114,6 +117,32 @@ Las transiciones se disparan siguiendo la siguiente regla:
 \end{figure}
 
 Las redes de Petri pueden ser vistas como una versión generalizada de las máquinas de estado que permite modelar la concurrencia y el paralelismo.
+Su uso como método formal de validación de software está establecido desde finales de los años 1980 y
+existen redes de Petri que permiten modelar primitivas de sincronización como enviar un mensaje o esperar a la recepción de un mensaje \cite{heiner1998}.
+Se pueden utilizar también para validar requerimientos de software expresados mediante casos de uso \cite{silva-dossantos2004}
+o para modelar procesos industriales \cite{aalst1994}.
+
+Existen varias técnicas que permiten encontrar \textit{deadlocks} en una red de Petri.
+Mediante un análisis de alcance \cite{murata1989}, se construye un grafo dirigido
+que representa los estados posibles que la red de Petri puede alcanzar durante su ejecución.
+En este grafo cada nodo representa un estado posible de la red y cada arista representa una transición que permite pasar de un estado al otro.
+Se puede demostrar matemáticamente que la existencia de un nodo sin aristas salientes implica la existencia de un \textit{deadlock} en la red de Petri.
+
+La desventaja de este análisis es su elevado costo computacional, el cual crece de forma exponencial
+con la cantidad de nodos de la red de Petri cuando no se puede hacer uso de hipótesis adicionales.
+La complejidad computacional del llamado \textit{reachability problem} es de hecho NP-completo para ciertas clases de redes de Petri.
+Sin embargo, existen clases de redes para las cuales la complejidad es menor, incluso polinomial.
+En \cite{esparza1994} se detallan los resultados teóricos más importantes obtenidos hasta 1998.
+
+Además existen métodos alternativos para detección de \textit{deadlocks}
+como el método basado en sifones (una estructura específica que ocurre en muchas redes de Petri) \cite{hu2011} y
+el método basado en jerarquías de abstracción \cite{kungas2005}.
+En particular, \cite{kungas2005} propone un método muy prometedor de orden polinomial para evitar el problema
+de la explosión de estados que subyace al algoritmo \textit{naïve} de detección de \textit{deadlocks}.
+A través de un algoritmo que abstrae una red de Petri dada a una representación más simple,
+se obtiene una jerarquía de redes de tamaño creciente para las cuales la verificación de ausencia de \textit{deadlocks} resulta sustancialmente más rápida.
+Es, dicho de una forma burda, una estrategia del tipo "divide y vencerás" que verifica la ausencia de \textit{deadlocks}
+en partes de la red para luego ir construyendo la verificación del todo final agregando partes a la red pequeña inicial.
 
 \subsection{Motivación}
 
@@ -121,12 +150,13 @@ En el presente trabajo nos proponemos estudiar la detección de \textit{deadlock
 Se utilizará un modelo teórico basado en Redes de Petri para encontrar los errores en el código fuente. Mediante una traducción del código fuente
 en tiempo de compilación, se obtendrá una red de Petri que luego podrá ser analizada mediante métodos de verificación de modelos para garantizar la ausencia de \textit{deadlocks}.
 
-El trabajo contará con una primera implementación del traductor que podrá ser utilizado como \textit{plugin}
-del gestor de paquetes estándar de Rust \textit{cargo} \cite{cargo-website}.
 El objetivo es contribuir a la comunidad de Rust aportando una primera versión de esta herramienta que podría luego ser extendida para soportar casos más complejos.
 Se busca que el uso de la herramienta sea lo más sencillo y accesible posible para fomentar su uso y aplicación a proyectos reales de software.
-A largo plazo, se podría incorporar la herramienta al compilador como un pase adicional opcional en el proceso de compilación.
-Este pase verificaría que no se pueden producir deadlocks, lo que haría de Rust un lenguaje de programación aún más seguro y confiable.
+Por esta razón la tesis contará con una primera implementación del traductor que podrá ser utilizado como \textit{plugin}
+del gestor de paquetes estándar de Rust \textit{cargo} \cite{cargo-website}.
+
+A largo plazo se podría incorporar la herramienta al compilador como un pase adicional opcional en el proceso de compilación.
+Este pase verificaría que no se pueden producir ciertas clases de \textit{deadlocks}, lo que haría de Rust un lenguaje de programación aún más seguro y confiable.
 
 \bigskip
 
@@ -150,7 +180,7 @@ La importancia de estas ventajas para la industria no puede ser subestimada.
 Diversas investigaciones empíricas han llegado a la conclusión que 70\% de las vulnerabilidades
 encontradas en proyectos grandes en C/C++ ocurren debido a errores en el manejo de la memoria.
 Esta cifra elevada se puede observar en proyectos tales como Android \cite{memory-bugs-android},
-los componentes de Bluetooth y media de Android \cite{memory-bugs-android-media-bluetooth},
+los componentes Bluetooth y media de Android \cite{memory-bugs-android-media-bluetooth},
 Chrome \cite{memory-bugs-chrome}, el componente CSS de Firefox \cite{memory-bugs-firefox},
 iOS y macOS \cite{memory-bugs-ios-macos}, productos de Microsoft \cite{miller-security-microsoft2019, memory-bugs-microsoft}
 y Ubuntu \cite{memory-bugs-ubuntu}.
@@ -170,7 +200,7 @@ Cabe destacar que la generación de código en Rust incluye además una serie de
 Si bien la librería estándar no está exenta de errores \cite{davidoff2018},
 los procesos de gobierno open-source y transparentes basados en el modelo RFC (\textit{Requests for Comments}) \cite{rust-rfcs}
 aseguran una mejora continua del lenguaje y su funcionalidad.
-El \textit{release cycle} del compilador oficial de Rust, \textit{rustc}, es sumamente veloz.
+El \textit{release cycle} del compilador oficial de Rust, \textit{rustc}, es por otra parte sumamente veloz.
 Cada 6 semanas se publica una nueva versión estable del compilador \cite[Appendix G]{rust-book}.
 Esto es posible gracias a un complejo sistema automatizado de tests que compila incluso todos los paquetes disponibles en \textit{crates.io}
 mediante un programa llamado \textit{crater} para verificar que
@@ -215,8 +245,8 @@ En particular se modela:
 
 \section{Objetivos}
 
-El objetivo general del trabajo consiste en estudiar la posibilidad de extender el compilador de Rust
-para detectar deadlocks en tiempo de compilación debidos a un uso incorrecto de mutexes
+El objetivo general de la tesis consiste en estudiar la posibilidad de extender el compilador de Rust
+para detectar \textit{deadlocks} en tiempo de compilación debidos a un uso incorrecto de mutexes
 y señales perdidas debidas a un uso incorrecto de \textit{condition variables}.
 
 Los objetivos particulares son:
@@ -250,7 +280,7 @@ Se establece el siguiente cronograma estimativo para el desarrollo de la tesis:
         \hline
         Diseño del sistema                                &                             & \cellcolor{gray} & \cellcolor{gray} &                  &                  &                  &                  &                  &                  \\
         \hline
-        Implementación de la biblioteca de Redes de Petri &                             & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} &                  &                  &                  &                  &                  \\
+        Implementación de la biblioteca de redes de Petri &                             & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} &                  &                  &                  &                  &                  \\
         \hline
         Desarrollo                                        &                             &                  &                  & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} &                  &                  \\
         \hline
@@ -264,7 +294,7 @@ La carga de trabajo estimada total es de alrededor de 900 horas.
 \begin{itemize}
     \item Lectura de bibliografía [130 horas]: Lectura de publicaciones científicas, libros de texto, artículos y documentación de herramientas existentes.
     \item Diseño del sistema [80 horas]: Familiarizarse con la arquitectura del compilador de Rust. Lectura de la documentación pertinente. Diseño de una solución extensible y confiable.
-    \item Implementación de la biblioteca de Redes de Petri [140 hs]: Considerando lo mencionado en \ref{petri-net-libs}, implementación de una biblioteca acorde a las necesidades de la solución.
+    \item Implementación de la biblioteca de redes de Petri [140 hs]: Considerando lo mencionado en \ref{petri-net-libs}, implementación de una biblioteca acorde a las necesidades de la solución.
     \item Desarrollo [400 hs]:
           \begin{itemize}
               \item Implementación de la traducción de código fuente Rust a una red de Petri.
