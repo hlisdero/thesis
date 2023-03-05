@@ -208,6 +208,8 @@ En particular se modela:
     \item Las funciones \texttt{pthread\_cond\_wait} y \texttt{pthread\_cond\_signal} para manejo de \textit{condition variables}.
 \end{itemize}
 
+\subsection{Bibliotecas de redes de Petri disponibles en Rust}
+\label{petri-net-libs}
 
 \bigskip
 
@@ -250,19 +252,27 @@ Se establece el siguiente cronograma estimativo para el desarrollo de la tesis:
         \hline
         Implementación de la biblioteca de Redes de Petri &                             & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} &                  &                  &                  &                  &                  \\
         \hline
-        Implementación de la traducción                   &                             &                  &                  & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} &                  &                  \\
+        Desarrollo                                        &                             &                  &                  & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} &                  &                  \\
         \hline
         Redacción del manuscrito                          &                             &                  &                  &                  &                  & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} & \cellcolor{gray} \\
         \hline
     \end{tabular}
 \end{center}
 
-\bigskip
+La carga de trabajo estimada total es de alrededor de 900 horas.
 
 \begin{itemize}
-    \item Tarea A [100 horas]: (descripción)
-    \item Tarea B [180 horas]:
-    \item ...
+    \item Lectura de bibliografía [130 horas]: Lectura de publicaciones científicas, libros de texto, artículos y documentación de herramientas existentes.
+    \item Diseño del sistema [80 horas]: Familiarizarse con la arquitectura del compilador de Rust. Lectura de la documentación pertinente. Diseño de una solución extensible y confiable.
+    \item Implementación de la biblioteca de Redes de Petri [140 hs]: Considerando lo mencionado en \ref{petri-net-libs}, implementación de una biblioteca acorde a las necesidades de la solución.
+    \item Desarrollo [400 hs]:
+          \begin{itemize}
+              \item Implementación de la traducción de código fuente Rust a una red de Petri.
+              \item Desarrollo de un plugin para el gestor de paquetes \textit{cargo}.
+              \item Incorporación de tests unitarios y de integración.
+              \item Documentación de la herramienta.
+          \end{itemize}
+    \item Redacción del manuscrito de la tesis [150 horas].
 \end{itemize}
 
 \bigskip
