@@ -44,7 +44,7 @@
         \normalsize{Facultad de Ingeniería, Universidad de Buenos Aires}        \\
     }
 
-    \date{17 de febrero de 2023}
+    \date{6 de marzo de 2023}
 
 \end{titlepage}
 
@@ -62,9 +62,9 @@
 
 En el área de computación concurrente, uno de los desafíos principales es probar la correctitud de un programa concurrente.
 A diferencia de un programa secuencial donde para cada entrada se obtiene siempre la misma salida, en un programa concurrente
-la salida puede depender de cómo se intercalaron las instrucciones de los diferentes procesos o threads durante la ejecución.
+la salida puede depender de cómo se intercalaron las instrucciones de los diferentes procesos o hilos durante la ejecución.
 
-La correctitud de un programa concurrente se define entonces en términos de propiedades del cómputo realizado y no en términos del
+La correctitud de un programa concurrente se define entonces en términos de propiedades del cómputo realizado y no solamente en términos del
 resultado obtenido. En la bibliografía \cite{ben-ari2006, coulouris2012, tanenbaum2017} se definen dos tipos de propiedades de correctitud:
 
 \begin{itemize}
@@ -86,7 +86,8 @@ Actualmente la mayoría de lenguajes de uso general, ya sean compilados o interp
 
 Dada la creciente importancia de la programación concurrente debida a la proliferación de sistemas de hardware multihilo y multiproceso,
 reducir el número de \textit{bugs} ligados a la sincronización de los procesos o hilos es de vital importancia para la industria.
-Evitar los \textit{deadlocks} es un requerimiento ineludible en el desarrollo, especialmente en sistemas embebidos y sistemas de misión crítica como vehículos autónomos o aeronaves.
+Evitar los \textit{deadlocks} es un requerimiento ineludible en el desarrollo,
+especialmente en sistemas embebidos y sistemas de misión crítica como vehículos autónomos o aeronaves.
 
 \subsection{Redes de Petri}
 
@@ -123,13 +124,13 @@ Se pueden utilizar también para validar requerimientos de software expresados m
 para modelar procesos industriales \cite{aalst1994} o para especificar y analizar sistemas de tiempo real \cite{kavi2011}.
 
 Existen varias técnicas que permiten encontrar \textit{deadlocks} en una red de Petri.
-Mediante un análisis de alcance \cite{murata1989}, se construye un grafo dirigido
-que representa los estados posibles que la red de Petri puede alcanzar durante su ejecución.
+El método más conocido se denomina análisis de alcance (\textit{reachability analysis}) \cite{murata1989}.
+En este se construye un grafo dirigido que representa los estados posibles que la red de Petri puede alcanzar durante su ejecución.
 En este grafo cada nodo representa un estado posible de la red y cada arista representa una transición que permite pasar de un estado al otro.
 Se puede demostrar matemáticamente que la existencia de un nodo sin aristas salientes implica la existencia de un \textit{deadlock} en la red de Petri.
 
 La desventaja de este análisis es su elevado costo computacional, el cual crece de forma exponencial
-con la cantidad de nodos de la red de Petri cuando no se puede hacer uso de hipótesis adicionales.
+con la cantidad de nodos de la red de Petri cuando no se puede hacer uso de hipótesis o heurísticas adicionales.
 La complejidad computacional del llamado \textit{reachability problem} es de hecho NP-completo para ciertas clases de redes de Petri.
 Sin embargo, existen clases de redes para las cuales la complejidad es menor, incluso polinomial.
 En \cite{esparza1994} se detallan los resultados teóricos más importantes obtenidos hasta 1998.
@@ -137,7 +138,7 @@ En \cite{esparza1994} se detallan los resultados teóricos más importantes obte
 Además existen métodos alternativos para detección de \textit{deadlocks}
 como el método basado en sifones (una estructura específica que ocurre en muchas redes de Petri) \cite{hu2011} y
 el método basado en jerarquías de abstracción \cite{kungas2005}.
-En particular, \cite{kungas2005} propone un método muy prometedor de orden polinomial para evitar el problema
+En particular, este último autor propone un método muy prometedor de orden polinomial para evitar el problema
 de la explosión de estados que subyace al algoritmo \textit{naïve} de detección de \textit{deadlocks}.
 A través de un algoritmo que abstrae una red de Petri dada a una representación más simple,
 se obtiene una jerarquía de redes de tamaño creciente para las cuales la verificación de ausencia de \textit{deadlocks} resulta sustancialmente más rápida.
@@ -148,13 +149,14 @@ en partes de la red para luego ir construyendo la verificación del todo final a
 \label{motivation}
 
 En el presente trabajo nos proponemos estudiar la detección de \textit{deadlocks} y \textit{lost signals} en el lenguaje de programación Rust.
-Se utilizará un modelo teórico basado en Redes de Petri para encontrar los errores en el código fuente. Mediante una traducción del código fuente
-en tiempo de compilación, se obtendrá una red de Petri que luego podrá ser analizada mediante métodos de verificación de modelos para garantizar la ausencia de \textit{deadlocks}.
+Se utilizará un modelo teórico basado en redes de Petri para encontrar los errores en el código fuente.
+Mediante una traducción del código fuente en tiempo de compilación,
+se obtendrá una red de Petri que luego podrá ser analizada mediante métodos de verificación de modelos para garantizar la ausencia de \textit{deadlocks}.
 
 El objetivo es contribuir a la comunidad de Rust aportando una primera versión de esta herramienta que podría luego ser extendida para soportar casos más complejos.
 Se busca que el uso de la herramienta sea lo más sencillo y accesible posible para fomentar su uso y aplicación a proyectos reales de software.
 Por esta razón la tesis contará con una primera implementación del traductor que podrá ser utilizado como \textit{plugin}
-del gestor de paquetes estándar de Rust \textit{cargo} \cite{cargo-website}.
+del gestor de paquetes estándar de Rust \textit{cargo}\footnote{\url{https://doc.rust-lang.org/stable/cargo/}}.
 
 A largo plazo se podría incorporar la herramienta al compilador como un pase adicional opcional en el proceso de compilación.
 Este pase verificaría que no se pueden producir ciertas clases de \textit{deadlocks}, lo que haría de Rust un lenguaje de programación aún más seguro y confiable.
@@ -168,8 +170,8 @@ a formatos estandarizados a fin de facilitar la interoperabilidad con otras herr
 Como parte de la investigación previa se encontró que dos formatos son particularmente relevantes en este sentido:
 
 \begin{itemize}
-    \item DOT: un lenguaje de visualización de gráficos de código abierto, parte de la suite Graphviz \cite{dot2015}.
-    \item Petri Net Markup Language (PNML): un lenguaje estandarizado para redes de Petri basado en XML \cite{pnml2000}.
+    \item DOT\footnote{\url{https://graphviz.org/}}: un lenguaje de visualización de gráficos de código abierto, parte de la suite Graphviz \cite{dot2015}.
+    \item Petri Net Markup Language (PNML)\footnote{\url{https://www.pnml.org/}}: un lenguaje estandarizado para redes de Petri basado en XML \cite{pnml2000}.
           Es parte del estándar ISO/IEC 15909-1:2019 que resultó de un trabajo arduo de muchos años para unificar la notación \cite{hillah:hal-01176335}.
 \end{itemize}
 
@@ -179,16 +181,16 @@ Como parte de la investigación previa se encontró que dos formatos son particu
 
 \subsection{El lenguaje de programación Rust}
 
-Uno de los lenguajes de programación modernos más prometedores para programación concurrente es Rust \cite{rust-website}.
+Uno de los lenguajes de programación modernos más prometedores para programación concurrente es Rust\footnote{\url{https://www.rust-lang.org/}}.
 Su modelo de memoria basado en el concepto de \textit{ownership} y su expresivo sistema de tipos permite eliminar una amplia variedad de
 errores relacionados al manejo de memoria y a la programación concurrente en tiempo de compilación:
 
 \begin{itemize}
-    \item \textit{double free} \cite[Cap. 4.1]{rust-book}
-    \item \textit{use-after-free} \cite[Cap. 4.1]{rust-book}
-    \item referencia colgante "\textit{dangling pointers}" \cite[Cap. 4.2]{rust-book}
-    \item \textit{data races} \cite[Cap. 4.2]{rust-book}
-    \item pasaje de variables de tipo \textit{non-thread-safe} entre hilos \cite[Cap. 16.4]{rust-book}
+    \item \textit{Double free} \cite[Cap. 4.1]{rust-book}
+    \item \textit{Use-after-free} \cite[Cap. 4.1]{rust-book}
+    \item Referencia colgante (\textit{dangling pointers}) \cite[Cap. 4.2]{rust-book}
+    \item \textit{Data races} \cite[Cap. 4.2]{rust-book}
+    \item Pasaje de variables de tipo \textit{non-thread-safe} entre hilos \cite[Cap. 16.4]{rust-book}
 \end{itemize}
 
 La importancia de estas ventajas para la industria no puede ser subestimada.
@@ -201,25 +203,30 @@ iOS y macOS \cite{memory-bugs-ios-macos}, productos de Microsoft \cite{miller-se
 y Ubuntu \cite{memory-bugs-ubuntu}.
 
 Numerosas herramientas se han dedicado a tratar de resolver estas vulnerabilidades causadas por el uso incorrecto de la memoria en \textit{codebases} ya establecidas.
-No obstante su utilización conlleva una notable pérdida de performance y no todas las vulnerabilidades se pueden prevenir \cite{szekeres2013}.
+Sin embargo, su utilización conlleva una notable pérdida de performance y no todas las vulnerabilidades se pueden prevenir \cite{szekeres2013}.
 
 En los últimos años, varios proyectos de gran importancia en el ambiente Open Source han decidido incorporar Rust
-a fin de reducir el número de bugs relacionados al manejo de la memoria.
+a fin de reducir el número de \textit{bugs} relacionados al manejo de la memoria.
 Entre ellos podemos nombrar al Android Open Source Project \cite{android-rust} y
 al kernel Linux que desde su versión 6.1 introduce soporte para programar componentes en Rust \cite{infoq-linux-6.1-rust, lwn-linux-6.1-rust}.
 Por otra parte, Meta aprueba y fomenta el uso de Rust como lenguaje para desarrollo \textit{server-side} desde el 2022 \cite{meta-rust-server-side}.
-La popularidad del lenguaje Rust es innegable, ya que Rust ha sido elegido durante 7 años consecutivos
+La popularidad del lenguaje Rust es innegable, ya que ha sido elegido durante 7 años consecutivos
 como el lenguaje de programación más querido por los programadores en la encuesta anual de Stack Overflow \cite{so-survey2022}.
 
 Cabe destacar que la generación de código en Rust incluye además una serie de mitigaciones a \textit{exploits} de diversos tipos \cite[Cap. 11]{rustc-book}.
-Si bien la librería estándar no está exenta de errores \cite{davidoff2018},
-los procesos de gobierno open-source y transparentes basados en el modelo RFC (\textit{Requests for Comments}) \cite{rust-rfcs}
+Asimismo, si bien la librería estándar no está exenta de errores \cite{davidoff2018},
+los procesos de gobierno de código abierto y transparentes basados en el modelo RFC (\textit{Requests for Comments})\footnote{\url{https://rust-lang.github.io/rfcs/}}
 aseguran una mejora continua del lenguaje y su funcionalidad.
-El \textit{release cycle} del compilador oficial de Rust, \textit{rustc}, es por otra parte sumamente veloz.
+
+El ciclo de lanzamientos del compilador oficial de Rust, \textit{rustc}, es por otra parte sumamente veloz.
 Cada 6 semanas se publica una nueva versión estable del compilador \cite[Appendix G]{rust-book}.
-Esto es posible gracias a un complejo sistema automatizado de tests que compila incluso todos los paquetes disponibles en \textit{crates.io}
+Esto es posible gracias a un complejo sistema de tests automatizado que compila incluso todos los paquetes disponibles en \textit{crates.io}
 mediante un programa llamado \textit{crater} para verificar que
 la nueva versión del compilador no falla al compilar ni causa errores en los tests de los paquetes existentes \cite{albini2019}.
+
+Por estas razones Rust es una excelente opción para estudiar los \textit{deadlocks} y \textit{lost signals} porque se los puede estudiar por separado,
+sabiendo que otros errores ya son evitados en tiempo de compilación.
+La estabilidad y la seguridad del lenguaje proveen una base firme sobre la que construir una herramienta que detecte más errores en tiempo de compilación.
 
 \subsection{Herramientas de verificación formal de código}
 
@@ -227,32 +234,34 @@ Existen varias herramientas de verificación automática en Rust.
 Una primera aproximación recomendable es el resumen producido por Alastair Reid, investigador en Intel.
 En ella se lista explícitamente que la mayoría de las herramientas formales de verificación no soportan concurrencia \cite{reid2021}.
 
-El intérprete \textit{Miri} desarrollado por el \textit{Rust project} en GitHub es un intérprete experimental para la representación intermedia del lenguaje Rust
-(\textit{mid-level intermediate representation}, conocida comúnmente por la sigla "MIR")
-que permite ejecutar binarios de proyectos de \textit{cargo} de forma granularizada, instrucción a instrucción, para verificar la ausencia de \textit{Undefined Behaviour} (UB) y otros
-errores en el manejo de la memoria.
-Detecta \textit{memory leaks}, accesos no alineados a memoria, \textit{data races} y violaciones de precondiciones o invariantes en código marcado como \textit{unsafe} \cite{miri-website}.
+El intérprete \textit{Miri}\footnote{\url{https://github.com/rust-lang/miri}} desarrollado por el \textit{Rust project} en GitHub
+es un intérprete experimental para la representación intermedia del lenguaje Rust
+(\textit{mid-level intermediate representation}, conocida comúnmente por la sigla ``MIR'')
+que permite ejecutar binarios de proyectos de \textit{cargo} de forma granularizada, instrucción a instrucción,
+para verificar la ausencia de \textit{Undefined Behaviour} (UB) y otros errores en el manejo de la memoria.
+Detecta \textit{memory leaks}, accesos no alineados a memoria, \textit{data races} y violaciones de precondiciones o invariantes en código marcado como \textit{unsafe}.
 
-Es conocido que en la actualidad las herramientas de verificación formal de software son utilizadas en unos pocos ámbitos muy específicos
-donde se requiere una demostración formal de correctitud del sistema. Usualmente se trata de sistemas de seguridad críticos.
+Es conocido que en la actualidad las herramientas de verificación formal de software son aplicadas en unos pocos ámbitos muy específicos
+donde se requiere una demostración formal de correctitud del sistema. Usualmente se trata de sistemas donde la seguridad es un factor crítico.
 En \cite{reid:hatra:2020} se discute la importancia de acercar las herramientas de verificación a los desarrolladores
 a través de un enfoque que buscar maximizar la relación costo-beneficio de su uso.
 Se propone mejorar la usabilidad de las herramientas existentes e incorporar su uso a la rutina del desarrollador partiendo
 de la base que la verificación puede ser vista como un tipo diferente de test unitario o de integración.
 
-En \cite{toman2015} se introduce un verificador formal para Rust que no requiere modificaciones en el código fuente sobre el que se lo aplica y
+En \cite{toman2015} se introduce un verificador formal para Rust que no requiere modificaciones en el código fuente y
 se lo ejecuta sobre módulos de la librería estándar de Rust.
 Como resultado se detectaron errores en el uso de la memoria en código \textit{unsafe}
 que tardaron meses en ser descubiertos de forma manual por el equipo de desarrollo.
+Esto ejemplifica la importancia del uso de herramientas de verificación automática para complementar las reviews manuales del código.
 
 \subsection{Detección de \textit{deadlocks}}
 
-La detección de \textit{deadlocks} es una de las estrategias clásicas para abordar este problema crucial en sistemas distribuidos.
+La detección de \textit{deadlocks} es una de las estrategias clásicas para abordar este problema crucial en programación concurrente.
 Las estrategias restantes (\textit{deadlock avoidance} y \textit{deadlock prevention}) y algunos algoritmos se describen brevemente en \cite{singhal1989}.
-El problema principal con el enfoque de detectar los deadlocks antes de su aparición es probar que
+El problema principal con el enfoque de detectar los \textit{deadlocks} antes de su aparición es probar que
 se detecta el tipo de \textit{deadlock} deseado en todos los casos y que no se producen falsos negativos en el proceso.
 El enfoque basado en redes de Petri, tratándose de un método formal, satisface estas condiciones.
-No obstante la dificultad de adopción radica mayoritariamente en la practicabilidad de la solución debido al gran número de estados posibles en un proyecto de software real.
+No obstante, la dificultad de adopción radica mayoritariamente en la practicabilidad de la solución debido al gran número de estados posibles en un proyecto de software real.
 
 En \cite{kavi-moshtaghi2002} y \cite{moshtaghi2001} se describe una traducción de algunas de las primitivas
 de sincronización de la librería POSIX de threads (\texttt{pthread}) en C a redes de Petri.
@@ -283,24 +292,25 @@ Una búsqueda rápida en los paquetes disponibles en \textit{crates.io}, GitHub 
 
 Se encontraron algunos simuladores de redes de Petri como:
 \begin{itemize}
-    \item \url{https://gitlab.com/porky11/pns}: Programado en C. No ofrece la opción de exportar la red resultante a un formato estándar.
-    \item \url{https://staff.um.edu.mt/jskl1/petrisim/index.html#How}: Un simulador antiguo para DOS/PC programado en Bordland Pascal.
-    \item \url{https://github.com/iig-uni-freiburg/WOLFGANG}: Un editor de redes de Petri en Java, mantenido por el Departamento de Ciencias de la Computación de la Universidad de Freiburg, Alemania.
+    \item pns\footnote{\url{https://gitlab.com/porky11/pns}}: Programado en C. No ofrece la opción de exportar la red resultante a un formato estándar.
+    \item PetriSim\footnote{\url{https://staff.um.edu.mt/jskl1/petrisim/index.html}}: Un simulador antiguo para DOS/PC programado en Bordland Pascal.
+    \item WOLFGANG\footnote{\url{https://github.com/iig-uni-freiburg/WOLFGANG}}: Un editor de redes de Petri en Java,
+          mantenido por el Departamento de Ciencias de la Computación de la Universidad de Freiburg, Alemania.
 \end{itemize}
 Lamentablemente ninguno satisface los requerimientos del trabajo.
 
 Dado que una red de Petri es un grafo, nos planteamos la posibilidad de usar una biblioteca de grafos y adaptarla a los objetivos del trabajo.
 Se encontraron dos bibliotecas de grafos en Rust:
 \begin{itemize}
-    \item \url{https://docs.rs/petgraph/latest/petgraph/}: La biblioteca más utilizada para grafos en \textit{crates.io}. Ofrece una opción de exportado al formato DOT.
-    \item \url{https://github.com/metamolecular/gamma}: Inestable y sin cambios desde el 2021. No ofrece la posibilidad de exportar el grafo.
+    \item petgraph\footnote{\url{https://docs.rs/petgraph/latest/petgraph/}}: La biblioteca más utilizada para grafos en \textit{crates.io}. Ofrece una opción de exportado al formato DOT.
+    \item gamma\footnote{\url{https://github.com/metamolecular/gamma}}: Inestable y sin cambios desde el 2021. No ofrece la posibilidad de exportar el grafo.
 \end{itemize}
 
 Ninguna de las posibilidades satisface el requerimiento de exportar la red resultante al formato PNML.
 Además, de usarse una biblioteca para grafos, se deberían implementar las operaciones propias de una red de Petri como un \textit{wrapper} alrededor de un grafo,
 lo que reduce la posibilidad de optimizaciones para nuestro caso de uso y dificulta la extensibilidad a largo plazo del proyecto.
 
-En conclusión es conveniente implementar una biblioteca de redes de Petri en Rust desde cero como un proyecto separado.
+En conclusión, es conveniente implementar una biblioteca de redes de Petri en Rust desde cero como un proyecto separado.
 Esto aporta una herramienta más a la comunidad que podría reutilizarse en trabajos posteriores.
 
 \bigskip
@@ -314,13 +324,13 @@ y señales perdidas debidas a un uso incorrecto de \textit{condition variables}.
 Los objetivos particulares son:
 
 \begin{enumerate}
-    \item 1 Diseñar e implementar un sistema de traducción del código Rust a una red de Petri.
-    \item 2 Conectar la salida del sistema con un \textit{model checker} para verificar la ausencia de \textit{deadlocks} y \textit{lost signals}.
+    \item Diseñar e implementar un sistema de traducción del código Rust a una red de Petri.
+    \item Conectar la salida del sistema con un \textit{model checker} para verificar la ausencia de \textit{deadlocks} y \textit{lost signals}.
           Se utilizarán entre otros los formatos de exportado especificados en \ref{motivation}.
-    \item 3 Integrar la herramienta al ecosistema Rust, haciendo su uso lo más simple posible para el usuario.
+    \item Integrar la herramienta al ecosistema Rust, haciendo su uso lo más simple posible para el usuario.
           \begin{enumerate}
-              \item 3.1 Implementar un plugin para el gestor de paquetes \textit{cargo} y publicarlo.
-              \item 3.2 Documentar la herramienta y sus limitaciones.
+              \item Implementar un plugin para el gestor de paquetes \textit{cargo} y publicarlo.
+              \item Documentar la herramienta y sus limitaciones.
                     Esto incluye el manuscrito, el cual será redactado en inglés como se enunció en \ref{motivation}.
           \end{enumerate}
 \end{enumerate}
