@@ -160,7 +160,7 @@ A largo plazo se podría incorporar la herramienta al compilador como un pase ad
 Este pase verificaría que no se pueden producir ciertas clases de \textit{deadlocks}, lo que haría de Rust un lenguaje de programación aún más seguro y confiable.
 
 Con el propósito de que el trabajo pueda ser leído por el mayor número de personas posible y
-que forme parte de la documentación de los respectivos repositorios de código publicados en \textit{GitHub},
+que forme parte de la documentación de los respectivos repositorios de código publicados en GitHub,
 resulta imprescindible redactar el manuscrito en idioma inglés.
 
 Por otra parte, nos proponemos implementar una funcionalidad de exportado de la red de Petri obtenida a partir del código fuente
@@ -278,6 +278,31 @@ ya que el funcionamiento interno del compilador cambió significativamente en lo
 \subsection{Bibliotecas de redes de Petri disponibles en Rust}
 \label{petri-net-libs}
 
+Como parte del desarrollo de la traducción del código fuente a una red de Petri será necesario utilizar una biblioteca de redes de Petri para el lenguaje de programación Rust.
+Una búsqueda rápida en los paquetes disponibles en \textit{crates.io}, GitHub y GitLab reveló que desafortunadamente no existe una biblioteca bien mantenida.
+
+Se encontraron algunos simuladores de redes de Petri como:
+\begin{itemize}
+    \item \url{https://gitlab.com/porky11/pns}: Programado en C. No ofrece la opción de exportar la red resultante a un formato estándar.
+    \item \url{https://staff.um.edu.mt/jskl1/petrisim/index.html#How}: Un simulador antiguo para DOS/PC programado en Bordland Pascal.
+    \item \url{https://github.com/iig-uni-freiburg/WOLFGANG}: Un editor de redes de Petri en Java, mantenido por el Departamento de Ciencias de la Computación de la Universidad de Freiburg, Alemania.
+\end{itemize}
+Lamentablemente ninguno satisface los requerimientos del trabajo.
+
+Dado que una red de Petri es un grafo, nos planteamos la posibilidad de usar una biblioteca de grafos y adaptarla a los objetivos del trabajo.
+Se encontraron dos bibliotecas de grafos en Rust:
+\begin{itemize}
+    \item \url{https://docs.rs/petgraph/latest/petgraph/}: La biblioteca más utilizada para grafos en \textit{crates.io}. Ofrece una opción de exportado al formato DOT.
+    \item \url{https://github.com/metamolecular/gamma}: Inestable y sin cambios desde el 2021. No ofrece la posibilidad de exportar el grafo.
+\end{itemize}
+
+Ninguna de las posibilidades satisface el requerimiento de exportar la red resultante al formato PNML.
+Además, de usarse una biblioteca para grafos, se deberían implementar las operaciones propias de una red de Petri como un \textit{wrapper} alrededor de un grafo,
+lo que reduce la posibilidad de optimizaciones para nuestro caso de uso y dificulta la extensibilidad a largo plazo del proyecto.
+
+En conclusión es conveniente implementar una biblioteca de redes de Petri en Rust desde cero como un proyecto separado.
+Esto aporta una herramienta más a la comunidad que podría reutilizarse en trabajos posteriores.
+
 \bigskip
 
 \section{Objetivos}
@@ -341,7 +366,7 @@ La carga de trabajo estimada total es de alrededor de 900 horas.
               \item Incorporación de tests unitarios y de integración.
               \item Documentación de la herramienta.
           \end{itemize}
-    \item Redacción del manuscrito de la tesis [150 horas].
+    \item Redacción del manuscrito de la tesis [150 horas]: El idioma a utilizar será inglés por lo explicado en \ref{motivation}.
 \end{itemize}
 
 \bigskip
