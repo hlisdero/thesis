@@ -32,5 +32,6 @@
       "env": {}
     }
   ],
-  "cSpell.language": "en"
+  "cSpell.enabled": false,
+  "grammarly.files.include": ["./README.md", "./main.tex"]
 }
