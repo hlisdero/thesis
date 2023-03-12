@@ -1,53 +1,368 @@
-%*******************************************************************************
-%
-%*******************************************************************************
-% required fields: author, title, booktitle, year
-%*******************************************************************************
-
-
-
-%*******************************************************************************
-% Article
-%*******************************************************************************
-% required fields: author, title, journal, year
-%*******************************************************************************
-
-@article{tuohy2015intra,
-  title={Intra-vehicle networks: A review},
-  author={Tuohy, Shane and Glavin, Martin and Hughes, Ciar{\'a}n and Jones, Edward and Trivedi, Mohan and Kilmartin, Liam},
-  journal={IEEE Transactions on Intelligent Transportation Systems},
-  volume={16},
-  number={2},
-  pages={534--545},
-  year={2015},
-  publisher={IEEE}
+@book{ben-ari2006,
+  author    = {Mordechai Ben-Ari},
+  edition   = {2nd},
+  publisher = {Pearson Education},
+  title     = {Principles of Concurrent and Distributed Programming},
+  year      = {2006}
 }
 
-@ARTICLE{annexLdot1Q,
-	author = {},
-	journal = {IEEE Std. 802.1Q-2014, Annex L},
-	title ={IEEE Standard for Local and metropolitan area networks--Bridges and Bridged Networks},
-	year= {2014},
-	pages = {1732-1748},
-	doi = {10.1109/IEEESTD.2014.6991462}
+@book{tanenbaum2017,
+  author    = {Maarten van Steen and Andrew S. Tanenbaum},
+  edition   = {3rd},
+  publisher = {Pearson Education},
+  title     = {Distributed Systems},
+  year      = {2017}
 }
 
-%*******************************************************************************
-% Techreports
-%*******************************************************************************
-% required fields: author, title, institution, year
-%*******************************************************************************
+@book{coulouris2012,
+  author    = {George Coulouris and Jean Dollimore and Tim Kindberg and Gordon Blair},
+  edition   = {5th},
+  publisher = {Pearson Education},
+  title     = {Distributed Systems, Concepts and Design},
+  year      = {2012}
+}
 
+@misc{rust-book,
+  author       = {Steve Klabnik and Carol Nichols},
+  howpublished = {\url{https://doc.rust-lang.org/book/}},
+  note         = {Accedido: 2023-02-20},
+  title        = {{The Rust Programming Language}},
+  year         = {2022}
+}
 
+@misc{rustc-book,
+  author       = {{Rust Project}},
+  howpublished = {\url{https://doc.rust-lang.org/rustc/}},
+  note         = {Accedido: 2023-02-20},
+  title        = {{The rustc book}},
+  year         = {2023}
+}
 
-%*******************************************************************************
-% Inproceedings (articles in a conferencepaper)
-%*******************************************************************************
-% required fields: author, title, booktitle, year
-%*******************************************************************************
-@book{knuth2014art,
-  title={Art of computer programming, volume 2: Seminumerical algorithms},
-  author={Knuth, Donald E},
-  year={2014},
-  publisher={Addison-Wesley Professional}
+@misc{reid2021,
+  author       = {Alastair Reid},
+  howpublished = {\url{https://alastairreid.github.io/automatic-rust-verification-tools-2021/}},
+  note         = {Accedido: 2023-02-20},
+  title        = {{Automatic Rust verification tools (2021)}},
+  year         = {2021}
+}
+
+@misc{davidoff2018,
+  author       = {Sergey Davidoff},
+  howpublished = {\url{https://shnatsel.medium.com/how-rusts-standard-library-was-vulnerable-for-years-and-nobody-noticed-aebf0503c3d6}},
+  note         = {Accedido: 2023-02-20},
+  title        = {{How Rust's standard library was vulnerable for years and nobody noticed}},
+  year         = {2018}
+}
+
+@misc{android-rust,
+  author       = {Jeff Vander Stoep and Stephen Hines},
+  howpublished = {\url{https://security.googleblog.com/2021/04/rust-in-android-platform.html}},
+  note         = {Accedido: 2023-02-22},
+  title        = {{Rust in the Android platform}},
+  year         = {2021}
+}
+
+@misc{so-survey2022,
+  author       = {{Stack Overflow}},
+  howpublished = {\url{https://survey.stackoverflow.co/2022/#section-most-loved-dreaded-and-wanted-programming-scripting-and-markup-languages}},
+  note         = {Accedido: 2023-02-22},
+  title        = {{2022 Developer Survey}},
+  year         = {2022}
+}
+
+@misc{lwn-linux-6.1-rust,
+  author       = {Jonathan Corbet},
+  howpublished = {\url{https://lwn.net/Articles/917504/}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{The 6.1 kernel is out}},
+  year         = {2022}
+}
+
+@misc{infoq-linux-6.1-rust,
+  author       = {Sergio De Simone},
+  howpublished = {\url{https://www.infoq.com/news/2022/12/linux-6-1-rust/}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{Linux 6.1 Officially Adds Support for Rust in the Kernel}},
+  year         = {2022}
+}
+
+@misc{meta-rust-server-side,
+  author       = {Eric Garcia},
+  howpublished = {\url{https://engineering.fb.com/2022/07/27/developer-tools/programming-languages-endorsed-for-server-side-use-at-meta/}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{Programming languages endorsed for server-side use at Meta}},
+  year         = {2022}
+}
+
+@misc{miller-security-microsoft2019,
+  author       = {Matt Miller},
+  howpublished = {\url{https://www.youtube.com/watch?v=PjbGojjnBZQ}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{Trends, Challenges, and Strategic Shifts in the Software Vulnerability Mitigation Landscape}},
+  year         = {2019}
+}
+
+@misc{memory-bugs-android,
+  author       = {Evgenii Stepanov},
+  howpublished = {\url{https://android-developers.googleblog.com/2020/02/detecting-memory-corruption-bugs-with-hwasan.html}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{Detecting Memory Corruption Bugs With HWASan}},
+  year         = {2020}
+}
+
+@misc{memory-bugs-android-media-bluetooth,
+  author       = {Jeff Vander Stoep and Chong Zhang},
+  howpublished = {\url{https://android-developers.googleblog.com/2020/02/detecting-memory-corruption-bugs-with-hwasan.html}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{Queue the Hardening Enhancements}},
+  year         = {2020}
+}
+
+@misc{memory-bugs-ios-macos,
+  author       = {Paul Kehrer},
+  howpublished = {\url{https://langui.sh/2019/07/23/apple-memory-safety/}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{Memory Unsafety in Apple's Operating Systems}},
+  year         = {2019}
+}
+
+@misc{memory-bugs-chrome,
+  author       = {{The Chromium Projects}},
+  howpublished = {\url{https://www.chromium.org/Home/chromium-security/memory-safety/}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{Memory safety}},
+  year         = {2015}
+}
+
+@misc{memory-bugs-microsoft,
+  author       = {Sebastian Fernandez},
+  howpublished = {\url{https://msrc.microsoft.com/blog/2019/07/a-proactive-approach-to-more-secure-code/}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{A proactive approach to more secure code}},
+  year         = {2019}
+}
+
+@misc{memory-bugs-firefox,
+  author       = {Diane Hosfelt},
+  howpublished = {\url{https://hacks.mozilla.org/2019/02/rewriting-a-browser-component-in-rust/}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{Implications of Rewriting a Browser Component in Rust}},
+  year         = {2019}
+}
+
+@misc{memory-bugs-ubuntu,
+  author       = {Alex Gaynor},
+  howpublished = {\url{https://alexgaynor.net/2020/may/27/science-on-memory-unsafety-and-security/}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{What science can tell us about C and C++'s security}},
+  year         = {2020}
+}
+
+@misc{albini2019,
+  author       = {Pietro Albini},
+  howpublished = {\url{https://www.youtube.com/watch?v=As1gXp5kX1M}},
+  note         = {Accedido: 2023-02-24},
+  title        = {{RustFest Barcelona - Shipping a stable compiler every six weeks}},
+  year         = {2019}
+}
+
+@article{szekeres2013,
+  author  = {László Szekeres and Mathias Payer and Tao Wei and Dawn Song},
+  journal = {2013 IEEE Symposium on Security and Privacy},
+  title   = {{SoK: Eternal War in Memory}},
+  year    = {2013}
+}
+
+@misc{reid:hatra:2020,
+  abstract      = {Formal verification of software is a bit of a niche
+                   activity: it is only applied to the most safety-critical or
+                   security-critical software and it is typically only performed by
+                   specialized verification engineers. This paper considers whether
+                   it would be possible to increase adoption of formal methods by
+                   integrating formal methods with developers' existing practices
+                   and workflows.
+                   
+                   
+                   We do not believe that widespread adoption will follow from
+                   making the prevailing formal methods argument that correctness
+                   is more important than engineering teams realize. Instead, our
+                   focus is on what we would need to do to enable programmers to
+                   make effective use of formal verification tools and techniques.
+                   We do this by considering how we might make verification tooling
+                   that both serves developers' needs and fits into their existing
+                   development lifecycle. We propose a target of two orders of
+                   magnitude increase in adoption within a decade driven by
+                   ensuring a positive `weekly cost-benefit' ratio for developer
+                   time invested.},
+  ar_file       = {HATRA_20},
+  ar_shortname  = {HATRA 20},
+  archiveprefix = {arXiv},
+  author        = {Alastair Reid and
+                   Luke Church and
+                   Shaked Flur and
+                   Sarah de Haas and
+                   Maritza Johnson and
+                   Ben Laurie},
+  day           = {30},
+  eprint        = {2010.16345},
+  file          = {hatra2020.pdf},
+  link          = {https://research.google/pubs/pub49713/},
+  month         = {October},
+  note          = {Accepted at HATRA 2020},
+  png           = {hatra2020.png},
+  primaryclass  = {cs.LO},
+  slides        = {hatra2020-slides.pdf},
+  title         = {{T}owards making formal methods normal: meeting developers where they are},
+  url           = {https://research.google/pubs/pub49713/},
+  video         = {https://youtu.be/fUNYvUMSmq4?t=520},
+  year          = {2020}
+}
+
+@article{murata1989,
+  author  = {Tadao Murata},
+  journal = {Proceedings of the IEEE},
+  number  = {4},
+  title   = {{Petri Nets: Properties, Analysis and Applications}},
+  volume  = {77},
+  year    = {1989}
+}
+
+@article{petri1962,
+  author  = {Carl Adam Petri},
+  journal = {Institut für Instrumentelle Mathematik},
+  title   = {{Kommunikation mit Automaten}},
+  volume  = {3},
+  year    = {1962}
+}
+
+@article{kavi-moshtaghi2002,
+  author  = {Krishna M. Kavi and Alireza Moshtaghi and Deng-Jyi Chen},
+  journal = {International Journal of Parallel Programming},
+  number  = {5},
+  title   = {{Modeling Multithreaded Applications Using Petri Nets}},
+  volume  = {30},
+  year    = {2002}
+}
+
+@mastersthesis{moshtaghi2001,
+  author = {Alireza Moshtaghi},
+  school = {The University of Alabama in Huntsville},
+  title  = {{Modeling Multithreaded Applications Using Petri Nets}},
+  year   = {2001}
+}
+
+@article{heiner1998,
+  author  = {Monika Heiner},
+  journal = {ICSI Technical Report TR-92-022},
+  title   = {{Petri Net Based Software Validation - Prospects and Limitations}},
+  year    = {1998}
+}
+
+@article{silva-dossantos2004,
+  author  = {José Reinaldo Silva and Eston Almança dos Santos},
+  journal = {IFAC Information Control Problems in Manufacturing},
+  number  = {4},
+  title   = {{Applying Petri Nets to Requirements Validation}},
+  volume  = {37},
+  year    = {2004}
+}
+
+@article{aalst1994,
+  author  = {W.M.P. van der Aalst},
+  journal = {Computers in Industry},
+  title   = {{Putting high-level Petri nets to work in industry}},
+  volume  = {25},
+  year    = {1994}
+}
+
+@article{hu2011,
+  author  = {Wensong Hu and Yuyuan Zhu and Jie Lei},
+  journal = {2011 International Conference on Physics Science and Technology (ICPST 2011)},
+  title   = {{The Detection and Prevention of Deadlock in Petri Nets}},
+  volume  = {22},
+  year    = {2011}
+}
+
+@article{esparza1994,
+  author  = {Javier Esparza and Mogens Nielsen},
+  journal = {BRICS: Basic Research in Computer Science},
+  number  = {8},
+  title   = {{Decidability Issues for Petri Nets}},
+  volume  = {1},
+  year    = {1994}
+}
+
+@article{kungas2005,
+  author  = {Peep Kungas},
+  journal = {6th International Symposium, SARA 2005},
+  title   = {{Petri Net Reachability Checking Is Polynomial with Optimal Abstraction Hierarchies}},
+  volume  = {6},
+  year    = {2005}
+}
+
+@mastersthesis{meyer2020,
+  author = {Tom Meyer},
+  school = {Universität Rostock | Fakultät für Informatik und Elektrotechnik},
+  title  = {{A Petri-Net semantics for Rust}},
+  year   = {2020}
+}
+
+@article{singhal1989,
+  author  = {Mukesh Singhal},
+  journal = {Computer},
+  number  = {11},
+  title   = {{Deadlock detection in distributed systems}},
+  volume  = {22},
+  year    = {1989}
+}
+
+@article{kavi2011,
+  author  = {Krishna M. Kavi and Frederick T. Sheldon and Sherman Reed},
+  journal = {International Journal of Software Engineering and Knowledge Engineering},
+  number  = {2},
+  title   = {{Specification and Analysis of Real-Time Systems Using CSP and Petri Nets}},
+  volume  = {6},
+  year    = {2011}
+}
+
+@article{karatkevich-grobelna2014,
+  author  = {Andrei Karatkevich and Iwona Grobelna},
+  journal = {7th International Conference on Human System Interactions (HSI)},
+  title   = {{Deadlock detection in Petri nets: one trace for one deadlock?}},
+  year    = {2014}
+}
+
+@manual{dot2015,
+  author = {Emden R. Gansner and Eleftherios Koutsofios and Stephen C. North},
+  title  = {{Drawing Graphs With Dot}},
+  year   = {2015}
+}
+
+@article{pnml2000,
+  author  = {Matthias Jüngel and Ekkart Kindler and Michael Weber},
+  journal = {7. Workshop Algorithmen und Werkzeuge für Petrinetze},
+  title   = {{The Petri Net Markup Language}},
+  volume  = {2-3},
+  year    = {2000}
+}
+
+@article{hillah:hal-01176335,
+  author      = {Hillah, Lom Messan and Petrucci, Laure},
+  hal_id      = {hal-01176335},
+  hal_version = {v1},
+  journal     = {{G{\'e}nie logiciel : le magazine de l'ing{\'e}nierie du logiciel et des syst{\`e}mes}},
+  month       = Jun,
+  pages       = {5-10},
+  publisher   = {{G{\'e}nie industriel multim{\'e}dia}},
+  title       = {{Standardisation des r{\'e}seaux de Petri : {\'e}tat de l'art et enjeux futurs}},
+  url         = {https://hal.science/hal-01176335},
+  volume      = {93},
+  year        = {2010}
+}
+
+@article{toman2015,
+  author  = {John Toman and Stuart Pernsteiner and Emina Torlak},
+  journal = {2015 30th IEEE/ACM International Conference on Automated Software Engineering (ASE)},
+  title   = {{CRUST: A Bounded Verifier for Rust}},
+  year    = {2015}
 }
