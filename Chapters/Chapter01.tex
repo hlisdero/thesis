@@ -9,7 +9,7 @@ They were introduced by the German researcher Carl Adam Petri in his doctoral di
 and have since been applied in a variety of fields such as computer science, engineering, and biology.
 A concise summary of the theory of Petri nets, its properties, analysis and applications can be found in \cite{murata1989}.
 
-A Petri net is a bipartite digraph consisting of a set of places, transitions and arcs.
+A Petri net is a bipartite, directed graph consisting of a set of places, transitions and arcs.
 There are two types of nodes, namely places and transitions.
 Places represent the state of the system, while transitions represent events or actions that can occur.
 Arcs connect places to transitions or transitions to places.
@@ -22,7 +22,7 @@ The number of tokens at a place or the simple presence of a token is what convey
 Tokens are consumed and produced as transitions fire, giving the impression that they move through the arcs.
 
 In the conventional graphical representation, places are depicted using circles, while transitions are depicted as rectangles.
-Tokens are represented as black dots inside of the places, as seen in \ref{fig:petri-net-example}.
+Tokens are represented as black dots inside of the places, as seen in Figure \ref{fig:petri-net-example}.
 
 \begin{figure}[H]
     \centering
@@ -31,14 +31,15 @@ Tokens are represented as black dots inside of the places, as seen in \ref{fig:p
     \label{fig:petri-net-example}
 \end{figure}
 
-When a transition fires, it consumes tokens from its input places and produces tokens in its output places, reflecting a change in the state of the system.
+When a transition fires, it consumes tokens from its input places and
+produces tokens in its output places, reflecting a change in the state of the system.
 The firing of a transition is enabled when there are sufficient tokens in its input places.
-In \ref{fig:petri-net-transition-firing-example}, we can see how successive firings happen.
+In Figure \ref{fig:petri-net-transition-firing-example}, we can see how successive firings happen.
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.25]{petri-net-transition-firing-example.png}
-    \caption{Example of transition firing. First, transition 1 fires, then transition 2 fires.}
+    \caption{Example of transition firing: Transition 1 fires first, then transition 2 fires.}
     \label{fig:petri-net-transition-firing-example}
 \end{figure}
 
@@ -47,7 +48,8 @@ A disabled transition is considered \textbf{dead} if there is no reachable state
 If all the transitions in the net are dead, then the net is considered \textbf{dead} too.
 This state is analogous to the deadlock of a computer program.
 
-Petri nets can be used to model and analyze a wide range of systems, from simple systems with a few components to complex systems with many interacting components.
+Petri nets can be used to model and analyze a wide range of systems,
+from simple systems with a few components to complex systems with many interacting components.
 They can be used to detect potential problems in a system, optimize system performance and design and implement systems more effectively.
 
 In particular, Petri nets can be used to detect deadlocks in source code by modeling the input program as a Petri net
@@ -56,6 +58,73 @@ It will be shown that this approach is formally sound and
 practicably amenable to source code written in the Rust programming language.
 
 \subsection{Formal mathematical model}
+
+A Petri net is a particular kind of bipartite, weighted, directed graph, equipped with an initial state called the \textit{initial marking}, $M_{0}$.
+For the purposes of this work, the following general definition of a Petri net taken from \cite{murata1989} will be used.
+
+\begin{definition}[Petri net]
+    A Petri net is a 5-tuple, $ PN = (P, T, F, W, M_{0}) $ where:
+
+    \begin{quote}
+        $ P = \{ p_1, p_2, \dots, p_m \} $ is a finite set of places,\\
+        $ T = \{ t_1, t_2, \dots, t_n \} $ is a finite set of transitions,\\
+        $ F \subseteq (P \times T) \cup (T \times P) $ is a set of arcs (flow relation),\\
+        $ W: F \leftarrow \{1, 2, 3, ... \} $ is a weight function for the arcs,\\
+        $ M_{0}: P \leftarrow \{0, 1, 2, 3, .... \} $ is the initial marking,\\
+        $ P \cap T = \varnothing $ and $ P \cup T \neq \varnothing $
+    \end{quote}
+\end{definition}
+
+Arcs are labeled with their weight, which is a non-negative integer $k$. Usually, the weight is not drawn if it is equal to 1.
+A $k$-weighted arc can be interpreted as a set of $k$ distinct parallel arcs.
+A \textit{marking (state)} associates with each place a non-negative integer $l$.
+If a marking assigns to place $p$ a non-negative integer $l$, we say that $p$ is \textit{marked with $l$ tokens}.
+In the graphical representation, we denote his by placing $l$ black dots (tokens) in place $p$.
+
+An alternative definition of Petri nets uses \textit{bags} instead of a set to define the arcs, thus allowing multiple elements to be present.
+It can be found in the literature, e.g., \cite[Definition 2.3]{peterson1981}.
+
+As an example, consider the Petri net $ PN_{1} = (P, T, F, W, M) $ where
+
+\begin{quote}
+    $ P = \{ p_1, p_2 \} $,\\
+    $ T = \{ t_1, t_2 \} $,\\
+    $ F = \{ (p_1, t_1), (p_2, t_2), (t_1, p_2), (t_2, p_2) \} $,\\
+    $ W(a_i) = 1 \quad \forall a_i \in F $\\
+    $ M(p_1) = 0, M(p_2) = 0 $
+\end{quote}
+
+This net contains no tokens and all the arc weights are equal to 1.
+It is shown in Figure \ref{fig:petri-net-formal-example}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.50]{petri-net-formal-example.png}
+    \caption{Example of a small Petri net containing a self-loop}
+    \label{fig:petri-net-formal-example}
+\end{figure}
+
+Figure \ref{fig:petri-net-formal-example} contains an interesting structure that we will encounter later.
+This motivates the following definition.
+
+\begin{definition}[Self-loop]
+    A place node $p$ and a transition node $t$ define a self-loop if $p$ is both an input place and an output place of $t$.
+\end{definition}
+
+In most cases, we are interested in Petri nets containing no self-loops, which are called \textit{pure}.
+
+\begin{definition}[Pure Petri net]
+    A Petri net is said to be \textit{pure} if it has no self-loops.
+\end{definition}
+
+Moreover, if every arc weight is equal to one, we call the Petri net \textit{ordinary}.
+
+\begin{definition}
+    A Petri net is said to be \textit{ordinary} if all of its arc weights are 1's, i.e.
+    \begin{equation*}
+        W(a) = 1 \quad \forall a \in F
+    \end{equation*}
+\end{definition}
 
 \section{The Rust programming language}
 
