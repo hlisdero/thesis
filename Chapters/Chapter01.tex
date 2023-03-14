@@ -60,7 +60,7 @@ practicably amenable to source code written in the Rust programming language.
 \subsection{Formal mathematical model}
 
 A Petri net is a particular kind of bipartite, weighted, directed graph, equipped with an initial state called the \textit{initial marking}, $M_{0}$.
-For the purposes of this work, the following general definition of a Petri net taken from \cite{murata1989} will be used.
+For this work, the following general definition of a Petri net taken from \cite{murata1989} will be used.
 
 \begin{definition}[Petri net]
     A Petri net is a 5-tuple, $ PN = (P, T, F, W, M_{0}) $ where:
@@ -75,16 +75,19 @@ For the purposes of this work, the following general definition of a Petri net t
     \end{quote}
 \end{definition}
 
-Arcs are labeled with their weight, which is a non-negative integer $k$. Usually, the weight is not drawn if it is equal to 1.
+In the graphical representation, arcs are labeled with their weight, which is a non-negative integer $k$.
+Usually, the weight is omitted if it is equal to 1.
 A $k$-weighted arc can be interpreted as a set of $k$ distinct parallel arcs.
+
 A \textit{marking (state)} associates with each place a non-negative integer $l$.
 If a marking assigns to place $p$ a non-negative integer $l$, we say that $p$ is \textit{marked with $l$ tokens}.
-In the graphical representation, we denote his by placing $l$ black dots (tokens) in place $p$.
+Pictorially, we denote his by placing $l$ black dots (tokens) in place $p$.
+The \textit{pth} component of $M$, denoted by $M(p)$, is the number of tokens in place $p$.
 
 An alternative definition of Petri nets uses \textit{bags} instead of a set to define the arcs, thus allowing multiple elements to be present.
 It can be found in the literature, e.g., \cite[Definition 2.3]{peterson1981}.
 
-As an example, consider the Petri net $ PN_{1} = (P, T, F, W, M) $ where
+As an example, consider the Petri net $ PN_{1} = (P, T, F, W, M) $ where:
 
 \begin{quote}
     $ P = \{ p_1, p_2 \} $,\\
@@ -125,6 +128,37 @@ Moreover, if every arc weight is equal to one, we call the Petri net \textit{ord
         W(a) = 1 \quad \forall a \in F
     \end{equation*}
 \end{definition}
+
+\subsection{Transition firing}
+
+The transition firing rule is the core concept in Petri nets.
+Despite being deceptively simple, its implications are far-reaching and complex.
+
+\begin{definition}[Transition firing rule]
+    Let $ PN = (P, T, F, W, M_{0}) $ be a Petri net.
+    \begin{enumerate}[label=(\roman*)]
+        \item A transition $t$ is said to be \textit{enabled} if each input place $p$ of $t$
+              is marked with at least $W(p, t)$ tokens, where $W(p,t)$ is the weight of the arc from $p$ to $t$.
+        \item An enabled transition may or may not fire (depending on whether or not the event takes place).
+        \item A firing of an enabled transition $t$ removes $W(t,p)$ tokens from each input place $p$ of $t$,
+              where $W(t, p)$ is the weight of the arc from $t$ to $p$.
+    \end{enumerate}
+\end{definition}
+
+Transitions without input places or output places receive a special name.
+
+\begin{definition}[Source transition]
+    A transition without any input place is called a \textit{source transition}.
+\end{definition}
+
+\begin{definition}[Sink transition]
+    A transition without any output place is called a \textit{sink transition}.
+\end{definition}
+
+It is important to note that a source transition is unconditionally enabled
+and produces tokens without consuming any, while the firing of a sink transition
+consumes tokens without producing any.
+
 
 \section{The Rust programming language}
 
