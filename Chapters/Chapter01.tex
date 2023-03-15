@@ -159,6 +159,48 @@ It is important to note that a source transition is unconditionally enabled
 and produces tokens without consuming any, while the firing of a sink transition
 consumes tokens without producing any.
 
+\subsection{Modeling examples}
+
+In this subsection, several simple examples are presented to introduce
+some basic concepts of Petri nets that are useful in modeling.
+This subsection has been adapted from \cite{murata1989}.
+
+\subsubsection{Finite-state machines}
+
+Finite state machines can be represented by a subclass of Petri nets.
+
+As an example of a finite-state machine, consider a coffee vending machine.
+It accepts \EUR{1} or \EUR{2} coins and sells two types of coffee, the first costs \EUR{3} and the second \EUR{4}.
+Assume that the machine can hold up to \EUR{4} and does not return any change.
+Then, the state diagram of the machine can be represented by the Petri net shown in Figure \ref{fig:state-machine-example}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.30]{state-machine-example.png}
+    \caption{The Petri net for a coffee vending machine. It is equivalent to a state diagram.}
+    \label{fig:state-machine-example}
+\end{figure}
+
+The transitions represent the insertion of a coin of the labeled value, e.g. ``Insert \EUR{1} coin''.
+The places represent a possible state of the machine, i.e. the amount of money currently stored inside.
+The place labeled \uppercase{P1} is marked with a token and corresponds to the initial state of the system.
+
+We can now present the following definition of this subclass of Petri nets.
+
+\begin{definition}[State machines]
+    A Petri net in which each transition has exactly one incoming arc
+    and exactly one outgoing arc is known as a \textit{state machine}.
+
+    Any finite-state machine (or its state diagram) can be modeled with a state machine.
+\end{definition}
+
+The structure of a place $p_1$ having two (or more) output transitions $t_1$ and $t_2$ is called
+a \textit{conflict}, \textit{decision} or \textit{choice}, depending on the application.
+This is seen in the initial place \uppercase{P1} of Figure 1.4, where the user must select which coin to insert.
+
+\subsubsection{Parallel activities}
+
+Contrary to finite-state machines, Petri nets can model parallel or concurrent activities.
 
 \section{The Rust programming language}
 
