@@ -22,7 +22,7 @@ The number of tokens at a place or the simple presence of a token is what convey
 Tokens are consumed and produced as transitions fire, giving the impression that they move through the arcs.
 
 In the conventional graphical representation, places are depicted using circles, while transitions are depicted as rectangles.
-Tokens are represented as black dots inside of the places, as seen in Figure \ref{fig:petri-net-example}.
+Tokens are represented as black dots inside of the places, as seen in Fig. \ref{fig:petri-net-example}.
 
 \begin{figure}[H]
     \centering
@@ -34,7 +34,7 @@ Tokens are represented as black dots inside of the places, as seen in Figure \re
 When a transition fires, it consumes tokens from its input places and
 produces tokens in its output places, reflecting a change in the state of the system.
 The firing of a transition is enabled when there are sufficient tokens in its input places.
-In Figure \ref{fig:petri-net-transition-firing-example}, we can see how successive firings happen.
+In Fig. \ref{fig:petri-net-transition-firing-example}, we can see how successive firings happen.
 
 \begin{figure}[H]
     \centering
@@ -98,7 +98,7 @@ As an example, consider the Petri net $ PN_{1} = (P, T, F, W, M) $ where:
 \end{quote}
 
 This net contains no tokens and all the arc weights are equal to 1.
-It is shown in Figure \ref{fig:petri-net-formal-example}.
+It is shown in Fig. \ref{fig:petri-net-formal-example}.
 
 \begin{figure}[H]
     \centering
@@ -107,7 +107,7 @@ It is shown in Figure \ref{fig:petri-net-formal-example}.
     \label{fig:petri-net-formal-example}
 \end{figure}
 
-Figure \ref{fig:petri-net-formal-example} contains an interesting structure that we will encounter later.
+Fig. \ref{fig:petri-net-formal-example} contains an interesting structure that we will encounter later.
 This motivates the following definition.
 
 \begin{definition}[Self-loop]
@@ -172,7 +172,7 @@ Finite state machines can be represented by a subclass of Petri nets.
 As an example of a finite-state machine, consider a coffee vending machine.
 It accepts \EUR{1} or \EUR{2} coins and sells two types of coffee, the first costs \EUR{3} and the second \EUR{4}.
 Assume that the machine can hold up to \EUR{4} and does not return any change.
-Then, the state diagram of the machine can be represented by the Petri net shown in Figure \ref{fig:state-machine-example}.
+Then, the state diagram of the machine can be represented by the Petri net shown in Fig. \ref{fig:state-machine-example}.
 
 \begin{figure}[H]
     \centering
@@ -196,11 +196,89 @@ We can now present the following definition of this subclass of Petri nets.
 
 The structure of a place $p_1$ having two (or more) output transitions $t_1$ and $t_2$ is called
 a \textit{conflict}, \textit{decision} or \textit{choice}, depending on the application.
-This is seen in the initial place \uppercase{P1} of Figure 1.4, where the user must select which coin to insert.
+This is seen in the initial place \uppercase{P1} of Fig. \ref{fig:state-machine-example}, where the user must select which coin to insert.
 
 \subsubsection{Parallel activities}
 
-Contrary to finite-state machines, Petri nets can model parallel or concurrent activities.
+Contrary to finite-state machines, Petri nets can also model parallel or concurrent activities.
+In Fig. \ref{fig:parallel-activities-example} an example of this is shown,
+where the net represents the division of a bigger task into two subtasks that may be executed in parallel.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.70]{parallel-activities-example.png}
+    \caption{The Petri net depicting two parallel activities in a fork-join fashion.}
+    \label{fig:parallel-activities-example}
+\end{figure}
+
+The transition ``Fork'' will fire before ``Task 1'' and ``Task 2''
+and that ``Join'' will only fire after both tasks are complete.
+But note that the order in which ``Tast 1'' and ``Tast 2'' execute is non-deterministic.
+``Task 1'' could fire before, after or at the same time that ``Task 2''.
+It is precisely this property of the firing rule in Petri nets that allows the modeling of concurrent systems.
+
+\begin{definition}[Concurrency in Petri nets]
+    Two transitions are said to be \textit{concurrent} if they are causally independent, i.e.
+    the firing of one transition does not cause and is not triggered by the firing of the other.
+\end{definition}
+
+Note that each place in the net in Fig. \ref{fig:parallel-activities-example} has exactly one incoming arc
+and one outgoing arc. This subclass of Petri nets allows the representation of concurrency but not decisions (conflicts).
+
+\begin{definition}[Marked graphs]
+    A Petri net in which each place has exactly one incoming arc
+    and exactly one outgoing arc is known as a \textit{marked graph}.
+\end{definition}
+
+\subsubsection{Communication protocols}
+
+Communications protocols can also be represented in Petri nets.
+Fig. \ref{fig:communication-protocols-example} illustrates a simple protocol
+in which Process 1 sends messages to Process 2 and waits for an acknowledgment to be received before continuing.
+Both processes communicate through a buffered channel whose maximum capacity is one message.
+Therefore, only one message may be traveling between the processes at any given time.
+For simplicity, no timeout mechanism was included.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.55]{communication-protocols-example.png}
+    \caption{A simplified Petri net model of a communication protocol.}
+    \label{fig:communication-protocols-example}
+\end{figure}
+
+A timeout for the send operation could be incorporated into the model
+by adding a transition $t_{timeout}$ with edges from ``Wait for ACK'' to ``Ready to send''.
+This maps the decision between receiving the acknowledgment and the timeout.
+
+\subsubsection{Synchronization control}
+
+In a multithreaded system, resources and information are shared among several threads.
+This sharing must be controlled or synchronized to ensure the correct operation of the overall system.
+Petri nets have been used to model a variety of synchronization mechanisms,
+including the mutual exclusion, readers-writers and producers-consumers problems \cite{murata1989}.
+
+A Petri net for a readers-writers system with $k$ processes is shown in Fig. \ref{fig:readers-writers-example}.
+Each token represents a process and the choice of $t_1$ or $t_2$
+represents whether the process performs a read or a write operation.
+
+It makes use of weighted edges to remove atomically
+$k - 1$ tokens from $p_3$ before performing a write (transition $t_2$),
+thus ensuring that no readers are present in the right loop of the net.
+
+At most $k$ processes may be reading at the same same,
+but when one process is reading, no process is allowed to read, that is $p_2$ will be empty.
+It can be easily verified that the mutual exclusion property is satisfied for this model.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.60]{readers-writers-example.png}
+    \caption{A Petri net system with k processes that either read or write.}
+    \label{fig:readers-writers-example}
+\end{figure}
+
+It should be pointed out that this system is not free from starvation,
+since there is no guarantee that a write operation will eventually take place.
+The system is on the other hand free from deadlocks.
 
 \section{The Rust programming language}
 

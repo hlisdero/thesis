@@ -1,0 +1,24 @@
+digraph petrinet {
+    rankdir="LR";
+    P1 [shape="circle" xlabel="P1" label="•"];
+    P2 [shape="circle" xlabel="P2" label="•"];
+    P3 [shape="circle" xlabel="P3" label=""];
+    P4 [shape="circle" xlabel="P4" label=""];
+    P5 [shape="circle" xlabel="P5" label=""];
+    
+    T1 [shape="box" xlabel="" label="Fork"];
+    T2 [shape="box" xlabel="" label="Task 1"];
+    T3 [shape="box" xlabel="" label="Task 2"];
+    T4 [shape="box" xlabel="" label="Join"];
+
+    T1 -> P1 -> T2 -> P3 -> T4;
+    T1 -> P2 -> T3 -> P4 -> T4;
+    T4 -> P5 -> T1;
+
+    // Order the nodes in 5 different levels
+    {rank = min; T1;}    
+    {rank = same; P1; P2;}
+    {rank = same; P5; T2; T3;}
+    {rank = same; P3; P4;}
+    {rank = same; T4;}
+}

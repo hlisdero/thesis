@@ -1,0 +1,32 @@
+digraph petrinet {
+    nodesep=1.5;
+    P1 [shape="circle" xlabel="P1" label="k"];
+    P2 [shape="circle" xlabel="P2\nReading" label=""];
+    P3 [shape="circle" xlabel="P3" label="k"];
+    P4 [shape="circle" xlabel="P4\nWriting" label=""];
+    
+    T1 [shape="box" xlabel="" label="T1"];
+    T2 [shape="box" xlabel="" label="T2"];
+    T3 [shape="box" xlabel="" label="T3"];
+    T4 [shape="box" xlabel="" label="T4"];
+
+    // Writing loop
+    P1 -> T2;
+    T2 -> P4 -> T4 [weight=10];
+    T4 -> P1 [weight=0.05];
+    // Reading loop
+    P1 -> T1;
+    T1 -> P2 -> T3 [weight=10];
+    T3 -> P1 [weight=0.05];
+    // Mutual exclusion
+    P3 -> T1;
+    P3 -> T2 [label="k" penwidth=3.0];
+    T3 -> P3;
+    T4 -> P3 [label="k" penwidth=3.0];
+    
+    // Order the nodes in 4 different levels
+    {rank = min; P1;}    
+    {rank = same; T1; T2;}
+    {rank = same; P4; P2; P3;}
+    {rank = same; T4; T3;}
+}

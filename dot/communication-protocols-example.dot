@@ -1,0 +1,37 @@
+digraph petrinet {
+    nodesep=1.0;
+    P1 [shape="circle" xlabel="Ready to send" label="•"];
+    P2 [shape="circle" xlabel="Wait for ACK" label=""];
+    P3 [shape="circle" xlabel="ACK received" label=""];
+    P4 [shape="circle" xlabel="Ready to receive" label="•"];
+    P5 [shape="circle" xlabel="Message received" label=""];
+    P6 [shape="circle" xlabel="ACK sent" label=""];
+    P7 [shape="circle" xlabel="Buffer full" label=""];
+    P8 [shape="circle" xlabel="Buffer full" label=""];
+    
+    T1 [shape="box" xlabel="" label="Process 1"];
+    T2 [shape="box" xlabel="" label="Send message"];
+    T3 [shape="box" xlabel="" label="Receive ACK"];
+    T4 [shape="box" xlabel="" label="Process 2"];
+    T5 [shape="box" xlabel="" label="Receive message"];
+    T6 [shape="box" xlabel="" label="Send ACK"];
+
+    // Process 1 loop
+    T1 -> P1 [weight=0.25];
+    P1 -> T2 -> P2 -> T3 -> P3;
+    P3 -> T1 [weight=0.25];
+    // Process 2 loop
+    T4 -> P4 [weight=0.25, constraint=false];
+    P4 -> T5 -> P5 -> T6 -> P6;
+    P6 -> T4 [weight=0.25, constraint=false];
+    // Buffer full
+    T2 -> P7 -> T5;
+    T6 -> P8 -> T3 [weight=0.25];
+
+    // Order the nodes in 5 different levels
+    {rank = min; P1; P4;}    
+    {rank = same; T2; P7; T5;}
+    {rank = same; T1; P2; P5; T4;}
+    {rank = same; T6; P8; T3;}
+    {rank = same; P3; P6;}
+}
