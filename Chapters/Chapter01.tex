@@ -44,13 +44,15 @@ In Fig. \ref{fig:petri-net-transition-firing-example}, we can see how successive
 \end{figure}
 
 The firing of enabled transitions is not deterministic, i.e., they fire randomly as long as they are enabled.
-A disabled transition is considered \textbf{dead} if there is no reachable state in the system that can lead to the transition being enabled.
+A disabled transition is considered \textbf{dead}
+if there is no reachable state in the system that can lead to the transition being enabled.
 If all the transitions in the net are dead, then the net is considered \textbf{dead} too.
 This state is analogous to the deadlock of a computer program.
 
 Petri nets can be used to model and analyze a wide range of systems,
 from simple systems with a few components to complex systems with many interacting components.
-They can be used to detect potential problems in a system, optimize system performance and design and implement systems more effectively.
+They can be used to detect potential problems in a system,
+optimize system performance and design and implement systems more effectively.
 
 In particular, Petri nets can be used to detect deadlocks in source code by modeling the input program as a Petri net
 and then analyzing the structure of the resulting net.
@@ -59,7 +61,8 @@ practicably amenable to source code written in the Rust programming language.
 
 \subsection{Formal mathematical model}
 
-A Petri net is a particular kind of bipartite, weighted, directed graph, equipped with an initial state called the \textit{initial marking}, $M_{0}$.
+A Petri net is a particular kind of bipartite, weighted, directed graph,
+equipped with an initial state called the \textit{initial marking}, $M_{0}$.
 For this work, the following general definition of a Petri net taken from \cite{murata1989} will be used.
 
 \begin{definition}[Petri net]
@@ -84,7 +87,8 @@ If a marking assigns to place $p$ a non-negative integer $l$, we say that $p$ is
 Pictorially, we denote his by placing $l$ black dots (tokens) in place $p$.
 The \textit{pth} component of $M$, denoted by $M(p)$, is the number of tokens in place $p$.
 
-An alternative definition of Petri nets uses \textit{bags} instead of a set to define the arcs, thus allowing multiple elements to be present.
+An alternative definition of Petri nets uses \textit{bags} instead of a set to define the arcs,
+thus allowing multiple elements to be present.
 It can be found in the literature, e.g., \cite[Definition 2.3]{peterson1981}.
 
 As an example, consider the Petri net $ PN_{1} = (P, T, F, W, M) $ where:
@@ -111,7 +115,8 @@ Fig. \ref{fig:petri-net-formal-example} contains an interesting structure that w
 This motivates the following definition.
 
 \begin{definition}[Self-loop]
-    A place node $p$ and a transition node $t$ define a self-loop if $p$ is both an input place and an output place of $t$.
+    A place node $p$ and a transition node $t$ define a self-loop
+    if $p$ is both an input place and an output place of $t$.
 \end{definition}
 
 In most cases, we are interested in Petri nets containing no self-loops, which are called \textit{pure}.
@@ -196,7 +201,8 @@ We can now present the following definition of this subclass of Petri nets.
 
 The structure of a place $p_1$ having two (or more) output transitions $t_1$ and $t_2$ is called
 a \textit{conflict}, \textit{decision} or \textit{choice}, depending on the application.
-This is seen in the initial place \uppercase{P1} of Fig. \ref{fig:state-machine-example}, where the user must select which coin to insert.
+This is seen in the initial place \uppercase{P1} of Fig. \ref{fig:state-machine-example},
+where the user must select which coin to insert.
 
 \subsubsection{Parallel activities}
 
@@ -267,7 +273,7 @@ thus ensuring that no readers are present in the right loop of the net.
 
 At most $k$ processes may be reading at the same same,
 but when one process is reading, no process is allowed to read, that is $p_2$ will be empty.
-It can be easily verified that the mutual exclusion property is satisfied for this model.
+It can be easily verified that the mutual exclusion property is satisfied for the system.
 
 \begin{figure}[H]
     \centering
