@@ -1,15 +1,35 @@
 digraph petrinet {
     rankdir="LR";
-    PLACE_1_A [shape="circle" xlabel="PLACE 1" label="•"];
-    PLACE_2_A [shape="circle" xlabel="PLACE 2" label=""];
-    PLACE_3_A [shape="circle" xlabel="PLACE 3" label=""];
-    PLACE_4_A [shape="circle" xlabel="PLACE 4" label=""];
-    TRANSITION_1_A [shape="box" xlabel="" label="TRANSITION 1"];
-    TRANSITION_2_A [shape="box" xlabel="" label="TRANSITION 2"];
-    PLACE_1_A -> TRANSITION_1_A;
-    TRANSITION_1_A -> PLACE_2_A;
-    TRANSITION_1_A -> PLACE_3_A;
-    PLACE_2_A -> TRANSITION_2_A;
-    PLACE_3_A -> TRANSITION_2_A;
-    TRANSITION_2_A -> PLACE_4_A;
+    P1 [shape="circle" xlabel="0 €\nP1" label="•"];
+    P2 [shape="circle" xlabel="1 €" label=""];
+    P3 [shape="circle" xlabel="2 €" label=""];
+    P4 [shape="circle" xlabel="3 €" label=""];
+    P5 [shape="circle" xlabel="4 €" label=""];
+    
+    T1 [shape="box" xlabel="" label="Insert 1 €"];
+    T2 [shape="box" xlabel="" label="Insert 2 €"];
+    T3 [shape="box" xlabel="" label="Insert 1 €"];
+    T4 [shape="box" xlabel="" label="Insert 2 €"];
+    T5 [shape="box" xlabel="" label="Insert 1 €"];
+    T6 [shape="box" xlabel="" label="Insert 2 €"];
+    T7 [shape="box" xlabel="" label="Insert 1 €"];
+    T8 [shape="box" xlabel="" label="Get 3 € coffee"];
+    T9 [shape="box" xlabel="" label="Get 4 € coffee"];
+
+    P1 -> T1 -> P2;
+    P1 -> T2 -> P3;
+    P2 -> T3 -> P3;
+    P2 -> T4 -> P4;
+    P3 -> T5 -> P4;
+    P3 -> T6 -> P5;
+    P4 -> T7 -> P5;
+    P4 -> T8 -> P1;
+    P5 -> T9 -> P1;
+
+    // Order the nodes in 5 different levels
+    {rank = same; P1;}    
+    {rank = same; T1; T2;}
+    {rank = same; P2; P3; T3; T8; T9;}
+    {rank = same; T4; T5; T6;}
+    {rank = same; P4; T7; P5;}
 }
