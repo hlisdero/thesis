@@ -69,7 +69,7 @@ A Petri net is a particular kind of bipartite, weighted, directed graph,
 equipped with an initial state called the \textit{initial marking}, $M_{0}$.
 For this work, the following general definition of a Petri net taken from \cite{murata1989} will be used.
 
-\begin{definition}[Petri net]
+\begin{definition}{Petri net}{petri-net}
     A Petri net is a 5-tuple, $ PN = (P, T, F, W, M_{0}) $ where:
 
     \begin{quote}
@@ -118,21 +118,21 @@ It is shown in Fig. \ref{fig:petri-net-formal-example}.
 Fig. \ref{fig:petri-net-formal-example} contains an interesting structure that we will encounter later.
 This motivates the following definition.
 
-\begin{definition}[Self-loop]
+\begin{definition}{Self-loop}{self-loop}
     A place node $p$ and a transition node $t$ define a self-loop
     if $p$ is both an input place and an output place of $t$.
 \end{definition}
 
 In most cases, we are interested in Petri nets containing no self-loops, which are called \textit{pure}.
 
-\begin{definition}[Pure Petri net]
-    A Petri net is said to be \textit{pure} if it has no self-loops.
+\begin{definition}{Pure Petri net}{pure-petri-net}
+    A Petri net is said to be pure if it has no self-loops.
 \end{definition}
 
 Moreover, if every arc weight is equal to one, we call the Petri net \textit{ordinary}.
 
-\begin{definition}
-    A Petri net is said to be \textit{ordinary} if all of its arc weights are 1's, i.e.
+\begin{definition}{Ordinary Petri net}{ordinary-petri-net}
+    A Petri net is said to be ordinary if all of its arc weights are 1's, i.e.
     \begin{equation*}
         W(a) = 1 \quad \forall a \in F
     \end{equation*}
@@ -144,10 +144,10 @@ Moreover, if every arc weight is equal to one, we call the Petri net \textit{ord
 The transition firing rule is the core concept in Petri nets.
 Despite being deceptively simple, its implications are far-reaching and complex.
 
-\begin{definition}[Transition firing rule]
+\begin{definition}{Transition firing rule}{transition-firing-rule}
     Let $ PN = (P, T, F, W, M_{0}) $ be a Petri net.
     \begin{enumerate}[label=(\roman*)]
-        \item A transition $t$ is said to be \textit{enabled} if each input place $p$ of $t$
+        \item A transition $t$ is said to be enabled if each input place $p$ of $t$
               is marked with at least $W(p, t)$ tokens, where $W(p,t)$ is the weight of the arc from $p$ to $t$.
         \item An enabled transition may or may not fire (depending on whether or not the event takes place).
         \item A firing of an enabled transition $t$ removes $W(t,p)$ tokens from each input place $p$ of $t$,
@@ -157,12 +157,12 @@ Despite being deceptively simple, its implications are far-reaching and complex.
 
 Transitions without input places or output places receive a special name.
 
-\begin{definition}[Source transition]
-    A transition without any input place is called a \textit{source transition}.
+\begin{definition}{Source transition}{source-transition}
+    A transition without any input place is called a source transition.
 \end{definition}
 
-\begin{definition}[Sink transition]
-    A transition without any output place is called a \textit{sink transition}.
+\begin{definition}{Sink transition}{sink-transition}
+    A transition without any output place is called a sink transition.
 \end{definition}
 
 It is important to note that a source transition is unconditionally enabled
@@ -203,9 +203,9 @@ The place labeled \uppercase{P1} is marked with a token and corresponds to the i
 
 We can now present the following definition of this subclass of Petri nets.
 
-\begin{definition}[State machines]
+\begin{definition}{State machines}{state-machines}
     A Petri net in which each transition has exactly one incoming arc
-    and exactly one outgoing arc is known as a \textit{state machine}.
+    and exactly one outgoing arc is known as a state machine.
 
     Any finite-state machine (or its state diagram) can be modeled with a state machine.
 \end{definition}
@@ -234,8 +234,8 @@ But note that the order in which ``Tast 1'' and ``Tast 2'' execute is non-determ
 ``Task 1'' could fire before, after or at the same time that ``Task 2''.
 It is precisely this property of the firing rule in Petri nets that allows the modeling of concurrent systems.
 
-\begin{definition}[Concurrency in Petri nets]
-    Two transitions are said to be \textit{concurrent} if they are causally independent, i.e.
+\begin{definition}{Concurrency in Petri nets}{petri-net-concurrency}
+    Two transitions are said to be concurrent if they are causally independent, i.e.
     the firing of one transition does not cause and is not triggered by the firing of the other.
 \end{definition}
 
@@ -243,9 +243,9 @@ Note that each place in the net in Fig. \ref{fig:parallel-activities-example} ha
 and one outgoing arc.
 This subclass of Petri nets allows the representation of concurrency but not decisions (conflicts).
 
-\begin{definition}[Marked graphs]
+\begin{definition}{Marked graphs}{marked-graphs}
     A Petri net in which each place has exactly one incoming arc
-    and exactly one outgoing arc is known as a \textit{marked graph}.
+    and exactly one outgoing arc is known as a marked graph.
 \end{definition}
 
 \subsubsection{Communication protocols}
@@ -318,9 +318,8 @@ $ \sigma = t_1\; t_2\; \cdots\; t_l\; $, since the markings
 resulting from each firing are derived
 from the transition firing rule described in Sec. \ref{section:transition-firing}.
 
-\begin{definition}[Reachability]
-
-    We say that a marking $M$ is \textit{reachable} from $M_0$
+\begin{definition}{Reachability}{reachability}
+    We say that a marking $M$ is reachable from $M_0$
     if there exists a firing sequence $\sigma$ such that $M$ is contained in $\sigma$.
 \end{definition}
 
@@ -353,19 +352,21 @@ exceed a certain tolerance.
 For example, if a place represents a buffer,
 we are interested that the buffer will never overflow.
 
-\begin{definition}[Boundedness]
-    A place in a Petri net is \textit{k-bounded} or \textit{k-safe}
+\begin{definition}{Boundedness}{boundedness}
+    A place in a Petri net is k-bounded or k-safe
     if the number of tokens in that place can not exceed a finite integer $k$
     for any marking reachable from $M_0$.
-    A Petri net is \textit{k-bounded} or simply \textit{bounded} if all places are bounded.
+
+    A Petri net is k-bounded or simply bounded if all places are bounded.
 \end{definition}
 
 Safeness is a special case of boundedness.
 It occurs when the place contains either 1 or 0 tokens during execution.
 
-\begin{definition}[Safeness]
-    A place in a Petri net is \textit{safe} if the number of tokens in that place never exceeds one.
-    A Petri net is \textit{safe} if each place in that net is safe.
+\begin{definition}{Safeness}{safeness}
+    A place in a Petri net is safe if the number of tokens in that place never exceeds one.
+
+    A Petri net is safe if each place in that net is safe.
 \end{definition}
 
 The nets in Fig. \ref{fig:state-machine-example}, \ref{fig:parallel-activities-example}
@@ -377,15 +378,15 @@ The net in Fig. \ref{fig:readers-writers-example} is k-bounded because all its p
 
 The concept of liveness is analogous to the complete absence of deadlocks in computer programs.
 
-\begin{definition}[Liveness]
-    A Patri net $(N, M_0)$ is said to be \textit{live}
-    (or equivalently $M_0$ is said to be a \textit{live marking} for N) if,
-    for every marking reachable from $M_0$, it is possible to fire \textbf{any} transition
+\begin{definition}{Liveness}{liveness}
+    A Patri net $(N, M_0)$ is said to be live
+    (or equivalently $M_0$ is said to be a live marking for N) if,
+    for every marking reachable from $M_0$, it is possible to fire any transition
     of the net by progressing through some firing sequence.
 \end{definition}
 
 When a net is live, it can always continue executing,
-no matter which specific transitions fired before.
+no matter the transitions that fired before.
 Eventually, every transition can be fired again.
 If a transition can be fired only once and there is no way to enable it again,
 then the net is not live.
@@ -393,14 +394,14 @@ then the net is not live.
 This is equivalent to saying that the Petri net is \textit{deadlock-free}.
 Let us now define what constitutes a deadlock and show examples of it.
 
-\begin{definition}[Deadlock in Petri nets]
+\begin{definition}{Deadlock in Petri nets}{petri-net-deadlock}
     A deadlock in a Patri net is a transition (or a set of transitions) that can not fire
     for any marking reachable from $M_0$.
     The transition (or a set of transitions) can not become enabled again
     after a certain point in the execution.
 \end{definition}
 
-A transition is \textit{live} if it is not deadlocked.
+A transition is \emph{live} if it is not deadlocked.
 If a transition is live, it is always possible to pick a suitable firing
 to get from the current marking to a marking that enables the transition.
 

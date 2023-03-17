@@ -25,10 +25,6 @@
     colorlinks=true,% make the links colored
 }
 
-% TREAT DEFINITIONS AS A THEOREM ENVIRONMENT %
-\theoremstyle{definition}
-\newtheorem{definition}{Definition}
-
 % ACRONYM CHECK %
 \usepackage{acronym}
 
@@ -39,12 +35,19 @@
 
 % TABLE FORMATTING %
 \usepackage[table]{xcolor}
-\usepackage{multirow}
 \usepackage{multicol}
 \setlength{\columnsep}{1cm}
 
 % BETTER ENUMERATE ENVIRONMENTS % 
 \usepackage{enumitem}
+
+% COLOR BOXES FOR DEFINITIONS %
+\usepackage[most]{tcolorbox}
+% Define a new environment for definitions
+% See example format: https://github.com/T-F-S/tcolorbox/blob/master/doc/latex/tcolorbox/tcolorbox-example.tex
+\newtcbtheorem[auto counter]{definition}
+{Definition}{fonttitle=\bfseries\upshape, fontupper=\slshape,
+    arc=0mm, colback=blue!5!white,colframe=blue!75!black}{definition}
 
 % CORRECT DISPLAY OF THE EURO SIGN %
 \usepackage{eurosym}
