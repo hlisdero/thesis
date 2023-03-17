@@ -66,7 +66,7 @@ practicably amenable to source code written in the Rust programming language.
 \subsection{Formal mathematical model}
 
 A Petri net is a particular kind of bipartite, weighted, directed graph,
-equipped with an initial state called the \textit{initial marking}, $M_{0}$.
+equipped with an initial state called the \emph{initial marking}, $M_{0}$.
 For this work, the following general definition of a Petri net taken from \cite{murata1989} will be used.
 
 \begin{definition}{Petri net}{petri-net}
@@ -86,12 +86,12 @@ In the graphical representation, arcs are labeled with their weight, which is a 
 Usually, the weight is omitted if it is equal to 1.
 A $k$-weighted arc can be interpreted as a set of $k$ distinct parallel arcs.
 
-A \textit{marking (state)} associates with each place a non-negative integer $l$.
-If a marking assigns to place $p$ a non-negative integer $l$, we say that $p$ is \textit{marked with $l$ tokens}.
+A \emph{marking (state)} associates with each place a non-negative integer $l$.
+If a marking assigns to place $p$ a non-negative integer $l$, we say that $p$ is \emph{marked with $l$ tokens}.
 Pictorially, we denote his by placing $l$ black dots (tokens) in place $p$.
-The \textit{pth} component of $M$, denoted by $M(p)$, is the number of tokens in place $p$.
+The \emph{pth} component of $M$, denoted by $M(p)$, is the number of tokens in place $p$.
 
-An alternative definition of Petri nets uses \textit{bags} instead of a set to define the arcs,
+An alternative definition of Petri nets uses \emph{bags} instead of a set to define the arcs,
 thus allowing multiple elements to be present.
 It can be found in the literature, e.g., \cite[Definition 2.3]{peterson1981}.
 
@@ -123,13 +123,13 @@ This motivates the following definition.
     if $p$ is both an input place and an output place of $t$.
 \end{definition}
 
-In most cases, we are interested in Petri nets containing no self-loops, which are called \textit{pure}.
+In most cases, we are interested in Petri nets containing no self-loops, which are called \emph{pure}.
 
 \begin{definition}{Pure Petri net}{pure-petri-net}
     A Petri net is said to be pure if it has no self-loops.
 \end{definition}
 
-Moreover, if every arc weight is equal to one, we call the Petri net \textit{ordinary}.
+Moreover, if every arc weight is equal to one, we call the Petri net \emph{ordinary}.
 
 \begin{definition}{Ordinary Petri net}{ordinary-petri-net}
     A Petri net is said to be ordinary if all of its arc weights are 1's, i.e.
@@ -211,7 +211,7 @@ We can now present the following definition of this subclass of Petri nets.
 \end{definition}
 
 The structure of a place $p_1$ having two (or more) output transitions $t_1$ and $t_2$ is called
-a \textit{conflict}, \textit{decision} or \textit{choice}, depending on the application.
+a \emph{conflict}, \emph{decision} or \emph{choice}, depending on the application.
 This is seen in the initial place \uppercase{P1} of Fig. \ref{fig:state-machine-example},
 where the user must select which coin to insert.
 
@@ -312,7 +312,7 @@ A sequence of firings creates a sequence of markings
 where each marking may be denoted as a vector of length $n$,
 with $n$ being the number of places in the Petri net.
 
-A \textit{firing} or \textit{occurence sequence} is denoted by
+A \emph{firing} or \emph{occurence sequence} is denoted by
 $ \sigma = M_0\; t_1\; M_1\; t_2\; M_2\; \cdots\; t_l\; M_l$ or simply
 $ \sigma = t_1\; t_2\; \cdots\; t_l\; $, since the markings
 resulting from each firing are derived
@@ -327,12 +327,12 @@ The set of all possible markings reachable from $M_0$ is denoted by $R(N, M_0)$ 
 $R(M_0)$ when the net meant is clear.
 
 A problem of utmost importance in the theory of Petri nets can be presented then,
-namely the \textit{reachability problem}:
+namely the \emph{reachability problem}:
 Finding if $M_n \in R(M_0, N)$ for a given net and initial marking.
 
 In some applications, we are just interested in the markings of a subset of places
 and we can ignore the remaining ones.
-This leads to a variation of the problem known as the \textit{submarking reachability problem}.
+This leads to a variation of the problem known as the \emph{submarking reachability problem}.
 
 It has been shown that the reachability problem is decidable \cite{mayr1981}.
 Nevertheless, it was also shown that it takes exponential space (formally, it is EXPSPACE-hard) \cite{lipton1976}.
@@ -391,7 +391,7 @@ Eventually, every transition can be fired again.
 If a transition can be fired only once and there is no way to enable it again,
 then the net is not live.
 
-This is equivalent to saying that the Petri net is \textit{deadlock-free}.
+This is equivalent to saying that the Petri net is \emph{deadlock-free}.
 Let us now define what constitutes a deadlock and show examples of it.
 
 \begin{definition}{Deadlock in Petri nets}{petri-net-deadlock}
