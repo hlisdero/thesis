@@ -355,7 +355,7 @@ we are interested that the buffer will never overflow.
 
 \begin{definition}[Boundedness]
     A place in a Petri net is \textit{k-bounded} or \textit{k-safe}
-    if the number of tokens in that place cannot exceed a finite integer $k$
+    if the number of tokens in that place can not exceed a finite integer $k$
     for any marking reachable from $M_0$.
     A Petri net is \textit{k-bounded} or simply \textit{bounded} if all places are bounded.
 \end{definition}
@@ -372,6 +372,47 @@ The nets in Fig. \ref{fig:state-machine-example}, \ref{fig:parallel-activities-e
 and \ref{fig:communication-protocols-example} are all safe.
 
 The net in Fig. \ref{fig:readers-writers-example} is k-bounded because all its places are k-bounded.
+
+\subsubsection{Liveness}
+
+The concept of liveness is analogous to the complete absence of deadlocks in computer programs.
+
+\begin{definition}[Liveness]
+    A Patri net $(N, M_0)$ is said to be \textit{live}
+    (or equivalently $M_0$ is said to be a \textit{live marking} for N) if,
+    for every marking reachable from $M_0$, it is possible to fire \textbf{any} transition
+    of the net by progressing through some firing sequence.
+\end{definition}
+
+When a net is live, it can always continue executing,
+no matter which specific transitions fired before.
+Eventually, every transition can be fired again.
+If a transition can be fired only once and there is no way to enable it again,
+then the net is not live.
+
+This is equivalent to saying that the Petri net is \textit{deadlock-free}.
+Let us now define what constitutes a deadlock and show examples of it.
+
+\begin{definition}[Deadlock in Petri nets]
+    A deadlock in a Patri net is a transition (or a set of transitions) that can not fire
+    for any marking reachable from $M_0$.
+    The transition (or a set of transitions) can not become enabled again
+    after a certain point in the execution.
+\end{definition}
+
+A transition is \textit{live} if it is not deadlocked.
+If a transition is live, it is always possible to pick a suitable firing
+to get from the current marking to a marking that enables the transition.
+
+The nets in Fig. \ref{fig:state-machine-example}, \ref{fig:parallel-activities-example}
+and \ref{fig:communication-protocols-example} are all live.
+In all these cases, after some firings,
+the net returns to the initial state and can restart the cycle.
+
+The net in Fig. \ref{fig:petri-net-example} is not live.
+After two firings it finishes executing and nothing more can happen.
+The net in Fig. \ref{fig:petri-net-formal-example} is also not live, because
+T1 will only execute once and only T2 can be enabled from that point on.
 
 \section{The Rust programming language}
 
