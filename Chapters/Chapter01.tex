@@ -135,6 +135,7 @@ Moreover, if every arc weight is equal to one, we call the Petri net \textit{ord
 \end{definition}
 
 \subsection{Transition firing}
+\label{section:transition-firing}
 
 The transition firing rule is the core concept in Petri nets.
 Despite being deceptively simple, its implications are far-reaching and complex.
@@ -169,6 +170,10 @@ consumes tokens without producing any.
 In this subsection, several simple examples are presented to introduce
 some basic concepts of Petri nets that are useful in modeling.
 This subsection has been adapted from \cite{murata1989}.
+
+For other modeling examples, such as the mutual exclusion problem,
+semaphores as proposed by Edsger W. Dijkstra, the producer/consumer problem
+and the dining philosophers problem, the reader is referred to \cite[Chapter 3]{peterson1981}.
 
 \subsubsection{Finite-state machines}
 
@@ -229,7 +234,8 @@ It is precisely this property of the firing rule in Petri nets that allows the m
 \end{definition}
 
 Note that each place in the net in Fig. \ref{fig:parallel-activities-example} has exactly one incoming arc
-and one outgoing arc. This subclass of Petri nets allows the representation of concurrency but not decisions (conflicts).
+and one outgoing arc.
+This subclass of Petri nets allows the representation of concurrency but not decisions (conflicts).
 
 \begin{definition}[Marked graphs]
     A Petri net in which each place has exactly one incoming arc
@@ -264,15 +270,15 @@ Petri nets have been used to model a variety of synchronization mechanisms,
 including the mutual exclusion, readers-writers and producers-consumers problems \cite{murata1989}.
 
 A Petri net for a readers-writers system with $k$ processes is shown in Fig. \ref{fig:readers-writers-example}.
-Each token represents a process and the choice of $t_1$ or $t_2$
+Each token represents a process and the choice of T1 or T2
 represents whether the process performs a read or a write operation.
 
 It makes use of weighted edges to remove atomically
-$k - 1$ tokens from $p_3$ before performing a write (transition $t_2$),
+$k - 1$ tokens from P3 before performing a write (transition T2),
 thus ensuring that no readers are present in the right loop of the net.
 
 At most $k$ processes may be reading at the same same,
-but when one process is reading, no process is allowed to read, that is $p_2$ will be empty.
+but when one process is reading, no process is allowed to read, that is P2 will be empty.
 It can be easily verified that the mutual exclusion property is satisfied for the system.
 
 \begin{figure}[H]
@@ -285,6 +291,77 @@ It can be easily verified that the mutual exclusion property is satisfied for th
 It should be pointed out that this system is not free from starvation,
 since there is no guarantee that a write operation will eventually take place.
 The system is on the other hand free from deadlocks.
+
+\subsection{Important properties}
+
+In this subsection, we will look at important concepts for the analysis of Petri nets
+that will facilitate the understanding of the nets we will be dealing with in the rest of the work.
+
+\subsubsection{Reachability}
+
+Reachability is one of the most important questions when studying the dynamic properties of a system.
+The firing of enabled transitions causes changes in the location of the tokens.
+In other words, it changes the marking $M$.
+A sequence of firings creates a sequence of markings
+where each marking may be denoted as a vector of length $n$,
+with $n$ being the number of places in the Petri net.
+
+A \textit{firing} or \textit{occurence sequence} is denoted by
+$ \sigma = M_0\; t_1\; M_1\; t_2\; M_2\; \cdots\; t_l\; M_l$ or simply
+$ \sigma = t_1\; t_2\; \cdots\; t_l\; $, since the markings
+resulting from each firing are derived
+from the transition firing rule described in Sec. \ref{section:transition-firing}.
+
+\begin{definition}[Reachability]
+
+    We say that a marking $M$ is \textit{reachable} from $M_0$
+    if there exists a firing sequence $\sigma$ such that $M$ is contained in $\sigma$.
+\end{definition}
+
+The set of all possible markings reachable from $M_0$ is denoted by $R(N, M_0)$ or more simply
+$R(M_0)$ when the net meant is clear.
+
+A problem of utmost importance in the theory of Petri nets can be presented then,
+namely the \textit{reachability problem}:
+Finding if $M_n \in R(M_0, N)$ for a given net and initial marking.
+
+In some applications, we are just interested in the markings of a subset of places
+and we can ignore the remaining ones.
+This leads to a variation of the problem known as the \textit{submarking reachability problem}.
+
+It has been shown that the reachability problem is decidable \cite{mayr1981}.
+Nevertheless, it was also shown that it takes exponential space (formally, it is EXPSPACE-hard) \cite{lipton1976}.
+New methods have been proposed to make the algorithms more efficient \cite{kungas2005petri}.
+Recently, \cite{czerwinski2020reachability} improved the lower bound and showed that the problem is not ELEMENTARY.
+These results highlight that the reachability problem is still an active area of research in theoretical computer science.
+
+\subsubsection{Boundedness and safeness}
+
+During the execution of a Petri net, tokens may accumulate in some places.
+Applications need to ensure that the number of tokens in a given place does not
+exceed a certain tolerance.
+For example, if a place represents a buffer,
+we are interested that the buffer will never overflow.
+
+\begin{definition}[Boundedness]
+    A place in a Petri net is \textit{k-bounded} or \textit{k-safe}
+    if the number of tokens in that place cannot exceed a finite integer $k$
+    for any marking reachable from $M_0$.
+    A Petri net is \textit{k-bounded} or simply \textit{bounded} if all places are bounded.
+\end{definition}
+
+Safeness is a special case of boundedness.
+It occurs when the place contains either 1 or 0 tokens during execution.
+
+\begin{definition}[Safeness]
+    A place in a Petri net is \textit{safe} if the number of tokens in that place never exceeds one.
+    A Petri net is \textit{safe} if each place in that net is safe.
+\end{definition}
+
+The nets in Fig. \ref{fig:state-machine-example}, \ref{fig:parallel-activities-example}
+and \ref{fig:communication-protocols-example} are all safe.
+
+The net in Fig. \ref{fig:readers-writers-example} is k-bounded because all its places are k-bounded.
 
 \section{The Rust programming language}
 
