@@ -54,8 +54,12 @@ from simple systems with a few components to complex systems with many interacti
 They can be used to detect potential problems in a system,
 optimize system performance and design and implement systems more effectively.
 
-In particular, Petri nets can be used to detect deadlocks in source code by modeling the input program as a Petri net
-and then analyzing the structure of the resulting net.
+They can also be used to model industrial processes \cite{aalst1994putting},
+to validate software requirements expressed as use cases \cite{silva2004applying}
+or to specify and analyze real-time systems \cite{kavi1996specification}.
+
+In particular, Petri nets can be used to detect deadlocks in source code
+by modeling the input program as a Petri net and then analyzing the structure of the resulting net.
 It will be shown that this approach is formally sound and
 practicably amenable to source code written in the Rust programming language.
 
@@ -173,7 +177,8 @@ This subsection has been adapted from \cite{murata1989}.
 
 For other modeling examples, such as the mutual exclusion problem,
 semaphores as proposed by Edsger W. Dijkstra, the producer/consumer problem
-and the dining philosophers problem, the reader is referred to \cite[Chapter 3]{peterson1981}.
+and the dining philosophers problem, the reader is referred to
+\cite[Chapter 3]{peterson1981} and \cite{reisig2013}.
 
 \subsubsection{Finite-state machines}
 
@@ -182,7 +187,8 @@ Finite state machines can be represented by a subclass of Petri nets.
 As an example of a finite-state machine, consider a coffee vending machine.
 It accepts \EUR{1} or \EUR{2} coins and sells two types of coffee, the first costs \EUR{3} and the second \EUR{4}.
 Assume that the machine can hold up to \EUR{4} and does not return any change.
-Then, the state diagram of the machine can be represented by the Petri net shown in Fig. \ref{fig:state-machine-example}.
+Then, the state diagram of the machine can be represented
+by the Petri net shown in Fig. \ref{fig:state-machine-example}.
 
 \begin{figure}[H]
     \centering
@@ -333,7 +339,11 @@ It has been shown that the reachability problem is decidable \cite{mayr1981}.
 Nevertheless, it was also shown that it takes exponential space (formally, it is EXPSPACE-hard) \cite{lipton1976}.
 New methods have been proposed to make the algorithms more efficient \cite{kungas2005petri}.
 Recently, \cite{czerwinski2020reachability} improved the lower bound and showed that the problem is not ELEMENTARY.
-These results highlight that the reachability problem is still an active area of research in theoretical computer science.
+These results highlight that the reachability problem is still
+an active area of research in theoretical computer science.
+
+For this and other key problems, the most important theoretical results
+obtained up to 1998 are detailed in \cite{esparza1994decidability}.
 
 \subsubsection{Boundedness and safeness}
 
