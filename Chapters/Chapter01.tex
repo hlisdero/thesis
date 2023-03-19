@@ -155,6 +155,19 @@ Despite being deceptively simple, its implications are far-reaching and complex.
     \end{enumerate}
 \end{definition}
 
+Whenever several transitions are enabled for a given marking $M$,
+any one of them can be fired.
+The choice is nondeterministic.
+Two enabled transitions are said to be in \textit{conflict}
+if the firing of one of the transitions will disable the other transition.
+In this case, the transitions compete for the token placed in a shared input place.
+
+If two transition $t_1$ and $t_2$ are enabled in some marking but are not in conflict,
+they can fire in either order, i.e. $t_1$ then $t_2$ or $t_2$ then $t_1$.
+Such transitions represent events that can occur concurrently or in parallel.
+In this sense, the Petri net model adopts an \textit{interleaved model of parallelism}, that is,
+the behavior of the system is the result of an arbitrary interleaving of the parallel events.
+
 Transitions without input places or output places receive a special name.
 
 \begin{definition}{Source transition}{source-transition}
@@ -325,6 +338,7 @@ from the transition firing rule described in Sec. \ref{section:transition-firing
 
 The set of all possible markings reachable from $M_0$ is denoted by $R(N, M_0)$ or more simply
 $R(M_0)$ when the net meant is clear.
+This set is called the \textit{reachability set}.
 
 A problem of utmost importance in the theory of Petri nets can be presented then,
 namely the \emph{reachability problem}:
