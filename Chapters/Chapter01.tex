@@ -139,7 +139,7 @@ Moreover, if every arc weight is equal to one, we call the Petri net \emph{ordin
 \end{definition}
 
 \subsection{Transition firing}
-\label{section:transition-firing}
+\label{sec:transition-firing}
 
 The transition firing rule is the core concept in Petri nets.
 Despite being deceptively simple, its implications are far-reaching and complex.
@@ -317,6 +317,7 @@ In this subsection, we will look at important concepts for the analysis of Petri
 that will facilitate the understanding of the nets we will be dealing with in the rest of the work.
 
 \subsubsection{Reachability}
+\label{sec:reachability}
 
 Reachability is one of the most important questions when studying the dynamic properties of a system.
 The firing of enabled transitions causes changes in the location of the tokens.
@@ -329,7 +330,7 @@ A \emph{firing} or \emph{occurence sequence} is denoted by
 $ \sigma = M_0\; t_1\; M_1\; t_2\; M_2\; \cdots\; t_l\; M_l$ or simply
 $ \sigma = t_1\; t_2\; \cdots\; t_l\; $, since the markings
 resulting from each firing are derived
-from the transition firing rule described in Sec. \ref{section:transition-firing}.
+from the transition firing rule described in Sec. \ref{sec:transition-firing}.
 
 \begin{definition}{Reachability}{reachability}
     We say that a marking $M$ is reachable from $M_0$
@@ -428,6 +429,24 @@ The net in Fig. \ref{fig:petri-net-example} is not live.
 After two firings it finishes executing and nothing more can happen.
 The net in Fig. \ref{fig:petri-net-formal-example} is also not live, because
 T1 will only execute once and only T2 can be enabled from that point on.
+
+\section{Reachability Analysis}
+
+Having introduced the reachability set $R(N, M_0)$ in Sec. \ref{sec:reachability}, we can now present the major
+analysis technique, which has been used with Petri nets: the \textit{reachability tree}.
+
+We will run the algorithm for constructing the reachability tree step by step
+and then present its advantages and drawbacks.
+Consider the Petri net shown in Fig. \ref{fig:reachability-tree-example}.
+
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.30]{reachability-tree-example.png}
+    \caption{A marked Petri net for illustrating the construction of a reachability tree.}
+    \label{fig:reachability-tree-example}
+\end{figure}
+
+
 
 \section{The Rust programming language}
 

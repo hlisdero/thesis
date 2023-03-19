@@ -1,0 +1,25 @@
+digraph petrinet {
+    nodesep=1.0;
+    P1 [shape="circle" xlabel="P1" label="•"];
+    P2 [shape="circle" xlabel="P2" label=""];
+    P3 [shape="circle" xlabel="P3" label=""];
+    
+    T0 [height=0.1 shape="box" xlabel="" label="T0"];
+    T1 [height=0.1 shape="box" xlabel="" label="T1"];
+    T2 [height=0.1 shape="box" xlabel="" label="T2"];
+    T3 [height=0.1 shape="box" xlabel="" label="T3"];
+    
+    P1 -> T1 -> P3;
+    P1 -> T0;
+    P3 -> T0;
+    P1 -> T3;
+    T3 -> P1;
+    T3 -> P2 -> T2;
+    T2 -> P3;
+    P3 -> T2;
+
+    // Order the nodes in 4 different levels
+    {rank = min; T3; P1;}    
+    {rank = same; P2; T1; T0}
+    {rank = same; T2; P3;}
+}
