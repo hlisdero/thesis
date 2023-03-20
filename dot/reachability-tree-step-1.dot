@@ -1,0 +1,14 @@
+digraph petrinet {
+    nodesep=1.5;
+    M0 [shape="plaintext" label="M0 = (1, 0, 0)"];
+    M1 [shape="plaintext" label="M1 = (0, 0, 1)"];
+    M2 [shape="plaintext" label="M2 = (1, 1, 0)"];
+    
+    // Use whitespace to position the edge labels somewhat correctly
+    M0 -> M1 [xlabel="T1   "];
+    M0 -> M2 [label="T2\n\n"];
+
+    // Order the nodes in 2 different levels
+    {rank = min; M0;}    
+    {rank = same; M1; M2;}
+}

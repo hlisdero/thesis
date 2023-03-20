@@ -158,14 +158,14 @@ Despite being deceptively simple, its implications are far-reaching and complex.
 Whenever several transitions are enabled for a given marking $M$,
 any one of them can be fired.
 The choice is nondeterministic.
-Two enabled transitions are said to be in \textit{conflict}
+Two enabled transitions are said to be in \emph{conflict}
 if the firing of one of the transitions will disable the other transition.
 In this case, the transitions compete for the token placed in a shared input place.
 
 If two transition $t_1$ and $t_2$ are enabled in some marking but are not in conflict,
 they can fire in either order, i.e. $t_1$ then $t_2$ or $t_2$ then $t_1$.
 Such transitions represent events that can occur concurrently or in parallel.
-In this sense, the Petri net model adopts an \textit{interleaved model of parallelism}, that is,
+In this sense, the Petri net model adopts an \emph{interleaved model of parallelism}, that is,
 the behavior of the system is the result of an arbitrary interleaving of the parallel events.
 
 Transitions without input places or output places receive a special name.
@@ -339,7 +339,7 @@ from the transition firing rule described in Sec. \ref{sec:transition-firing}.
 
 The set of all possible markings reachable from $M_0$ is denoted by $R(N, M_0)$ or more simply
 $R(M_0)$ when the net meant is clear.
-This set is called the \textit{reachability set}.
+This set is called the \emph{reachability set}.
 
 A problem of utmost importance in the theory of Petri nets can be presented then,
 namely the \emph{reachability problem}:
@@ -433,11 +433,13 @@ T1 will only execute once and only T2 can be enabled from that point on.
 \section{Reachability Analysis}
 
 Having introduced the reachability set $R(N, M_0)$ in Sec. \ref{sec:reachability}, we can now present the major
-analysis technique, which has been used with Petri nets: the \textit{reachability tree}.
+analysis technique, which has been used with Petri nets: the \emph{reachability tree}.
 
 We will run the algorithm for constructing the reachability tree step by step
 and then present its advantages and drawbacks.
-Consider the Petri net shown in Fig. \ref{fig:reachability-tree-example}.
+In general terms, the reachability tree has the following structure.
+Nodes represent markings generated from $M_0$, the root of the tree, and its successors,
+and each arc represents a transition firing, which transforms one marking into another.
 
 \begin{figure}
     \centering
@@ -446,7 +448,34 @@ Consider the Petri net shown in Fig. \ref{fig:reachability-tree-example}.
     \label{fig:reachability-tree-example}
 \end{figure}
 
+Consider the Petri net shown in Fig. \ref{fig:reachability-tree-example}.
+The initial marking is $(1, 0, 0)$.
+In this initial marking, two transitions are enabled: T1 and T3.
+Given that we would like to obtain the entire reachability set,
+we define a new node in the reachability tree for each reachable marking,
+which results from firing each transition.
+An arc, labeled by the transition fired, leads from the initial marking
+(the root of the tree) to each of the new markings.
+After this first step (Fig. \ref{fig:reachability-tree-step-1}), the tree contains all markings
+that are immediately reachable from the initial marking.
 
+\begin{figure}
+    \centering
+    \includegraphics[scale=0.30]{reachability-tree-step-1.png}
+    \caption{The first step building the reachability tree
+        for the Petri net in Fig. \ref{fig:reachability-tree-example}}
+    \label{fig:reachability-tree-step-1}
+\end{figure}
+
+Now we must consider all markings reachable from the leaves of the tree.
+
+From marking $(0,0,1)$ we cannot fire any transition.
+This is known as a \emph{dead marking}.
+In other words, it is a ``dead-end'' node.
+This class of end-states is particularly relevant for deadlock analysis.
+
+From the marking on the right of the tree, denoted $(1, 1, 0)$, we can fire T1 or T3.
+If we fire T1, we obtain $(0, 1, 1)$ and if T3 fires, the resulting marking is $(1, 2, 0)$.
 
 \section{The Rust programming language}
 
