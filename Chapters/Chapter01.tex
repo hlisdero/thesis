@@ -430,11 +430,10 @@ After two firings it finishes executing and nothing more can happen.
 The net in Fig. \ref{fig:petri-net-formal-example} is also not live, because
 T1 will only execute once and only T2 can be enabled from that point on.
 
-\section{Reachability Analysis}
+\subsection{Reachability Analysis}
 
 Having introduced the reachability set $R(N, M_0)$ in Sec. \ref{sec:reachability},
-we can now present the major analysis technique, which has been used with Petri nets:
-the \emph{reachability tree}.
+we can now present a major analysis technique for Petri nets: the \emph{reachability tree}.
 
 We will run the algorithm for constructing the reachability tree step by step
 and then present its advantages and drawbacks.
