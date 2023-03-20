@@ -1,0 +1,13 @@
+digraph petrinet {
+    nodesep=1.5;
+    M0 [shape="plaintext" label="M0 = (1, 0)"];
+    M1 [shape="plaintext" label="M1 = (0, 1)"];
+    M2 [shape="plaintext" label="M2 = (1, 0)"];
+    M3 [shape="plaintext" label="M3 = (0, 1)"];
+    M4 [shape="plaintext" label="•\n•\n•\n"];
+ 
+    M0 -> M1 [xlabel="T1  "];
+    M1 -> M2 [xlabel="T2  "];
+    M2 -> M3 [xlabel="T1  "];
+    M3 -> M4 [xlabel="T2  "];
+}

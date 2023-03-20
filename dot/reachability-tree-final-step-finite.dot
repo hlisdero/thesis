@@ -1,0 +1,22 @@
+digraph petrinet {
+    nodesep=1.5;
+    M0 [shape="plaintext" label="M0 = (1, 0, 0)"];
+    M1 [shape="plaintext" label="M1 = (0, 0, 1)"];
+    M2 [shape="plaintext" label="M2 = (1, ω, 0)"];
+    M3 [shape="plaintext" label="M3 = (0, ω, 1)"];
+    M4 [shape="plaintext" label="M4 = (1, ω, 0)"];
+    M5 [shape="plaintext" label="M5 = (0, ω, 1)"];
+    
+    // Use whitespace to position the edge labels somewhat correctly
+    // Tune the weights to generate a standard binary tree layout
+    M0 -> M1 [xlabel="T1   "];
+    M0 -> M2 [label="T3\n\n"];
+    M2 -> M3 [xlabel="T1   "];
+    M2 -> M4 [label="T3\n\n"];
+    M3 -> M5 [xlabel="T2   "];
+    
+    // Order the nodes in 3 different levels
+    {rank = min; M0;}    
+    {rank = same; M1; M2;}
+    {rank = same; M3; M4;}
+}

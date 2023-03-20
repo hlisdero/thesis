@@ -1,0 +1,34 @@
+digraph petrinet {
+    nodesep=1.5;
+    M0 [shape="plaintext" label="M0 = (1, 0, 0)"];
+    M1 [shape="plaintext" label="M1 = (0, 0, 1)"];
+    M2 [shape="plaintext" label="M2 = (1, 1, 0)"];
+    M3 [shape="plaintext" label="M3 = (0, 1, 1)"];
+    M4 [shape="plaintext" label="M4 = (1, 2, 0)"];
+    M5 [shape="plaintext" label="M5 = (0, 0, 1)"];
+    M6 [shape="plaintext" label="M6 = (0, 2, 1)"];
+    M7 [shape="plaintext" label="M7 = (1, 3, 0)"]; 
+    M8 [shape="plaintext" label="M8 = (0, 1, 0)"];
+    M9 [shape="plaintext" label="...."];
+    M10 [shape="plaintext" label="...."];
+    
+    // Use whitespace to position the edge labels somewhat correctly
+    // Tune the weights to generate a standard binary tree layout
+    M0 -> M1 [xlabel="T1   "];
+    M0 -> M2 [label="T3\n\n"];
+    M2 -> M3 [xlabel="T1   "];
+    M2 -> M4 [label="T3\n\n"];
+    M3 -> M5 [xlabel="T2   "];
+    M4 -> M6 [xlabel="T1   " weight=0.99999];
+    M4 -> M7 [label="T3\n\n"];
+    M6 -> M8 [xlabel="T2   " weight=0.99999];
+    M7 -> M9 [xlabel="T1   "];
+    M7 -> M10 [label="T3\n\n"];
+
+    // Order the nodes in 5 different levels
+    {rank = min; M0;}    
+    {rank = same; M1; M2;}
+    {rank = same; M3; M4;}
+    {rank = same; M5; M6; M7;}
+    {rank = same; M8; M9; M10;}
+}
