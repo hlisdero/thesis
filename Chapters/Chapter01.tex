@@ -572,6 +572,79 @@ These concepts are beyond the scope of this work and are not required in the fol
 
 \section{The Rust programming language}
 
+One of the most promising modern programming languages
+for concurrent programming is Rust\footnote{\url{https://www.rust-lang.org/}}.
+Its memory model based on the concept of \emph{ownership} and its expressive type system prevent
+a wide variety of errors related to memory management and concurrent programming at compile-time:
+
+\begin{itemize}
+    \item Double free \cite[Cap. 4.1]{rust-book}
+    \item Use after free \cite[Cap. 4.1]{rust-book}
+    \item Dangling pointers \cite[Cap. 4.2]{rust-book}
+    \item Data races \cite[Cap. 4.2]{rust-book}
+    \item Passing non-thread-safe variables \cite[Cap. 16.4]{rust-book}
+\end{itemize}
+
+In this section, we will justify the choice of Rust to study the detection of deadlocks and lost signals.
+We will show how these problems can be studied separately, knowing that other errors are already avoided at compile time.
+In other words, we will argue that the stability and safety of the language provide a firm foundation
+on which to build a tool that detects additional errors during compilation.
+
+\subsection{Adoption}
+
+In this subsection, we will briefly describe the trend in the adoption of the Rust programming language.
+This highlights the relevance of this work as a contribution to a growing community of programmers
+who emphasize the importance of safe and performant systems programming for the next years in the software industry.
+
+In the last few years, several major projects in the Open Source community and at private companies have decided
+to incorporate Rust to reduce the number of bugs related to memory management without sacrificing performance.
+Among them, we can name a few significant examples:
+
+\begin{itemize}
+    \item The Android Open Source Project encourages the use of Rust for the SO components below the Android Runtime (ART) \cite{stoep2021}.
+    \item The Linux kernel, which introduces in version 6.1 (released in December 2022) official tooling support
+          for programming components in Rust \cite{corbet2022,desimone2022}.
+    \item At Mozilla, the Oxidation project was created in 2015 to increase the usage of Rust in Firefox and related projects.
+          As of March 2023, the lines of code in Rust represent more than 10\% of the total in Firefox Nightly \cite{mozilla-oxidation}.
+    \item At Meta, the use of Rust as a development language server-side
+          is approved and encouraged since July 2022 \cite{garcia2022}.
+    \item At Cloudflare, a new HTTP proxy in Rust was built from scratch to overcome the architectural limitations
+          of NGINX, reducing CPU usage by 70\% and memory usage by 67\% \cite{wu2022}.
+    \item At Discord, reimplementing a crucial service written in Go in Rust provided great benefits in performance
+          and solved a performance penalty due to the garbage collection in Go \cite{howarth2020}.
+    \item At npm Inc., the company behind the npm registry, Rust allowed scaling CPU-bound services
+          to more than 1.3 billion downloads per day.
+\end{itemize}
+
+Moreover, the interest of the developer community in Rust is undeniable,
+as it has been voted for 7 years in a row as the programming language most loved by programmers
+in Stack Overflow's annual survey \cite{so-survey2022}.
+
+\subsection{Importance of memory safety}
+
+In this subsection, compelling evidence that the use of a memory-safe programming language is presented.
+The goal is to highlight the importance of advancing research in the compile-time detection of errors
+to prevent bugs that are subsequently difficult to correct in production systems.
+
+Several empirical investigations have concluded that around 70\% of the vulnerabilities
+found in large C/C++ projects occur due to memory handling errors.
+This high figure can be observed in projects such as:
+
+\begin{itemize}
+    \item Android Open Source Project \cite{memory-bugs-android},
+    \item the Bluetooth and media components of Android \cite{memory-bugs-android-media-bluetooth},
+    \item the Chromium Projects behind the Chrome web browser \cite{memory-bugs-chrome},
+    \item the CSS component of Firefox \cite{memory-bugs-firefox},
+    \item iOS and macOS \cite{memory-bugs-ios-macos},
+    \item Microsoft products \cite{miller-security-microsoft2019, memory-bugs-microsoft},
+    \item Ubuntu \cite{memory-bugs-ubuntu}
+\end{itemize}
+
+Numerous tools have set the goal to address these vulnerabilities
+caused by improper memory allocation in already established codebases.
+However, their use leads to a noticeable loss of performance and
+not all vulnerabilities can be prevented \cite{szekeres2013sok}.
+
 \section{Deadlocks}
 
 \section{Lost signals}
