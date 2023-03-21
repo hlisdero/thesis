@@ -469,7 +469,7 @@ that are immediately reachable from the initial marking.
 
 Now we must consider all markings reachable from the leaves of the tree.
 
-From marking $(0,0,1)$ we cannot fire any transition.
+From marking $(0,0,1)$ we can not fire any transition.
 This is known as a \emph{dead marking}.
 In other words, it is a ``dead-end'' node.
 This class of end-states is particularly relevant for deadlock analysis.
@@ -573,9 +573,15 @@ These concepts are beyond the scope of this work and are not required in the fol
 \section{The Rust programming language}
 
 One of the most promising modern programming languages
-for concurrent programming is Rust\footnote{\url{https://www.rust-lang.org/}}.
-Its memory model based on the concept of \emph{ownership} and its expressive type system prevent
-a wide variety of errors related to memory management and concurrent programming at compile-time:
+for concurrent and memory-safe programming is Rust\footnote{\url{https://www.rust-lang.org/}}.
+Rust is a multi-paradigm, general-purpose programming language that aims to provide developers
+with a safe, concurrent, and efficient way to write low-level code.
+It started as a project at Mozilla Research in 2009.
+The first stable release, Rust 1.0, was announced on May 15, 2015.
+For a brief history of Rust up to 2023, see \cite{thompson2023mit}.
+
+Rust's memory model based on the concept of \emph{ownership} and its expressive type system prevent
+a wide variety of error classes related to memory management and concurrent programming at compile-time:
 
 \begin{itemize}
     \item Double free \cite[Cap. 4.1]{rust-book}
@@ -585,10 +591,75 @@ a wide variety of errors related to memory management and concurrent programming
     \item Passing non-thread-safe variables \cite[Cap. 16.4]{rust-book}
 \end{itemize}
 
+The official compiler \emph{rustc}\footnote{\url{https://github.com/rust-lang/rust}}
+takes care of controlling how the memory is used and allocating and deallocating objects.
+If a violation of its strict rules is found, the program will simply not compile.
+
 In this section, we will justify the choice of Rust to study the detection of deadlocks and lost signals.
-We will show how these problems can be studied separately, knowing that other errors are already avoided at compile time.
+We will show how these problems can be studied separately, knowing that other errors are already caught at compile time.
 In other words, we will argue that the stability and safety of the language provide a firm foundation
 on which to build a tool that detects additional errors during compilation.
+
+\subsection{Main characteristics}
+
+Some of Rust's main features are:
+
+\begin{itemize}
+    \item Type system: Rust has a powerful type system that provides compile-time safety checks and prevents many common programming errors.
+          It includes features such as type inference, generics, enums, and pattern matching.
+          Every variable has a type but it is commonly inferred by the compiler.
+    \item Performance: Rust's performance is comparable to C and C++,
+          and it is often faster than many other popular programming languages such as Java, Go, Python or Javascript.
+          Rust's performance is achieved through a combination of features
+          such as zero-cost abstractions, minimal runtime, and efficient memory management.
+    \item Concurrency: Rust has built-in support for concurrency.
+          It supports several concurrency paradigms such as shared state, message passing and asynchronous programming.
+          It does not force the developer to implement concurrency in a specific manner.
+    \item Ownership and borrowing: Rust uses a unique ownership model to manage memory,
+          allowing for efficient memory allocation and deallocation without the risk of memory leaks or data races.
+          Furthermore, it does not rely on a garbage collector, thus saving resources.
+          The \emph{borrow checker} ensures that there is only one owner of a resource at any given time.
+    \item Community-driven: Rust has a vibrant and growing community of developers
+          who contribute to the language's development and ecosystem.
+          Anyone can contribute to the language's development and suggest improvements.
+\end{itemize}
+
+\subsubsection{The borrow checker}
+
+Rust's borrow checker is a crucial component of its ownership model,
+which is designed to ensure memory safety and prevent data races in concurrent code.
+The borrow checker analyzes Rust code at compile-time
+and enforces a set of rules to ensure that a program's memory is accessed safely and efficiently.
+
+The core idea behind the borrow checker is that each piece of memory in a Rust program has an owner.
+The owner may change during execution but there can only be one owner at any given time.
+Memory values can also be \emph{borrowed}, that is, used without swapping the owner,
+similar to accessing the value through a pointer or a reference in other programming languages.
+When a value is borrowed, the borrower receives a reference to the value, but the original owner retains ownership.
+The borrow checker enforces rules to ensure that a borrowed value is not modified while it is borrowed
+and that the borrower releases the reference before the owner goes out of scope.
+
+For clarity, we will now present some of the key rules enforced by the borrow checker:
+
+\begin{itemize}
+    \item No two mutable references to the same memory location can exist simultaneously.
+          This prevents data races, where two threads try to modify the same memory location at the same time.
+    \item Mutable references can not exist at the same time as immutable references to the same memory location.
+          This ensures that mutable and immutable references can not be used simultaneously,
+          preventing inconsistent reads and writes.
+    \item References can not outlive the value they reference.
+          This ensures that references do not point to invalid memory locations,
+          preventing null pointer dereferences and other memory errors.
+    \item References can not be used after their owner has been moved or destroyed.
+          This ensures that references do not point to memory that has been deallocated,
+          preventing use-after-free errors.
+\end{itemize}
+
+It can take some effort to write Rust code that satisfies these rules.
+The borrow checker is usually singled out as one aspect of the language that is confusing for newcomers.
+However, this discipline pays off in terms of increased memory safety and performance.
+By ensuring that Rust programs follow these rules, the borrow checker eliminates many common programming errors
+that can lead to memory leaks, data races, and other bugs, while also teaching good coding practices and patterns.
 
 \subsection{Adoption}
 
@@ -613,11 +684,15 @@ Among them, we can name a few significant examples:
     \item At Discord, reimplementing a crucial service written in Go in Rust provided great benefits in performance
           and solved a performance penalty due to the garbage collection in Go \cite{howarth2020}.
     \item At npm Inc., the company behind the npm registry, Rust allowed scaling CPU-bound services
-          to more than 1.3 billion downloads per day.
+          to more than 1.3 billion downloads per day \cite{rust-npm-case-study}.
 \end{itemize}
 
+In other cases, Rust has proved to be a great choice in existing C/C++ projects to rewrite modules
+that process untrusted user input, for instance, parsers,
+and reduce the number of security vulnerabilities due to memory issues \cite{chifflier2017writing}.
+
 Moreover, the interest of the developer community in Rust is undeniable,
-as it has been voted for 7 years in a row as the programming language most loved by programmers
+as it has been rated for 7 years in a row as the programming language most ``loved'' by programmers
 in Stack Overflow's annual survey \cite{so-survey2022}.
 
 \subsection{Importance of memory safety}
