@@ -605,7 +605,8 @@ on which to build a tool that detects additional errors during compilation.
 Some of Rust's main features are:
 
 \begin{itemize}
-    \item Type system: Rust has a powerful type system that provides compile-time safety checks and prevents many common programming errors.
+    \item Type system: Rust has a powerful type system
+          that provides compile-time safety checks and prevents many common programming errors.
           It includes features such as type inference, generics, enums, and pattern matching.
           Every variable has a type but it is commonly inferred by the compiler.
     \item Performance: Rust's performance is comparable to C and C++,
@@ -622,7 +623,17 @@ Some of Rust's main features are:
     \item Community-driven: Rust has a vibrant and growing community of developers
           who contribute to the language's development and ecosystem.
           Anyone can contribute to the language's development and suggest improvements.
+          The documentation is also open-source and important decisions are documented
+          in form of RFCs (\emph{Requests for Comments})\footnote{\url{https://rust-lang.github.io/rfcs/}}.
 \end{itemize}
+
+The release cycle of the official Rust compiler, \textit{rustc}, is remarkably fast.
+A new stable version of the compiler is released every 6 weeks \cite[Appendix G]{rust-book}.
+This is made possible by a complex automated testing system that compiles even all packages
+available on \texttt{crates.io}\footnote{\url{https://crates.io/}}
+using a program called \textit{crater}\footnote{\url{https://github.com/rust-lang/crater}}
+to verify that compiling and running the tests with the new version of the compiler
+does not break existing packages \cite{albini2019}.
 
 \subsubsection{The borrow checker}
 
@@ -672,7 +683,8 @@ to incorporate Rust to reduce the number of bugs related to memory management wi
 Among them, we can name a few significant examples:
 
 \begin{itemize}
-    \item The Android Open Source Project encourages the use of Rust for the SO components below the Android Runtime (ART) \cite{stoep2021}.
+    \item The Android Open Source Project encourages the use of Rust for the SO components
+          below the Android Runtime (ART) \cite{stoep2021}.
     \item The Linux kernel, which introduces in version 6.1 (released in December 2022) official tooling support
           for programming components in Rust \cite{corbet2022,desimone2022}.
     \item At Mozilla, the Oxidation project was created in 2015 to increase the usage of Rust in Firefox and related projects.
@@ -719,6 +731,11 @@ Numerous tools have set the goal to address these vulnerabilities
 caused by improper memory allocation in already established codebases.
 However, their use leads to a noticeable loss of performance and
 not all vulnerabilities can be prevented \cite{szekeres2013sok}.
+
+We must note that Rust itself, like any other piece of software, is not exempt from security vulnerabilities.
+Serious bugs have been discovered in the standard library in the past \cite{davidoff2018}.
+Besides, code generation in Rust also includes mitigations to exploits of various kinds \cite[Chap. 11]{rustc-book}.
+However, this is far from the well-known issues in C and C++.
 
 \section{Deadlocks}
 
