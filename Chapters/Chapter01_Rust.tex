@@ -1,0 +1,166 @@
+\section{The Rust programming language}
+
+One of the most promising modern programming languages
+for concurrent and memory-safe programming is Rust\footnote{\url{https://www.rust-lang.org/}}.
+Rust is a multi-paradigm, general-purpose programming language that aims to provide developers
+with a safe, concurrent, and efficient way to write low-level code.
+It started as a project at Mozilla Research in 2009.
+The first stable release, Rust 1.0, was announced on May 15, 2015.
+For a brief history of Rust up to 2023, see \cite{thompson2023mit}.
+
+Rust's memory model based on the concept of \emph{ownership} and its expressive type system prevent
+a wide variety of error classes related to memory management and concurrent programming at compile-time:
+
+\begin{itemize}
+    \item Double free \cite[Cap. 4.1]{rust-book}
+    \item Use after free \cite[Cap. 4.1]{rust-book}
+    \item Dangling pointers \cite[Cap. 4.2]{rust-book}
+    \item Data races \cite[Cap. 4.2]{rust-book}
+    \item Passing non-thread-safe variables \cite[Cap. 16.4]{rust-book}
+\end{itemize}
+
+The official compiler \emph{rustc}\footnote{\url{https://github.com/rust-lang/rust}}
+takes care of controlling how the memory is used and allocating and deallocating objects.
+If a violation of its strict rules is found, the program will simply not compile.
+
+In this section, we will justify the choice of Rust to study the detection of deadlocks and lost signals.
+We will show how these problems can be studied separately, knowing that other errors are already caught at compile time.
+In other words, we will argue that the stability and safety of the language provide a firm foundation
+on which to build a tool that detects additional errors during compilation.
+
+\subsection{Main characteristics}
+
+Some of Rust's main features are:
+
+\begin{itemize}
+    \item Type system: Rust has a powerful type system
+          that provides compile-time safety checks and prevents many common programming errors.
+          It includes features such as type inference, generics, enums, and pattern matching.
+          Every variable has a type but it is commonly inferred by the compiler.
+    \item Performance: Rust's performance is comparable to C and C++,
+          and it is often faster than many other popular programming languages such as Java, Go, Python or Javascript.
+          Rust's performance is achieved through a combination of features
+          such as zero-cost abstractions, minimal runtime, and efficient memory management.
+    \item Concurrency: Rust has built-in support for concurrency.
+          It supports several concurrency paradigms such as shared state, message passing and asynchronous programming.
+          It does not force the developer to implement concurrency in a specific manner.
+    \item Ownership and borrowing: Rust uses a unique ownership model to manage memory,
+          allowing for efficient memory allocation and deallocation without the risk of memory leaks or data races.
+          Furthermore, it does not rely on a garbage collector, thus saving resources.
+          The \emph{borrow checker} ensures that there is only one owner of a resource at any given time.
+    \item Community-driven: Rust has a vibrant and growing community of developers
+          who contribute to the language's development and ecosystem.
+          Anyone can contribute to the language's development and suggest improvements.
+          The documentation is also open-source and important decisions are documented
+          in form of RFCs (\emph{Requests for Comments})\footnote{\url{https://rust-lang.github.io/rfcs/}}.
+\end{itemize}
+
+The release cycle of the official Rust compiler, \textit{rustc}, is remarkably fast.
+A new stable version of the compiler is released every 6 weeks \cite[Appendix G]{rust-book}.
+This is made possible by a complex automated testing system that compiles even all packages
+available on \texttt{crates.io}\footnote{\url{https://crates.io/}}
+using a program called \textit{crater}\footnote{\url{https://github.com/rust-lang/crater}}
+to verify that compiling and running the tests with the new version of the compiler
+does not break existing packages \cite{albini2019}.
+
+\subsubsection{The borrow checker}
+
+Rust's borrow checker is a crucial component of its ownership model,
+which is designed to ensure memory safety and prevent data races in concurrent code.
+The borrow checker analyzes Rust code at compile-time
+and enforces a set of rules to ensure that a program's memory is accessed safely and efficiently.
+
+The core idea behind the borrow checker is that each piece of memory in a Rust program has an owner.
+The owner may change during execution but there can only be one owner at any given time.
+Memory values can also be \emph{borrowed}, that is, used without swapping the owner,
+similar to accessing the value through a pointer or a reference in other programming languages.
+When a value is borrowed, the borrower receives a reference to the value, but the original owner retains ownership.
+The borrow checker enforces rules to ensure that a borrowed value is not modified while it is borrowed
+and that the borrower releases the reference before the owner goes out of scope.
+
+For clarity, we will now present some of the key rules enforced by the borrow checker:
+
+\begin{itemize}
+    \item No two mutable references to the same memory location can exist simultaneously.
+          This prevents data races, where two threads try to modify the same memory location at the same time.
+    \item Mutable references can not exist at the same time as immutable references to the same memory location.
+          This ensures that mutable and immutable references can not be used simultaneously,
+          preventing inconsistent reads and writes.
+    \item References can not outlive the value they reference.
+          This ensures that references do not point to invalid memory locations,
+          preventing null pointer dereferences and other memory errors.
+    \item References can not be used after their owner has been moved or destroyed.
+          This ensures that references do not point to memory that has been deallocated,
+          preventing use-after-free errors.
+\end{itemize}
+
+It can take some effort to write Rust code that satisfies these rules.
+The borrow checker is usually singled out as one aspect of the language that is confusing for newcomers.
+However, this discipline pays off in terms of increased memory safety and performance.
+By ensuring that Rust programs follow these rules, the borrow checker eliminates many common programming errors
+that can lead to memory leaks, data races, and other bugs, while also teaching good coding practices and patterns.
+
+\subsection{Adoption}
+
+In this subsection, we will briefly describe the trend in the adoption of the Rust programming language.
+This highlights the relevance of this work as a contribution to a growing community of programmers
+who emphasize the importance of safe and performant systems programming for the next years in the software industry.
+
+In the last few years, several major projects in the Open Source community and at private companies have decided
+to incorporate Rust to reduce the number of bugs related to memory management without sacrificing performance.
+Among them, we can name a few significant examples:
+
+\begin{itemize}
+    \item The Android Open Source Project encourages the use of Rust for the SO components
+          below the Android Runtime (ART) \cite{stoep2021}.
+    \item The Linux kernel, which introduces in version 6.1 (released in December 2022) official tooling support
+          for programming components in Rust \cite{corbet2022,desimone2022}.
+    \item At Mozilla, the Oxidation project was created in 2015 to increase the usage of Rust in Firefox and related projects.
+          As of March 2023, the lines of code in Rust represent more than 10\% of the total in Firefox Nightly \cite{mozilla-oxidation}.
+    \item At Meta, the use of Rust as a development language server-side
+          is approved and encouraged since July 2022 \cite{garcia2022}.
+    \item At Cloudflare, a new HTTP proxy in Rust was built from scratch to overcome the architectural limitations
+          of NGINX, reducing CPU usage by 70\% and memory usage by 67\% \cite{wu2022}.
+    \item At Discord, reimplementing a crucial service written in Go in Rust provided great benefits in performance
+          and solved a performance penalty due to the garbage collection in Go \cite{howarth2020}.
+    \item At npm Inc., the company behind the npm registry, Rust allowed scaling CPU-bound services
+          to more than 1.3 billion downloads per day \cite{rust-npm-case-study}.
+\end{itemize}
+
+In other cases, Rust has proved to be a great choice in existing C/C++ projects to rewrite modules
+that process untrusted user input, for instance, parsers,
+and reduce the number of security vulnerabilities due to memory issues \cite{chifflier2017writing}.
+
+Moreover, the interest of the developer community in Rust is undeniable,
+as it has been rated for 7 years in a row as the programming language most ``loved'' by programmers
+in Stack Overflow's annual survey \cite{so-survey2022}.
+
+\subsection{Importance of memory safety}
+
+In this subsection, compelling evidence that the use of a memory-safe programming language is presented.
+The goal is to highlight the importance of advancing research in the compile-time detection of errors
+to prevent bugs that are subsequently difficult to correct in production systems.
+
+Several empirical investigations have concluded that around 70\% of the vulnerabilities
+found in large C/C++ projects occur due to memory handling errors.
+This high figure can be observed in projects such as:
+
+\begin{itemize}
+    \item Android Open Source Project \cite{memory-bugs-android},
+    \item the Bluetooth and media components of Android \cite{memory-bugs-android-media-bluetooth},
+    \item the Chromium Projects behind the Chrome web browser \cite{memory-bugs-chrome},
+    \item the CSS component of Firefox \cite{memory-bugs-firefox},
+    \item iOS and macOS \cite{memory-bugs-ios-macos},
+    \item Microsoft products \cite{miller-security-microsoft2019, memory-bugs-microsoft},
+    \item Ubuntu \cite{memory-bugs-ubuntu}
+\end{itemize}
+
+Numerous tools have set the goal to address these vulnerabilities
+caused by improper memory allocation in already established codebases.
+However, their use leads to a noticeable loss of performance and
+not all vulnerabilities can be prevented \cite{szekeres2013sok}.
+
+We must note that Rust itself, like any other piece of software, is not exempt from security vulnerabilities.
+Serious bugs have been discovered in the standard library in the past \cite{davidoff2018}.
+Besides, code generation in Rust also includes mitigations to exploits of various kinds \cite[Chap. 11]{rustc-book}.
+However, this is far from the well-known issues in C and C++.
