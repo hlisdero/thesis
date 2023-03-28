@@ -1,0 +1,47 @@
+% !TeX root = ../Thesis.tex
+\documentclass[../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../images/}}}
+
+\begin{document}
+
+\section{Deadlocks}
+
+Deadlocks are a common problem that can occur in concurrent systems,
+which are systems where multiple threads or processes are
+running simultaneously and potentially sharing resources.
+
+A deadlock occurs when two or more threads or processes
+are blocked and unable to continue executing
+because each is waiting for the other to release a resource that it needs.
+This results in a situation where none of the threads or processes
+can make progress and the system becomes effectively stuck.
+
+This can be a serious problem in concurrent systems,
+as they can cause the system to become unresponsive or even crash.
+Therefore, it is important to be able to detect and prevent deadlocks.
+They can occur in any concurrent system where multiple threads or processes
+are competing for shared resources.
+Examples of shared resources that can lead to deadlocks include system memory,
+input/output devices, locks, and other types of synchronization primitives.
+
+Deadlocks can be difficult to detect and prevent
+because they depend on the precise timing of events in the system.
+Even in cases where deadlocks can be detected, resolving them can be difficult,
+as it may require releasing resources that have already been acquired or
+rolling back completed transactions.
+To avoid deadlocks, it is important to carefully manage shared resources in a concurrent system.
+This can involve using techniques such as resource allocation algorithms,
+deadlock detection algorithms, and other types of synchronization primitives.
+By carefully managing shared resources, it is possible to prevent deadlocks from occurring and
+ensure the smooth operation of concurrent systems.
+
+To understand the concept in more detail,
+consider a simple example where two processes, A and B,
+are competing for two resources, X and Y.
+Initially, process A has acquired resource X and is waiting to acquire resource Y,
+while process B has acquired resource Y and is waiting to acquire resource X.
+In this situation, neither process can continue executing
+because it is waiting for the other process to release a resource that it needs.
+This results in a deadlock, as neither process can make progress.
+
+\end{document}
