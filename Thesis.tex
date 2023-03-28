@@ -55,19 +55,67 @@
 % PLACEHOLDER %
 \usepackage{blindtext}
 
+% SUPPORT FOR SUBFILES COMPILED SEPARATELY %
+% See example on: https://www.overleaf.com/learn/latex/Multi-file_LaTeX_projects
+\usepackage{subfiles}
+
 \begin{document}
 
 \include{FrontBackMatter/TitlePage.tex}
 \include{FrontBackMatter/Contents.tex}
 \include{FrontBackMatter/Lists.tex}
-\include{Chapters/Chapter01_PetriNets.tex}
-\include{Chapters/Chapter01_Rust.tex}
-\include{Chapters/Chapter01_DeadlockModelChecking.tex}
-\include{Chapters/Chapter02.tex}
-\include{Chapters/Chapter03.tex}
-\include{Chapters/Chapter04.tex}
-\include{Chapters/Chapter05.tex}
-\include{Chapters/Chapter06.tex}
+
+\chapter{Introduction}
+
+\subfile{Sections/PetriNets.tex}
+\subfile{Sections/Rust.tex}
+\subfile{Sections/DeadlockModelChecking.tex}
+
+\bigskip
+
+\chapter{Design of the proposed solution}
+
+\section{Rust compiler: \emph{rustc}}
+\section{Mid-level Intermediate Representation (MIR)}
+\section{Entry point for the translation}
+\section{Function calls}
+\section{Function memory}
+\section{MIR function}
+\subsection{Basic blocks}
+\subsection{Statements}
+\subsection{Terminators}
+\section{Panic handling}
+\section{Multithreading}
+\section{Emulation of Rust synchronization primitives}
+
+\subsection{Mutex (\texttt{std::sync::Mutex})}
+\subsection{Mutex lock guard (\texttt{std::sync::MutexGuard})}
+\subsection{Condition variables (\texttt{std::sync::Condvar})}
+\subsection{Atomic Refence Counter (\texttt{std::sync::Arc})}
+
+\bigskip
+
+\chapter{Testing the implementation}
+
+\section{Unit tests}
+\section{Integration tests}
+\section{Generating the MIR representation}
+\section{Visualizing the result}
+
+\bigskip
+
+\chapter{Conclusions}
+
+\bigskip
+
+\chapter{Future work}
+
+\bigskip
+
+\chapter{Related work}
+
+\bigskip
+
 \include{FrontBackMatter/Bibliography.tex}
 
 \end{document}
