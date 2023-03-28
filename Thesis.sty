@@ -1,0 +1,78 @@
+% Style file for the thesis %
+% Based on the guide: https://en.wikibooks.org/wiki/LaTeX/Modular_Documents#The_file_mystyle.sty 
+\ProvidesPackage{Thesis}
+
+% SET THE LANGUAGE TO ENGLISH %
+\usepackage[english]{babel}
+
+% INCLUDE THE BASIC PACKAGES FOR TYPESETTING EQUATIONS %
+\usepackage{amssymb,amsmath,amsthm,amsfonts}
+\usepackage{calc}
+
+% MARGINS CONFIGURATION %
+\usepackage{vmargin}
+\setmarginsrb{2 cm}{2 cm}{2 cm}{2 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+% SPACE BETWEEN PARAGRAPHS
+\usepackage{parskip}
+
+% TITLE PAGE SETUP % 
+\usepackage{titlesec}
+
+% FANCY HEADERS %
+\usepackage{fancyhdr}
+
+% GRAPHICS CONFIGURATION %
+\usepackage{graphicx}
+\graphicspath{{images/}}
+
+% ADD SUPPORT FOR SUBFIGURE %
+\usepackage{subfigure}
+
+% ADD SUPPORT FOR PLACING FIGURES AT A SPECIFIC LOCATION WITH "[H]" %
+\usepackage{float}
+
+% A SIMPLE \url COMMAND FOR TYPESETTING URLS %
+\usepackage{url}
+
+% HYPERLINK CONFIGURATION %
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\hypersetup{
+    colorlinks=true,% make the links colored
+}
+
+% ACRONYM SUPPORT %
+\usepackage{acronym}
+
+% CODE LISTINGS %
+\usepackage{listings}
+
+% ADD SINTAX HIGHLIGHTING TO CODE LISTINGS %
+\usepackage{minted}
+
+% DEFINE SOME COMMON SYMBOLS (THE INCLUDE IS LOCATION-SENSITIVE) %
+\usepackage{gensymb}
+
+% TABLE FORMATTING %
+\usepackage[table]{xcolor}
+\usepackage{multicol}
+\setlength{\columnsep}{1cm}
+
+% BETTER ENUMERATE ENVIRONMENTS: SUPPORT USING ROMAN NUMERALS % 
+\usepackage{enumitem}
+
+% COLOR BOXES FOR DEFINITIONS %
+\usepackage[most]{tcolorbox}
+% Define a new environment for definitions
+% See example format: https://github.com/T-F-S/tcolorbox/blob/master/doc/latex/tcolorbox/tcolorbox-example.tex
+\newtcbtheorem[auto counter]{definition}
+{Definition}{fonttitle=\bfseries\upshape, fontupper=\slshape,
+    arc=0mm, colback=blue!5!white,colframe=blue!75!black}{definition}
+
+% CORRECT DISPLAY OF THE EURO SIGN %
+\usepackage{eurosym}
+
+% SUPPORT FOR SUBFILES COMPILED SEPARATELY %
+% This should be placed at the end
+% See example on: https://www.overleaf.com/learn/latex/Multi-file_LaTeX_projects
+\usepackage{subfiles}
