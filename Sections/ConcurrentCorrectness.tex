@@ -15,7 +15,7 @@ on how instructions from different processes or threads were interleaved during 
 The correctness of a concurrent program is then defined
 in terms of the properties of the computation performed
 and not only in terms of the obtained result.
-In the literature \cite{ben-ari2006, coulouris2012, tanenbaum2017},
+In the literature \cite{ben-ari2006,coulouris2012,tanenbaum2017},
 two types of correctness properties are defined:
 
 \begin{itemize}
@@ -32,17 +32,23 @@ Two desirable safety properties in a concurrent program are:
           that is, progressing and producing useful work.
 \end{itemize}
 
-Synchronization primitives such as mutexes, semaphores (as proposed by \cite{Dijkstra2002} in 1968),
-monitors (as proposed by \cite{hoare1974monitors}) and condition variables are usually used.
+Synchronization primitives such as mutexes, semaphores (as proposed by \cite{Dijkstra2002}),
+monitors (as proposed by \cite{hoare1974monitors}) and condition variables are usually used
 to implement coordinated access of threads or processes to shared resources.
 However, the correct use of these primitives is difficult to achieve in practice
 and can introduce errors that are difficult to detect and correct.
 Currently, most general-purpose languages, whether compiled or interpreted,
 do not allow these errors to be detected in all cases.
 
-Given the increasing importance of concurrent programming due to the proliferation of multithreaded and multithreaded hardware systems,
-Reducing the number of bugs linked to the synchronization of processes or threads is of vital importance for the industry.
-Avoiding deadlocks is an unavoidable requirement in development,
-especially in embedded systems and mission-critical systems such as autonomous vehicles or aircraft.
+Given the increasing importance of concurrent programming due to the proliferation
+of multithreaded and multithreaded hardware systems,
+reducing the number of bugs linked to the synchronization of threads or processes
+is extremely important for the industry.
+Deadlock-free operation is an unavoidable requirement for many projects, such as
+operating systems \cite{arpaci2018operating}, autonomous vehicles \cite{Perronnet2019}
+and aircraft \cite{carreno2005safety,monzon2009deadlock}.
+
+In the next section, we will have a closer look at the conditions that cause a deadlock
+and the strategies used to cope with them.
 
 \end{document}
