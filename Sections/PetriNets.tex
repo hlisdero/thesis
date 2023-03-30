@@ -8,25 +8,38 @@
 
 \subsection{Overview}
 
-Petri nets are a graphical and mathematical modeling tool used to describe and analyze the behavior of concurrent systems.
-They were introduced by the German researcher Carl Adam Petri in his doctoral dissertation \cite{petri1962}
-and have since been applied in a variety of fields such as computer science, engineering, and biology.
-A concise summary of the theory of Petri nets, its properties, analysis and applications can be found in \cite{murata1989}.
+Petri nets are a graphical and mathematical modeling tool
+used to describe and analyze the behavior of concurrent systems.
+They were introduced by the German researcher
+Carl Adam Petri in his doctoral dissertation \cite{petri1962}
+and have since been applied in a variety of fields
+such as computer science, engineering, and biology.
+A concise summary of the theory of Petri nets,
+its properties, analysis and applications can be found in \cite{murata1989}.
 
-A Petri net is a bipartite, directed graph consisting of a set of places, transitions and arcs.
+A Petri net is a bipartite, directed graph
+consisting of a set of places, transitions and arcs.
 There are two types of nodes, namely places and transitions.
-Places represent the state of the system, while transitions represent events or actions that can occur.
+Places represent the state of the system,
+while transitions represent events or actions that can occur.
 Arcs connect places to transitions or transitions to places.
-There can be no arcs between places nor transitions, thus preserving the bipartite property.
+There can be no arcs between places nor transitions,
+thus preserving the bipartite property.
 
 Places may hold zero or more tokens.
-Tokens are used to represent the presence or absence of entities in the system, such as resources, data, or processes.
-In the most simple class of Petri nets, tokens do not carry any information and they are indistinguishable from one another.
-The number of tokens at a place or the simple presence of a token is what conveys meaning in the net.
-Tokens are consumed and produced as transitions fire, giving the impression that they move through the arcs.
+Tokens are used to represent the presence or absence of entities in the system,
+such as resources, data, or processes.
+In the most simple class of Petri nets,
+tokens do not carry any information and they are indistinguishable from one another.
+The number of tokens at a place or the simple presence of a token is
+what conveys meaning in the net.
+Tokens are consumed and produced as transitions fire,
+giving the impression that they move through the arcs.
 
-In the conventional graphical representation, places are depicted using circles, while transitions are depicted as rectangles.
-Tokens are represented as black dots inside of the places, as seen in Fig. \ref{fig:petri-net-example}.
+In the conventional graphical representation,
+places are depicted using circles, while transitions are depicted as rectangles.
+Tokens are represented as black dots inside of the places,
+as seen in Fig. \ref{fig:petri-net-example}.
 
 \begin{figure}[H]
     \centering
@@ -47,7 +60,8 @@ In Fig. \ref{fig:petri-net-transition-firing-example}, we can see how successive
     \label{fig:petri-net-transition-firing-example}
 \end{figure}
 
-The firing of enabled transitions is not deterministic, i.e., they fire randomly as long as they are enabled.
+The firing of enabled transitions is not deterministic,
+i.e., they fire randomly as long as they are enabled.
 A disabled transition is considered \emph{dead}
 if there is no reachable state in the system that can lead to the transition being enabled.
 If all the transitions in the net are dead, then the net is considered \emph{dead} too.
@@ -71,7 +85,8 @@ practicably amenable to source code written in the Rust programming language.
 
 A Petri net is a particular kind of bipartite, weighted, directed graph,
 equipped with an initial state called the \emph{initial marking}, $M_{0}$.
-For this work, the following general definition of a Petri net taken from \cite{murata1989} will be used.
+For this work, the following general definition of a Petri net
+taken from \cite{murata1989} will be used.
 
 \begin{definition}{Petri net}{petri-net}
     A Petri net is a 5-tuple, $ PN = (P, T, F, W, M_{0}) $ where:
@@ -86,12 +101,14 @@ For this work, the following general definition of a Petri net taken from \cite{
     \end{quote}
 \end{definition}
 
-In the graphical representation, arcs are labeled with their weight, which is a non-negative integer $k$.
+In the graphical representation, arcs are labeled with their weight,
+which is a non-negative integer $k$.
 Usually, the weight is omitted if it is equal to 1.
 A $k$-weighted arc can be interpreted as a set of $k$ distinct parallel arcs.
 
 A \emph{marking (state)} associates with each place a non-negative integer $l$.
-If a marking assigns to place $p$ a non-negative integer $l$, we say that $p$ is \emph{marked with $l$ tokens}.
+If a marking assigns to place $p$ a non-negative integer $l$,
+we say that $p$ is \emph{marked with $l$ tokens}.
 Pictorially, we denote his by placing $l$ black dots (tokens) in place $p$.
 The \emph{pth} component of $M$, denoted by $M(p)$, is the number of tokens in place $p$.
 
@@ -119,7 +136,8 @@ It is shown in Fig. \ref{fig:petri-net-formal-example}.
     \label{fig:petri-net-formal-example}
 \end{figure}
 
-Fig. \ref{fig:petri-net-formal-example} contains an interesting structure that we will encounter later.
+Fig. \ref{fig:petri-net-formal-example} contains an interesting structure
+that we will encounter later.
 This motivates the following definition.
 
 \begin{definition}{Self-loop}{self-loop}
@@ -127,7 +145,8 @@ This motivates the following definition.
     if $p$ is both an input place and an output place of $t$.
 \end{definition}
 
-In most cases, we are interested in Petri nets containing no self-loops, which are called \emph{pure}.
+In most cases, we are interested in Petri nets containing no self-loops,
+which are called \emph{pure}.
 
 \begin{definition}{Pure Petri net}{pure-petri-net}
     A Petri net is said to be pure if it has no self-loops.
@@ -152,9 +171,12 @@ Despite being deceptively simple, its implications are far-reaching and complex.
     Let $ PN = (P, T, F, W, M_{0}) $ be a Petri net.
     \begin{enumerate}[label=(\roman*)]
         \item A transition $t$ is said to be enabled if each input place $p$ of $t$
-              is marked with at least $W(p, t)$ tokens, where $W(p,t)$ is the weight of the arc from $p$ to $t$.
-        \item An enabled transition may or may not fire (depending on whether or not the event takes place).
-        \item A firing of an enabled transition $t$ removes $W(t,p)$ tokens from each input place $p$ of $t$,
+              is marked with at least $W(p, t)$ tokens,
+              where $W(p,t)$ is the weight of the arc from $p$ to $t$.
+        \item An enabled transition may or may not fire
+              (depending on whether or not the event takes place).
+        \item A firing of an enabled transition $t$ removes
+              $W(t,p)$ tokens from each input place $p$ of $t$,
               where $W(t, p)$ is the weight of the arc from $t$ to $p$.
     \end{enumerate}
 \end{definition}
@@ -202,7 +224,8 @@ and the dining philosophers problem, the reader is referred to
 Finite state machines can be represented by a subclass of Petri nets.
 
 As an example of a finite-state machine, consider a coffee vending machine.
-It accepts \EUR{1} or \EUR{2} coins and sells two types of coffee, the first costs \EUR{3} and the second \EUR{4}.
+It accepts \EUR{1} or \EUR{2} coins and sells two types of coffee,
+the first costs \EUR{3} and the second \EUR{4}.
 Assume that the machine can hold up to \EUR{4} and does not return any change.
 Then, the state diagram of the machine can be represented
 by the Petri net shown in Fig. \ref{fig:state-machine-example}.
@@ -210,13 +233,17 @@ by the Petri net shown in Fig. \ref{fig:state-machine-example}.
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.30]{state-machine-example.png}
-    \caption{The Petri net for a coffee vending machine. It is equivalent to a state diagram.}
+    \caption{The Petri net for a coffee vending machine.
+        It is equivalent to a state diagram.}
     \label{fig:state-machine-example}
 \end{figure}
 
-The transitions represent the insertion of a coin of the labeled value, e.g. ``Insert \EUR{1} coin''.
-The places represent a possible state of the machine, i.e. the amount of money currently stored inside.
-The place labeled \uppercase{P1} is marked with a token and corresponds to the initial state of the system.
+The transitions represent the insertion of a coin of the labeled value,
+e.g. ``Insert \EUR{1} coin''.
+The places represent a possible state of the machine,
+i.e. the amount of money currently stored inside.
+The place labeled \uppercase{P1} is marked with a token
+and corresponds to the initial state of the system.
 
 We can now present the following definition of this subclass of Petri nets.
 
@@ -236,7 +263,8 @@ where the user must select which coin to insert.
 
 Contrary to finite-state machines, Petri nets can also model parallel or concurrent activities.
 In Fig. \ref{fig:parallel-activities-example} an example of this is shown,
-where the net represents the division of a bigger task into two subtasks that may be executed in parallel.
+where the net represents the division of a bigger task
+into two subtasks that may be executed in parallel.
 
 \begin{figure}[H]
     \centering
@@ -249,15 +277,16 @@ The transition ``Fork'' will fire before ``Task 1'' and ``Task 2''
 and that ``Join'' will only fire after both tasks are complete.
 But note that the order in which ``Tast 1'' and ``Tast 2'' execute is non-deterministic.
 ``Task 1'' could fire before, after or at the same time that ``Task 2''.
-It is precisely this property of the firing rule in Petri nets that allows the modeling of concurrent systems.
+It is precisely this property of the firing rule in Petri nets
+that allows the modeling of concurrent systems.
 
 \begin{definition}{Concurrency in Petri nets}{petri-net-concurrency}
     Two transitions are said to be concurrent if they are causally independent, i.e.
     the firing of one transition does not cause and is not triggered by the firing of the other.
 \end{definition}
 
-Note that each place in the net in Fig. \ref{fig:parallel-activities-example} has exactly one incoming arc
-and one outgoing arc.
+Note that each place in the net in Fig. \ref{fig:parallel-activities-example}
+has exactly one incoming arc and one outgoing arc.
 This subclass of Petri nets allows the representation of concurrency but not decisions (conflicts).
 
 \begin{definition}{Marked graphs}{marked-graphs}
@@ -269,7 +298,8 @@ This subclass of Petri nets allows the representation of concurrency but not dec
 
 Communications protocols can also be represented in Petri nets.
 Fig. \ref{fig:communication-protocols-example} illustrates a simple protocol
-in which Process 1 sends messages to Process 2 and waits for an acknowledgment to be received before continuing.
+in which Process 1 sends messages to Process 2 and
+waits for an acknowledgment to be received before continuing.
 Both processes communicate through a buffered channel whose maximum capacity is one message.
 Therefore, only one message may be traveling between the processes at any given time.
 For simplicity, no timeout mechanism was included.
@@ -288,11 +318,13 @@ This maps the decision between receiving the acknowledgment and the timeout.
 \subsubsection{Synchronization control}
 
 In a multithreaded system, resources and information are shared among several threads.
-This sharing must be controlled or synchronized to ensure the correct operation of the overall system.
+This sharing must be controlled or synchronized
+to ensure the correct operation of the overall system.
 Petri nets have been used to model a variety of synchronization mechanisms,
 including the mutual exclusion, readers-writers and producers-consumers problems \cite{murata1989}.
 
-A Petri net for a readers-writers system with $k$ processes is shown in Fig. \ref{fig:readers-writers-example}.
+A Petri net for a readers-writers system with $k$ processes
+is shown in Fig. \ref{fig:readers-writers-example}.
 Each token represents a process and the choice of T1 or T2
 represents whether the process performs a read or a write operation.
 
@@ -323,7 +355,8 @@ that will facilitate the understanding of the nets we will be dealing with in th
 \subsubsection{Reachability}
 \label{sec:reachability}
 
-Reachability is one of the most important questions when studying the dynamic properties of a system.
+Reachability is one of the most important questions
+when studying the dynamic properties of a system.
 The firing of enabled transitions causes changes in the location of the tokens.
 In other words, it changes the marking $M$.
 A sequence of firings creates a sequence of markings
@@ -354,9 +387,11 @@ and we can ignore the remaining ones.
 This leads to a variation of the problem known as the \emph{submarking reachability problem}.
 
 It has been shown that the reachability problem is decidable \cite{mayr1981}.
-Nevertheless, it was also shown that it takes exponential space (formally, it is EXPSPACE-hard) \cite{lipton1976}.
+Nevertheless, it was also shown that it takes exponential space
+(formally, it is EXPSPACE-hard) \cite{lipton1976}.
 New methods have been proposed to make the algorithms more efficient \cite{kungas2005petri}.
-Recently, \cite{czerwinski2020reachability} improved the lower bound and showed that the problem is not ELEMENTARY.
+Recently, \cite{czerwinski2020reachability} improved
+the lower bound and showed that the problem is not ELEMENTARY.
 These results highlight that the reachability problem is still
 an active area of research in theoretical computer science.
 
@@ -391,11 +426,13 @@ It occurs when the place contains either 1 or 0 tokens during execution.
 The nets in Fig. \ref{fig:state-machine-example}, \ref{fig:parallel-activities-example}
 and \ref{fig:communication-protocols-example} are all safe.
 
-The net in Fig. \ref{fig:readers-writers-example} is k-bounded because all its places are k-bounded.
+The net in Fig. \ref{fig:readers-writers-example}
+is k-bounded because all its places are k-bounded.
 
 \subsubsection{Liveness}
 
-The concept of liveness is analogous to the complete absence of deadlocks in computer programs.
+The concept of liveness is analogous to
+the complete absence of deadlocks in computer programs.
 
 \begin{definition}{Liveness}{liveness}
     A Patri net $(N, M_0)$ is said to be live
@@ -460,8 +497,8 @@ we define a new node in the reachability tree for each reachable marking,
 which results from firing each transition.
 An arc, labeled by the transition fired, leads from the initial marking
 (the root of the tree) to each of the new markings.
-After this first step (Fig. \ref{fig:reachability-tree-step-1}), the tree contains all markings
-that are immediately reachable from the initial marking.
+After this first step (Fig. \ref{fig:reachability-tree-step-1}),
+the tree contains all markings that are immediately reachable from the initial marking.
 
 \begin{figure}
     \centering
@@ -501,13 +538,15 @@ See Fig. \ref{fig:reachability-tree-final-step} for the abbreviated final result
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.27]{reachability-tree-final-step.png}
-    \caption{The infinite reachability tree for the Petri net in Fig. \ref{fig:reachability-tree-example}.}
+    \caption{The infinite reachability tree for the Petri net in Fig.
+        \ref{fig:reachability-tree-example}.}
     \label{fig:reachability-tree-final-step}
 \end{figure}
 
 The previously presented method enumerates the elements in the reachability set.
 Every marking in the reachability set will be produced,
-and so for any Petri net with an infinite reachability set (i.e. an infinite number of possible states),
+and so for any Petri net with an infinite reachability set
+(i.e. an infinite number of possible states),
 the corresponding tree would also be infinite.
 Nonetheless, this opposite is not true.
 A Petri net with a finite reachability set can have an infinite tree
@@ -539,7 +578,8 @@ This implies in general a certain loss of information since the method will have
 an infinite number of reachable markings onto a single element.
 The reduction to a finite representation may be accomplished by the following means.
 
-Notice on one hand that we may encounter duplicate nodes in our tree and we always naively treat them as new.
+Notice on one hand that we may encounter duplicate nodes
+in our tree and we always naively treat them as new.
 This is illustrated most clearly in Fig. \ref{fig:reachability-tree-bounded-net-counterexample}.
 It is thus possible to stop the exploration of the successors of a duplicated node.
 
@@ -548,8 +588,10 @@ but they enable the same set of transitions.
 We say in this case that the marking with additional tokens \emph{covers} the one
 that has the minimum number of tokens needed to enable the set of transitions in question.
 Firing some transitions may allow us to accumulate an arbitrary number of tokens in one place.
-For example firing T3 in the Petri net seen in Fig. \ref{fig:reachability-tree-example} exhibits exactly this behavior.
-Therefore, it would suffice to mark the accumulating place with a special label $\omega$, which stands for infinity
+For example, firing T3 in the Petri net seen in
+Fig. \ref{fig:reachability-tree-example} exhibits exactly this behavior.
+Therefore, it would suffice to mark the accumulating place
+with a special label $\omega$, which stands for infinity
 since we could get as many tokens as we wish in that place.
 
 For instance, the result of converting the tree of Fig. \ref{fig:reachability-tree-final-step}
@@ -558,7 +600,8 @@ to a finite tree is shown in Fig. \ref{fig:reachability-tree-final-step-finite}.
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.27]{reachability-tree-final-step-finite.png}
-    \caption{The finite reachability tree for the Petri net in Fig. \ref{fig:reachability-tree-example}.}
+    \caption{The finite reachability tree for the Petri net in Fig.
+        \ref{fig:reachability-tree-example}.}
     \label{fig:reachability-tree-final-step-finite}
 \end{figure}
 
@@ -572,6 +615,7 @@ For more details about
 \end{enumerate}
 
 the reader is referred to \cite{murata1989} and \cite{peterson1981}.
-These concepts are beyond the scope of this work and are not required in the following chapters.
+These concepts are beyond the scope of this work
+and are not required in the following chapters.
 
 \end{document}

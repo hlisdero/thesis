@@ -10,7 +10,8 @@ In the area of concurrent computing, one of the main challenges is
 to prove the correctness of a concurrent program.
 Unlike a sequential program where for each input the same output
 is always obtained, in a concurrent program the output may depend
-on how instructions from different processes or threads were interleaved during execution.
+on how instructions from different processes or
+threads were interleaved during execution.
 
 The correctness of a concurrent program is then defined
 in terms of the properties of the computation performed
@@ -32,8 +33,10 @@ Two desirable safety properties in a concurrent program are:
         that is, progressing and producing useful work.
 \end{itemize}
 
-Synchronization primitives such as mutexes, semaphores (as proposed by \cite{Dijkstra2002}),
-monitors (as proposed by \cite{hoare1974monitors}) and condition variables are usually used
+Synchronization primitives such as mutexes,
+semaphores (as proposed by \cite{Dijkstra2002}),
+monitors (as proposed by \cite{hoare1974monitors})
+and condition variables are usually used
 to implement coordinated access of threads or processes to shared resources.
 However, the correct use of these primitives is difficult to achieve in practice
 and can introduce errors that are difficult to detect and correct.
