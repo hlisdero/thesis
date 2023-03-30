@@ -1,4 +1,4 @@
-digraph petrinet {
+digraph reachability_tree {
     nodesep=1.0;
     P1 [shape="circle" xlabel="P1" label="•"];
     P2 [shape="circle" xlabel="P2" label=""];

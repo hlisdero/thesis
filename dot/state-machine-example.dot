@@ -1,4 +1,4 @@
-digraph petrinet {
+digraph state_machine {
     rankdir="LR";
     P1 [shape="circle" xlabel="0 €\nP1" label="•"];
     P2 [shape="circle" xlabel="1 €" label=""];

@@ -1,4 +1,4 @@
-digraph petrinet {
+digraph communication_protocol {
     nodesep=1.0;
     P1 [shape="circle" xlabel="Ready to send" label="•"];
     P2 [shape="circle" xlabel="Wait for ACK" label=""];

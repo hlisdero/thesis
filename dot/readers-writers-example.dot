@@ -1,4 +1,4 @@
-digraph petrinet {
+digraph readers_writers {
     nodesep=1.5;
     P1 [shape="circle" xlabel="P1" label="k"];
     P2 [shape="circle" xlabel="P2\nReading" label=""];
