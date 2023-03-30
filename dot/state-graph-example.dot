@@ -1,0 +1,7 @@
+digraph stategraph {
+    nodesep=1.5;
+    X [width=0.6 shape="circle" xlabel="" label="X"];
+    Y [width=0.6 shape="circle" xlabel="" label="Y"];
+    X -> Y -> X;
+    {rank = min; X; Y;}
+}
