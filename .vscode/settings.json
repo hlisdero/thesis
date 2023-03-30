@@ -1,6 +1,7 @@
 // Configuration to run pdflatex and latexmk with `--shell-escape` flag:
 // https://stackoverflow.com/questions/56743092/modifying-settings-json-in-vscode-to-add-shell-escape-flag-to-pdflatex-in-latex
 {
+  "editor.rulers": [80, 120],
   "latex-workshop.latex.tools": [
     {
       "name": "latexmk",
