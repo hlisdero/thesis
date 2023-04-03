@@ -4,7 +4,71 @@
 
 \begin{document}
 
-\section{Lost signals}
+\section{Condition variables}
+
+Condition variables are a synchronization primitive in concurrent programming
+that allows threads to efficiently wait
+for a specific condition to be met before proceeding.
+They were first introduced by \cite{hoare1974monitors}
+as part of a building block for the concept of monitor developed
+originally by \cite{hansen1973operating}.
+
+Following the classic definition, two main operations
+can be called on a condition variable:
+
+\begin{itemize}
+    \item \texttt{wait}: Blocks the current thread or process.
+          In some implementations, the associated mutex
+          is released as part of the operation.
+    \item \texttt{signal}: Wakes up one thread or process
+          waiting on the condition variable.
+          In some implementations, the associated mutex lock is immediately
+          acquired by the signaled thread or process.
+\end{itemize}
+
+Condition variables are typically associated
+with a boolean predicate (a condition) and a mutex.
+The boolean predicate is the condition
+on which the threads or processes are waiting for.
+When it is set to a particular value (either true or false),
+the thread or process should continue executing.
+The mutex ensures that only one thread or process
+may access the condition variable at a time.
+
+Condition variables do not contain an actual value
+accessible to the programmer inside of them.
+Instead, they are implemented using a queue data structure, where
+threads or processes are added to the queue when they enter the wait state.
+When another thread or process signals the condition,
+an element from the queue is selected to resume execution.
+The specific scheduling policy may vary depending on the implementation.
+
+Over the years, various implementations and optimizations have been developed
+for condition variables to improve performance and reduce overhead.
+For example, some implementations allow multiple threads to be awakened at once
+(an operation called \emph{broadcast}),
+while others use a priority queue
+to ensure that the most important threads are awakened first.
+
+Condition variables are part of the POSIX standard library
+for threads \cite{nichols1996pthreads},
+and they are now widely used in concurrent programming languages and systems.
+They are found among others in:
+
+\begin{itemize}
+    \item UNIX\footnote{\url{https://man7.org/linux/man-pages/man3/pthread_cond_init.3p.html}},
+    \item Rust\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html}}
+    \item Python\footnote{\url{https://docs.python.org/3/library/threading.html}}
+    \item Go\footnote{\url{https://pkg.go.dev/sync}}
+    \item Java\footnote{
+              \href{https://docs.oracle.com/en/java/javase/20/docs/api/java.base/java/util/concurrent/locks/Condition.html}
+              {Condition Interface}}
+\end{itemize}
+
+Despite their widespread use, condition variables can be tricky to use correctly,
+and incorrect use can lead to subtle and
+hard-to-debug errors such as missed signals or spurious wakeups.
+We will look now at these errors in detail.
 
 \section{Compiler arquitecture}
 
