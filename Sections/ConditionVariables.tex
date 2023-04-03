@@ -17,13 +17,13 @@ Following the classic definition, two main operations
 can be called on a condition variable:
 
 \begin{itemize}
-    \item \texttt{wait}: Blocks the current thread or process.
-          In some implementations, the associated mutex
-          is released as part of the operation.
-    \item \texttt{signal}: Wakes up one thread or process
-          waiting on the condition variable.
-          In some implementations, the associated mutex lock is immediately
-          acquired by the signaled thread or process.
+      \item \texttt{wait}: Blocks the current thread or process.
+            In some implementations, the associated mutex
+            is released as part of the operation.
+      \item \texttt{signal}: Wakes up one thread or process
+            waiting on the condition variable.
+            In some implementations, the associated mutex lock is immediately
+            acquired by the signaled thread or process.
 \end{itemize}
 
 Condition variables are typically associated
@@ -56,22 +56,18 @@ and they are now widely used in concurrent programming languages and systems.
 They are found among others in:
 
 \begin{itemize}
-    \item UNIX\footnote{\url{https://man7.org/linux/man-pages/man3/pthread_cond_init.3p.html}},
-    \item Rust\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html}}
-    \item Python\footnote{\url{https://docs.python.org/3/library/threading.html}}
-    \item Go\footnote{\url{https://pkg.go.dev/sync}}
-    \item Java\footnote{
-              \href{https://docs.oracle.com/en/java/javase/20/docs/api/java.base/java/util/concurrent/locks/Condition.html}
-              {Condition Interface}}
+      \item UNIX\footnote{\url{https://man7.org/linux/man-pages/man3/pthread_cond_init.3p.html}},
+      \item Rust\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html}}
+      \item Python\footnote{\url{https://docs.python.org/3/library/threading.html}}
+      \item Go\footnote{\url{https://pkg.go.dev/sync}}
+      \item Java\footnote{
+                  \href{https://docs.oracle.com/en/java/javase/20/docs/api/java.base/java/util/concurrent/locks/Condition.html}
+                  {Condition Interface}}
 \end{itemize}
 
 Despite their widespread use, condition variables can be tricky to use correctly,
 and incorrect use can lead to subtle and
 hard-to-debug errors such as missed signals or spurious wakeups.
 We will look now at these errors in detail.
-
-\section{Compiler arquitecture}
-
-\section{Model checking}
 
 \end{document}
