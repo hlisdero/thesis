@@ -110,7 +110,8 @@ as shown in the following sequence of events:
       \item T1 signals \texttt{cv} to wake up T2.
       \item T1 releases the lock.
       \item T2 acquires the lock and checks if \texttt{flag} has changed.
-            Since \texttt{flag} is still \texttt{false}, T2 enters the wait state on \texttt{cv}.
+            Since \texttt{flag} is still \texttt{false},
+            T2 enters the wait state on \texttt{cv}.
       \item Due to scheduling delays or other factors,
             T2 does not receive the signal emitted by T1
             and remains stuck in the wait state forever.
@@ -146,7 +147,8 @@ The following sequence of events leads to this unfortunate outcome:
       \item T1 signals \texttt{cv} to wake up T2.
       \item T1 releases the lock.
       \item T2 acquires the lock and checks if \texttt{flag} is \texttt{true}.
-            Since \texttt{flag} is still \texttt{false}, T2 enters the wait state on \texttt{cv}.
+            Since \texttt{flag} is still \texttt{false},
+            T2 enters the wait state on \texttt{cv}.
       \item Due to some internal implementation detail
             of the condition variable or other unpredictable factors,
             T2 wakes up without receiving the signal emitted by T1
