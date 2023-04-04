@@ -17,8 +17,10 @@ are blocked and unable to continue executing
 because each is waiting for the other to release a resource that it needs.
 This results in a situation where none of the threads or processes
 can make progress and the system becomes effectively stuck.
+An alternative equivalent definition of deadlocks
+in terms of program states can be found in \cite{holt1972some}.
 
-This can be a serious problem in concurrent systems,
+Deadlocks can be a serious problem in concurrent systems,
 as they can cause the system to become unresponsive or even crash.
 Therefore, it is important to be able to detect and prevent deadlocks.
 They can occur in any concurrent system where multiple threads or processes
@@ -49,6 +51,8 @@ because it is waiting for the other process to release a resource that it needs.
 This results in a deadlock, as neither process can make progress.
 Fig. \ref{fig:state-graph-example} illustrates this situation.
 The cycle therein indicates a deadlock, as will be explained in the next section.
+
+
 
 \begin{figure}[!htb]
       \centering
