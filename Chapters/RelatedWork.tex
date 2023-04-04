@@ -1,0 +1,41 @@
+% !TeX root = ../Thesis.tex
+\documentclass[../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../images/}}}
+
+\begin{document}
+
+In \cite{rawson2022petri}, the authors propose a generalized model
+based on colored Petri nets and implement an open-source middleware framework
+in Rust\footnote{\url{https://github.com/MarshallRawson/nt-petri-net}}
+to build, design, simulate and analyze the resulting Petri nets.
+
+Colored Petri nets (CPNs) are a type of Petri net that can represent
+more complex systems than traditional Petri nets.
+In a CPN, tokens have a specific value associated with them,
+which can represent various attributes or properties of the system being modeled.
+This allows for more detailed and accurate modeling of real-world systems,
+including those with complex data structures and behaviors.
+In the visual representation, each token has a color
+(analogous to a type in programming languages)
+and the transitions expect tokens from a particular
+color (type) and can generate tokens
+of the same color or tokens of a different color.
+As a short example, consider a transition
+with two input places and one output place
+representing the mixing of primary colors.
+If the input token colors are red and blue, then the output token color is purple.
+If the input token colors are yellow and blue, then the output token color is green.
+
+The model proposed by the authors is an even more general type of Petri net,
+named \emph{Nondeterministic Transitioning Petri nets} (NT-Petri nets),
+which allows transitions to fire
+without having all their input places marked with tokens,
+while also allowing each transition to define
+which output places should be marked depending on the input.
+In other words, each transition defines arbitrary rules for its firing to take place.
+They explain briefly how the Petri net could be analyzed
+to solve for the maximal number of useful threads to execute the task modeled therein.
+They also mention the modeling step as a tool for checking for erroneous states
+before deploying an electronic or computer system.
+
+\end{document}
