@@ -6,4 +6,171 @@
 
 \section{Model checking}
 
+Model checking is a technique used in software development
+to formally verify the correctness of a system's behavior
+with respect to its specifications or requirements.
+It involves constructing a mathematical model of the system
+and analyzing it to ensure that it meets certain properties,
+such as mutual exclusion when accessing shared resources,
+absence of data races and deadlock-freedom.
+
+The process of model checking begins by constructing a finite-state model of the system,
+typically using a formal language, in the case of this work the language of Petri nets.
+The model captures the system's behavior and the properties that are to be verified.
+The next step is to perform an exhaustive search of the state space of the model
+to ensure that all possible behaviors have been considered.
+This search can be performed automatically using specialized software tools.
+
+During the search, the model checker looks for counterexamples,
+which are sequences of events that violate the system's specifications.
+If a counterexample is found, the model checker provides information
+on the state of the system at the time of the violation,
+helping developers to identify and fix the problem.
+
+Model checking has become an important technique
+in the development of critical software systems,
+such as aerospace \cite{carreno2005safety,monzon2009deadlock}
+and automotive control systems \cite{Perronnet2019},
+medical devices, and financial systems.
+By verifying the correctness of the software before it is deployed,
+developers can ensure that the system meets its requirements and is safe to use.
+
+One of the main advantages of model checking is
+that it provides a formal and rigorous approach to verifying software correctness.
+Unlike traditional testing methods, which can only demonstrate the presence of errors,
+model checking can prove the absence of errors.
+This is particularly important for safety-critical systems like the ones mentioned before,
+where a single error can have catastrophic consequences for human lives.
+Model checking can also be automated, allowing developers to quickly
+and efficiently verify the correctness of complex software systems.
+This reduces the time and cost of software development
+and increases confidence in the correctness of the system.
+
+It is known that formal software verification tools are currently applied
+in a few very specific fields where
+formal proof of the correctness of the system is required.
+\cite{reid:hatra:2020} discusses the importance of bringing verification
+tools closer to developers through an approach
+that seeks to maximize the cost-benefit ratio of its use.
+Improvements in the usability of existing tools and
+approaches to incorporate their use into the developer's routine are presented.
+The paper starts from the premise that from the developer's point of view,
+verification can be seen as a different type of unit or integration test.
+Therefore, it is of utmost importance that running the verification is as easy as possible
+and feedback is provided to the developer quickly during the development process
+to increase adoption.
+
+In this work, we develop a formal verification tool
+for the Rust programming language that is able to detect some classes of deadlocks
+and missed signals in the source code at compile time.
+This tool can help developers quickly verify
+that their use of synchronization primitives
+is correct and will not cause hard-to-detect bugs later on.
+Our goal is to make the tool user-friendly and easy to get started with,
+so that its adoption benefits the larger community of Rust developers.
+
+In the next two sections, we will look at the existing tools,
+their scope and their goals compared to the tool we developed.
+
+\subsection{Formal verification of Rust code}
+
+There are numerous automatic verification tools available for Rust code.
+A recommended first approximation to the topic is
+the survey produced by Alastair Reid, a researcher at Intel.
+It explicitly lists that most formal verification tools
+do not support concurrency \cite{reid2021}.
+
+The \emph{Miri}\footnote{\url{https://github.com/rust-lang/miri}} interpreter
+developed by the Rust project on GitHub is an experimental interpreter
+for the intermediate representation of the Rust language
+(\emph{mid-level intermediate representation}, commonly known by the acronym ``MIR'')
+that allows executing standard cargo project binaries
+in a granularized way, instruction by instruction,
+to check for the absence of \emph{Undefined Behavior} (UB)
+and other errors in memory handling.
+It detects memory leaks, unaligned memory accesses, data races,
+and precondition or invariant violations in code marked as \texttt{unsafe}.
+
+\cite{toman2015crust} introduces a formal checker for Rust
+that does not require modifications to the source code.
+It was tested on past versions of modules from the Rust standard library.
+As a result, errors were detected in the use of memory in unsafe Rust code
+which in reality took months to be discovered manually by the development team.
+This exemplifies the importance of using automatic verification tools
+to complement manual code reviews.
+
+\subsection{Deadlock detection using Petri nets}
+
+Deadlock prevention is one of the classic strategies
+to address this crucial problem in concurrent programming,
+as discussed in Sec. \ref{sec:deadlock-strategies}.
+The main problem with the approach of detecting deadlocks before they occur
+is proving that the desired type of deadlock is detected in all cases
+and that no false negatives are produced in the process.
+The Petri net-based approach, being a formal method, satisfies these conditions.
+However, the difficulty of adoption lies mainly in the practicability of the solution
+due to the large number of possible states in a real software project.
+
+In \cite{karatkevich2014deadlock}, a method is proposed
+to reduce the number of explored states
+during the detection of deadlocks using reachability analysis.
+These heuristics help improve the performance of the Petri net-based approach.
+Another optimization is presented in \cite{kungas2005petri}.
+The author proposes a very promising polynomial order method to avoid the problem
+of the state explosion that underlies the naïve deadlock detection algorithm.
+Through an algorithm that abstracts a given Petri net to a simpler representation,
+a hierarchy of networks of increasing size is obtained
+for which the verification of the absence of deadlocks is substantially faster.
+It is, crudely put, a ``divide and conquer'' strategy
+that checks for the absence of deadlocks in parts of the network
+to later build the verification of the final whole
+by adding parts to the initial small network.
+
+Despite the previously mentioned caveats,
+the use of Petri nets as a formal software verification method
+has been established since the late 1980s.
+Petri nets allow for intuitive modeling of synchronization primitives,
+such as sending a message or waiting for the reception of a message.
+Examples of these simple nets with correspondingly simple behavior
+are found in \cite{heiner1992petri}.
+These nets are construction blocks that can be combined to form a more complex system.
+
+To put these models to use, there are two possibilities:
+
+\begin{itemize}
+      \item One is designing the system in terms of Petri nets
+            and then translating the Petri nets to the source code.
+      \item The other one is to translate the existing source code to a Petri net representation
+            and then verify that the Petri net model satisfies the desired properties.
+\end{itemize}
+
+For the purposes of this work, we are interested in the latter.
+This approach is not novel.
+It has been implemented for other programming languages like C and Rust already,
+as seen in the literature.
+
+In \cite{kavi2002modeling} and \cite{moshtaghi2001},
+a translation of some synchronization primitives available as part of
+the POSIX library of threads (\texttt{pthread}) in C to Petri nets is described.
+In particular, the translation supports:
+
+\begin{itemize}
+      \item The creation of threads with the function \texttt{pthread\_create}
+            and the handling of the variable of type \texttt{pthread\_t}.
+      \item The thread join operation with the \texttt{pthread\_join} function.
+      \item The operation of acquiring a mutex with \texttt{pthread\_mutex\_lock}
+            and its eventual manual release with \texttt{pthread\_mutex\_unlock}.
+      \item The \texttt{pthread\_cond\_wait} and \texttt{pthread\_cond\_signal} functions
+            for working with condition variables.
+\end{itemize}
+
+In his master's thesis, \cite{meyer2020} establishes
+the bases for a Petri net semantic for the Rust programming language.
+He focuses his efforts however on single-threaded code,
+limiting himself to the detection of deadlocks caused by
+executing the \texttt{lock} operation twice on the same mutex in the main thread.
+Unfortunately, the code available as part of the thesis is
+no longer valid for the new version of the \emph{rustc} compiler,
+since the internals of the compiler changed significantly in the last two years.
+
 \end{document}
