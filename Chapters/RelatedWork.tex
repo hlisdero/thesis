@@ -9,7 +9,7 @@ based on colored Petri nets and implement an open-source middleware framework
 in Rust\footnote{\url{https://github.com/MarshallRawson/nt-petri-net}}
 to build, design, simulate and analyze the resulting Petri nets.
 
-Colored Petri nets (CPNs) are a type of Petri net that can represent
+\acrfull{CPN} are a type of Petri net that can represent
 more complex systems than traditional Petri nets.
 In a CPN, tokens have a specific value associated with them,
 which can represent various attributes or properties of the system being modeled.
@@ -27,8 +27,7 @@ If the input token colors are red and blue, then the output token color is purpl
 If the input token colors are yellow and blue, then the output token color is green.
 
 The model proposed by the authors is an even more general type of Petri net,
-named \emph{Nondeterministic Transitioning Petri nets} (NT-Petri nets),
-which allows transitions to fire
+named \acrfull{NT-PN}, which allows transitions to fire
 without having all their input places marked with tokens,
 while also allowing each transition to define
 which output places should be marked depending on the input.

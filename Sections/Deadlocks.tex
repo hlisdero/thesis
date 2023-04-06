@@ -142,7 +142,7 @@ the thread or process releases the resource
 or a supervisor process recovers the resource forcibly.
 Usually, this works well when the state of the resource can be easily saved
 and restored later.
-One example of this is the allocation of CPU cores in a modern operating system.
+One example of this is the allocation of CPU cores in a modern \acrfull{OS}.
 The scheduler allocates one processor core to one task and
 may switch to a different task or
 move the task to a new processor core at any moment just
@@ -194,7 +194,7 @@ For a survey of algorithms for deadlock detection
 in distributed systems, see \cite{singhal1989deadlock}.
 We will briefly present the general idea behind one of them for illustration purposes.
 
-The Resource Allocation Graph (RAG) is a commonly used method
+The \acrfull{RAG} is a commonly used method
 for detecting deadlocks in concurrent systems.
 It represents the relationship between threads/processes
 and resources in the system as a directed graph.
@@ -216,16 +216,15 @@ terminating one of the threads or processes in the cycle.
 This causes the resources to be released and
 the other threads or processes are allowed to continue.
 
-Numerous database management systems (DBMS)
-incorporate subsystems for detecting and resolving deadlocks.
+\acrfull{DBMS} incorporate subsystems for detecting and resolving deadlocks.
 A deadlock detector is executed at intervals,
 generating a regular allocation graph,
-otherwise called the transaction-wait-for (TWF) graph,
+otherwise called the \acrfull{TWF} graph,
 and examining it for any cycles.
 If a cycle (deadlock) is identified, the system must be restarted.
 An excellent overview of deadlock detection
 in distributed database systems is \cite{knapp1987deadlock}.
-The subject of concurrency control and recovery from deadlocks in DBMSs is
+The subject of concurrency control and recovery from deadlocks in \acrshort{DBMS} is
 extensively discussed in \cite{bernstein1987concurrency}.
 
 \subsubsection{Acceptance or ignoring deadlocks altogether}

@@ -82,11 +82,10 @@ do not support concurrency \cite{reid2021}.
 
 The \emph{Miri}\footnote{\url{https://github.com/rust-lang/miri}} interpreter
 developed by the Rust project on GitHub is an experimental interpreter
-for the intermediate representation of the Rust language
-(\emph{mid-level intermediate representation}, commonly known by the acronym ``MIR'')
+for the intermediate representation of the Rust language (\acrfull{MIR})
 that allows executing standard cargo project binaries
 in a granularized way, instruction by instruction,
-to check for the absence of \emph{Undefined Behavior} (UB)
+to check for the absence of \acrfull{UB}
 and other errors in memory handling.
 It detects memory leaks, unaligned memory accesses, data races,
 and precondition or invariant violations in code marked as \texttt{unsafe}.

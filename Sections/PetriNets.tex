@@ -8,7 +8,7 @@
 
 \subsection{Overview}
 
-Petri nets are a graphical and mathematical modeling tool
+\acrfull{PN} are a graphical and mathematical modeling tool
 used to describe and analyze the behavior of concurrent systems.
 They were introduced by the German researcher
 Carl Adam Petri in his doctoral dissertation \cite{petri1962}
@@ -173,8 +173,8 @@ Despite being deceptively simple, its implications are far-reaching and complex.
         \item A transition $t$ is said to be enabled if each input place $p$ of $t$
               is marked with at least $W(p, t)$ tokens,
               where $W(p,t)$ is the weight of the arc from $p$ to $t$.
-        \item An enabled transition may or may not fire
-              (depending on whether or not the event takes place).
+        \item An enabled transition may or may not fire,
+              depending on whether or not the event takes place.
         \item A firing of an enabled transition $t$ removes
               $W(t,p)$ tokens from each input place $p$ of $t$,
               where $W(t, p)$ is the weight of the arc from $t$ to $p$.
@@ -221,7 +221,7 @@ and the dining philosophers problem, the reader is referred to
 
 \subsubsection{Finite-state machines}
 
-Finite state machines can be represented by a subclass of Petri nets.
+\acrfull{FSM} can be represented by a subclass of Petri nets.
 
 As an example of a finite-state machine, consider a coffee vending machine.
 It accepts \EUR{1} or \EUR{2} coins and sells two types of coffee,
@@ -251,7 +251,7 @@ We can now present the following definition of this subclass of Petri nets.
     A Petri net in which each transition has exactly one incoming arc
     and exactly one outgoing arc is known as a state machine.
 
-    Any finite-state machine (or its state diagram) can be modeled with a state machine.
+    Any \acrshort{FSM} (or its state diagram) can be modeled with a state machine.
 \end{definition}
 
 The structure of a place $p_1$ having two (or more) output transitions $t_1$ and $t_2$ is called

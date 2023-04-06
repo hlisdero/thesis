@@ -38,11 +38,16 @@
 % HYPERLINK CONFIGURATION %
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \hypersetup{
-    colorlinks=true,% make the links colored
+    colorlinks=true,
+    linkcolor=black,
+    filecolor=blue,
+    citecolor=blue,
+    urlcolor=blue,
 }
 
 % ACRONYM SUPPORT %
-\usepackage{acronym}
+\usepackage[acronym,nomain]{glossaries}
+\makeglossaries
 
 % CODE LISTINGS %
 \usepackage{listings}
