@@ -2,12 +2,6 @@
 // https://stackoverflow.com/questions/56743092/modifying-settings-json-in-vscode-to-add-shell-escape-flag-to-pdflatex-in-latex
 {
   "editor.rulers": [80, 120],
-  "latex-workshop.latex.recipes": [
-    {
-      "name": "pdflatex, bibtex, makeglossaries, pdflatex",
-      "tools": ["pdflatex", "bibtex", "makeglossaries", "pdflatex"]
-    }
-  ],
   "latex-workshop.latex.tools": [
     {
       "name": "latexmk",
