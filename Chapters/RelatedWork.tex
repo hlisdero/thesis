@@ -37,4 +37,17 @@ to solve for the maximal number of useful threads to execute the task modeled th
 They also mention the modeling step as a tool for checking for erroneous states
 before deploying an electronic or computer system.
 
+In \cite{deboer2013petri}, a translation from a formal language to Petri nets
+for deadlock detection in the context of active objects and futures is presented.
+The formal language chosen is \acrfull{Creol}.
+It is an object oriented modeling language designed for specifying distributed systems.
+In this paper, the program is made of asynchronously communicating active objects
+where futures are used to handle return values,
+which can be retrieved via a lock detaining \texttt{get} primitive (blocking)
+or a lock releasing \texttt{claim} primitive (non-blocking).
+After translating the program to a Petri net,
+reachability analysis is applied to detect deadlocks.
+This paper shows that a traslation of asynchronous communication strategies to
+Petri nets is also possible.
+
 \end{document}
