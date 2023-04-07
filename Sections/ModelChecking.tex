@@ -172,4 +172,21 @@ Unfortunately, the code available on GitHub\footnote{\url{https://github.com/Ska
 as part of the thesis is no longer valid for the new version of \emph{rustc}
 since the internals of the compiler changed significantly in the last three years.
 
+In a late 2022 pre-print, \cite{zhang2022deadlocks} implement a translation
+of Rust source code to Petri nets for checking deadlocks.
+The translation focuses on deadlocks caused by two types of locks
+in the standard library: \texttt{std::sync::Mutex} and \texttt{std::sync::RwLock}.
+The resulting Petri net is expressed in the \acrfull{PNML}
+and fed into the model checker \acrfull{PIPE2}\footnote{\url{https://pipe2.sourceforge.net/}}
+to perform reachability analysis.
+Function calls are handled in a very different way compared to this work and
+missed signals are not modeled at all.
+The source code of their tool, named TRustPN, is not publicly available as of this writing.
+Despite these limitations, the authors offer a very detailed and up-to-date survey
+of static analysis tools for checking Rust code,
+which could be appealing to the interested reader.
+Moreover, they list several papers dedicated to
+formalizing the semantics of the Rust programming language,
+which are out of the scope of this work.
+
 \end{document}
