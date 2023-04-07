@@ -196,8 +196,12 @@ Numerous tools have set the goal to address these vulnerabilities
 caused by improper memory allocation in already established codebases.
 However, their use leads to a noticeable loss of performance and
 not all vulnerabilities can be prevented \cite{szekeres2013sok}.
-An example of such a tool, more precisely a dynamic data racer detector
-for multithreaded programs in C, can be found in \cite{savage1997eraser}.
+An example of an important tool in this area, more precisely
+a dynamic data racer detector for multithreaded programs in C,
+can be found in \cite{savage1997eraser},
+whose algorithm was later improved in \cite{jannesari2009helgrind+} and
+integrated into the Helgrind tool, part of the well-known
+Valgrind instrumentation framework\footnote{\url{https://valgrind.org/}}.
 
 In \cite{jaeger2014mind}, the authors provide
 a detailed survey of programming language features that
