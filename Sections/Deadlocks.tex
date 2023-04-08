@@ -115,7 +115,7 @@ With this objective in mind, we must ensure that at every point in time
 at least one of the necessary conditions developed in Sec. \ref{sec:coffman-conditions}
 is not satisfied.
 This restricts the possible protocols in which requests for resources may be made.
-We will now look at each condition in isolation
+We will now look at each condition separately
 and elaborate on the most common approaches.
 
 If the first condition must be false,
@@ -145,7 +145,7 @@ and restored later.
 One example of this is the allocation of CPU cores in a modern \acrfull{OS}.
 The scheduler allocates one processor core to one task and
 may switch to a different task or
-move the task to a new processor core at any moment just
+may move the task to a new processor core at any moment just
 by saving the contents of the registers \cite[Chapter 6]{ArpaciDusseau2018}.
 However, if preserving the resource state is not possible,
 preemption may entail a loss of the progress done so far,
@@ -161,7 +161,7 @@ This involves using special synchronization primitives
 that allow resources to be shared in a controlled manner and
 enforcing strict rules for resource acquisition and release.
 Under these conditions, the state graph will be strictly speaking
-a forest (an acyclical graph) and no deadlocks are possible.
+a forest (an acyclical graph), thus no deadlocks are possible.
 
 In practical applications, a combination of the previous strategies may prove useful
 when none of them is entirely applicable.
