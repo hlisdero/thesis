@@ -15,11 +15,11 @@ Carl Adam Petri in his doctoral dissertation \cite{petri1962}
 and have since been applied in a variety of fields
 such as computer science, engineering, and biology.
 A concise summary of the theory of Petri nets,
-its properties, analysis and applications can be found in \cite{murata1989}.
+its properties, analysis, and applications can be found in \cite{murata1989}.
 
 A Petri net is a bipartite, directed graph
-consisting of a set of places, transitions and arcs.
-There are two types of nodes, namely places and transitions.
+consisting of a set of places, transitions, and arcs.
+There are two types of nodes: places and transitions.
 Places represent the state of the system,
 while transitions represent events or actions that can occur.
 Arcs connect places to transitions or transitions to places.
@@ -70,7 +70,7 @@ This state is analogous to the deadlock of a computer program.
 Petri nets can be used to model and analyze a wide range of systems,
 from simple systems with a few components to complex systems with many interacting components.
 They can be used to detect potential problems in a system,
-optimize system performance and design and implement systems more effectively.
+optimize system performance, and design and implement systems more effectively.
 
 They can also be used to model industrial processes \cite{aalst1994putting},
 to validate software requirements expressed as use cases \cite{silva2004applying}
@@ -188,7 +188,7 @@ Two enabled transitions are said to be in \emph{conflict}
 if the firing of one of the transitions will disable the other transition.
 In this case, the transitions compete for the token placed in a shared input place.
 
-If two transition $t_1$ and $t_2$ are enabled in some marking but are not in conflict,
+If two transitions $t_1$ and $t_2$ are enabled in some marking but are not in conflict,
 they can fire in either order, i.e. $t_1$ then $t_2$ or $t_2$ then $t_1$.
 Such transitions represent events that can occur concurrently or in parallel.
 In this sense, the Petri net model adopts an \emph{interleaved model of parallelism}, that is,
@@ -255,7 +255,7 @@ We can now present the following definition of this subclass of Petri nets.
 \end{definition}
 
 The structure of a place $p_1$ having two (or more) output transitions $t_1$ and $t_2$ is called
-a \emph{conflict}, \emph{decision} or \emph{choice}, depending on the application.
+a \emph{conflict}, \emph{decision}, or \emph{choice}, depending on the application.
 This is seen in the initial place \uppercase{P1} of Fig. \ref{fig:state-machine-example},
 where the user must select which coin to insert.
 
@@ -276,7 +276,7 @@ into two subtasks that may be executed in parallel.
 The transition ``Fork'' will fire before ``Task 1'' and ``Task 2''
 and that ``Join'' will only fire after both tasks are complete.
 But note that the order in which ``Tast 1'' and ``Tast 2'' execute is non-deterministic.
-``Task 1'' could fire before, after or at the same time that ``Task 2''.
+``Task 1'' could fire before, after, or at the same time that ``Task 2''.
 It is precisely this property of the firing rule in Petri nets
 that allows the modeling of concurrent systems.
 
@@ -321,7 +321,7 @@ In a multithreaded system, resources and information are shared among several th
 This sharing must be controlled or synchronized
 to ensure the correct operation of the overall system.
 Petri nets have been used to model a variety of synchronization mechanisms,
-including the mutual exclusion, readers-writers and producers-consumers problems \cite{murata1989}.
+including the mutual exclusion, readers-writers, and producers-consumers problems \cite{murata1989}.
 
 A Petri net for a readers-writers system with $k$ processes
 is shown in Fig. \ref{fig:readers-writers-example}.
@@ -478,9 +478,9 @@ we can now present a major analysis technique for Petri nets: the \emph{reachabi
 
 We will run the algorithm for constructing the reachability tree step by step
 and then present its advantages and drawbacks.
-In general terms, the reachability tree has the following structure.
-Nodes represent markings generated from $M_0$, the root of the tree, and its successors,
-and each arc represents a transition firing, which transforms one marking into another.
+In general terms, the reachability tree has the following structure:
+Nodes represent markings generated from $M_0$, the root of the tree, and its successors.
+Each arc represents a transition firing, which transforms one marking into another.
 
 \begin{figure}
     \centering
@@ -544,7 +544,7 @@ See Fig. \ref{fig:reachability-tree-final-step} for the abbreviated final result
 \end{figure}
 
 The previously presented method enumerates the elements in the reachability set.
-Every marking in the reachability set will be produced,
+Every marking in the reachability set will be produced
 and so for any Petri net with an infinite reachability set
 (i.e. an infinite number of possible states),
 the corresponding tree would also be infinite.
