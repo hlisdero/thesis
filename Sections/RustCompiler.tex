@@ -59,14 +59,52 @@ bootstraping involves a substantial amount of complexity and is described
 in detail in the documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html}}
 and in conferences \cite{nelson2022} and tutorials \cite{klock2022} by members of the Rust team.
 
-\subsection{Stages}
+\subsection{Compilation stages}
 
-The existence of the query system does not entail
+The existence of the query system does not imply
 that rustc does not have compilation phases at all.
 On the contrary, several stages of compilation are required
 to transform Rust source code into machine code that can be executed on a computer.
 These stages involve multiple intermediate representations of the program,
 each one optimized for a specific purpose.
 We will now briefly describe these stages.
+A more complete overview is found
+in the documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/overview.html}}.
+
+\subsubsection{Lexing and parsing}
+
+First, the raw Rust source text is analyzed by a low-level lexer.
+At this stage, the source text is turned
+into a stream of atomic source code units known as tokens.
+
+Then parsing takes place.
+The stream of tokens is converted into an AST.
+Interning of string values occurs here.
+Macro expansion, AST validation, name resolution,
+and early linting also take place during this stage.
+The resulting intermediate representation from this step is thus the AST.
+
+\subsubsection{HIR lowering}
+
+Next, the AST is converted to \acrfull{HIR}.
+This process is known as ``lowering''.
+This representation looks like Rust code but with complex constructs desugared
+to simpler versions.
+For instance, all \texttt{while} and \texttt{for} loops are converted into simpler
+\texttt{loop} loops.
+
+The HIR is used to perform some important steps:
+
+\begin{enumerate}
+    \item \emph{type inference}: The automatic detection of a type
+          of an expression, e.g. when declaring variables with \texttt{let}.
+    \item \emph{trait solving}: Ensuring that each implementation block (\texttt{impl})
+          refers to a valid, existing trait.
+    \item \emph{type checking}: This process converts the types written by the user
+          into the internal representation used by the compiler.
+          It is, in other words, where types are interned.
+          Then, using this information, the type safety, correctness, and coherence are verified.
+\end{enumerate}
+
 
 \end{document}
