@@ -1,13 +1,12 @@
 \documentclass[12pt, oneside]{book}
 \usepackage{Thesis}
 
-\include{FrontBackMatter/AcronymsDefinitions.tex}
+\input{FrontMatter/Acronyms.tex}
 
 \begin{document}
 
-\include{FrontBackMatter/TitlePage.tex}
-\include{FrontBackMatter/Contents.tex}
-\include{FrontBackMatter/Lists.tex}
+\input{FrontMatter/TitlePage.tex}
+\input{FrontMatter/Contents.tex}
 
 \chapter{Introduction}
 
@@ -56,6 +55,14 @@
 \chapter{Related work}
 \subfile{Chapters/RelatedWork.tex}
 
-\include{FrontBackMatter/Bibliography.tex}
+\clearpage
+\bibliographystyle{apalike}
+\bibliography{
+    Bibliography/Articles.bib,
+    Bibliography/Blogs.bib,
+    Bibliography/Books.bib,
+    Bibliography/Conferences.bib,
+    Bibliography/Proceedings.bib
+}
 
 \end{document}
