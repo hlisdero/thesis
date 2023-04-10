@@ -6,13 +6,13 @@
 
 \section{Rust compiler: \emph{rustc}}
 
-The Rust compiler, rustc, is responsible for translating Rust code into executable code.
-However, rustc is not a traditional compiler in the sense
+The Rust compiler, \emph{rustc}, is responsible for translating Rust code into executable code.
+However, \emph{rustc} is not a traditional compiler in the sense
 that it performs multiple passes over the code,
 as described in Sec. \ref{sec:compiler-architecture}.
-Instead, rustc is built on a query-based system that supports incremental compilation.
+Instead, \emph{rustc} is built on a query-based system that supports incremental compilation.
 
-In rustc's query system, the compiler computes a dependency graph between code artifacts,
+In \emph{rustc}'s query system, the compiler computes a dependency graph between code artifacts,
 including source files, crates, and intermediate artifacts, such as object files.
 The query system then uses this graph to efficiently recompile
 only those artifacts that have changed since the last
@@ -21,48 +21,48 @@ This incremental compilation can significantly
 reduce the compilation time for large projects,
 making it easier to develop and iterate on Rust code.
 
-The query system also enables rustc to perform other optimizations,
+The query system also enables the Rust compiler to perform other optimizations,
 such as memoization and caching of intermediate results.
 For example, if a function's return value has been computed before,
 the query system can return the cached result instead of recomputing it,
 further reducing compilation time.
 
-Another important design choice in rustc is interning.
+Another important design choice in \emph{rustc} is interning.
 Interning is a technique to store strings and
 other data structures in a memory-efficient way.
 Instead of storing multiple copies of the same string or data structure,
-rustc stores only one copy in a special allocator called an \emph{arena}.
+the Rust compiler stores only one copy in a special allocator called an \emph{arena}.
 References to values stored in the arena are passed around between different parts
 of the compiler and they can be compared cheaply by comparing pointers.
 This can reduce memory usage and speed up operations
 that compare or manipulate strings and data structures.
 
-rustc uses the LLVM compiler infrastructure\footnote{\url{https://llvm.org/}}
+\emph{rustc} uses the LLVM compiler infrastructure\footnote{\url{https://llvm.org/}}
 to perform low-level code generation and optimization.
 LLVM provides a flexible framework for compiling code
 to a variety of targets, including native machine code and \acrfull{WASM}.
-Rustc uses LLVM to optimize code for performance and
+The Rust compiler uses LLVM to optimize code for performance and
 to generate high-quality code for a variety of platforms.
-Instead of generating machine code, rustc only needs
+Instead of generating machine code, it only needs
 to generate the source code's LLVM \acrfull{IR}
 and then instruct LLVM to transform this to the compilation target,
 applying the desired optimizations.
 
-rustc is programmed in Rust.
+\emph{rustc} is programmed in Rust.
 In order to compile the newer version of the compiler
 and the newer standard library version that goes with it,
-a slightly older version of rustc and the standard library is used.
-This process is called \emph{bootstraping} and it implies
+a slightly older version of \emph{rustc} and the standard library is used.
+This process is called \emph{bootstrapping} and it implies
 that one of the major users of Rust is the Rust compiler itself.
-Considering that a new stable version of rustc is released every six weeks,
-bootstraping involves a substantial amount of complexity and is described
+Considering that a new stable version is released every six weeks,
+bootstrapping involves a substantial amount of complexity and is described
 in detail in the documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html}}
 and in conferences \cite{nelson2022} and tutorials \cite{klock2022} by members of the Rust team.
 
 \subsection{Compilation stages}
 
 The existence of the query system does not imply
-that rustc does not have compilation phases at all.
+that \emph{rustc} does not have compilation phases at all.
 On the contrary, several stages of compilation are required
 to transform Rust source code into machine code that can be executed on a computer.
 These stages involve multiple intermediate representations of the program,
@@ -131,7 +131,7 @@ and the corresponding optimizations.
 To this effect, the MIR is converted to LLVM IR.
 
 LLVM IR is the standard form of input for the LLVM compiler
-that all compilers using LLVM, such as clang C compiler, utilize.
+that all compilers using LLVM, such as the \emph{clang} C compiler, utilize.
 It is a type of assembly language that is well-annotated
 and designed to be easy for other compilers to produce.
 Additionally, it is designed to be rich enough to enable LLVM
