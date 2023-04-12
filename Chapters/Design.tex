@@ -1,0 +1,22 @@
+% !TeX root = ../Thesis.tex
+\documentclass[../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../images/}}}
+
+\begin{document}
+
+Now that the relevant background topics have been covered,
+we can proceed to delve into the specifics of the design of the translation process.
+The design is marked by three crucial architectural choices
+that will be elaborated on in this chapter:
+
+\begin{enumerate}
+    \item The decision to utilize the Rust compiler as a backend for the translation.
+    \item Basing the translation on the Mid-level Intermediate Representation (MIR).
+    \item Inlining function calls when side-effects are present.
+\end{enumerate}
+
+Throughout the course of this chapter,
+we will conduct an in-depth analysis
+of the Rust compiler's internal mechanisms and its relevant compilation stages.
+
+\end{document}
