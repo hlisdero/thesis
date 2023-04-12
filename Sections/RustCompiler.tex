@@ -78,22 +78,22 @@ At this stage, the source text is turned
 into a stream of atomic source code units known as tokens.
 
 Then parsing takes place.
-The stream of tokens is converted into an AST.
+The stream of tokens is converted into an \acrshort{AST}.
 Interning of string values occurs here.
-Macro expansion, AST validation, name resolution,
+Macro expansion, \acrshort{AST} validation, name resolution,
 and early linting also take place during this stage.
-The resulting intermediate representation from this step is thus the AST.
+The resulting intermediate representation from this step is thus the \acrshort{AST}.
 
 \subsubsection{HIR lowering}
 
-Next, the AST is converted to \acrfull{HIR}.
+Next, the \acrshort{AST} is converted to \acrfull{HIR}.
 This process is known as ``lowering''.
 This representation looks like Rust code but with complex constructs desugared
 to simpler versions.
 For instance, all \texttt{while} and \texttt{for} loops are converted into simpler
 \texttt{loop} loops.
 
-The HIR is used to perform some important steps:
+The \acrshort{HIR} is used to perform some important steps:
 
 \begin{enumerate}
       \item \emph{type inference}: The automatic detection of a type
@@ -108,36 +108,36 @@ The HIR is used to perform some important steps:
 
 \subsubsection{MIR lowering}
 
-In this stage, the HIR is lowered to \acrfull{MIR},
+In this stage, the \acrshort{HIR} is lowered to \acrfull{MIR},
 which is used for \emph{borrow checking}.
 As part of the process, the \acrfull{THIR} is constructed,
-which is a representation that is easier to convert to MIR than the HIR.
+which is a representation that is easier to convert to \acrshort{MIR} than the \acrshort{HIR}.
 
-The THIR is an even more desugared version of HIR.
+The \acrshort{THIR} is an even more desugared version of \acrshort{HIR}.
 It is used for pattern and exhaustiveness matching.
-It is similar to the HIR, but with all types and method calls made explicit.
+It is similar to the \acrshort{HIR}, but with all types and method calls made explicit.
 Furthermore, implicit dereferences are included where needed.
 
-Many optimizations are performed on the MIR
+Many optimizations are performed on the \acrshort{MIR}
 as it is still a very generic representation.
 Optimizations are in some cases easier
-to perform on the MIR than on the subsequent LLVM IR.
+to perform on the \acrshort{MIR} than on the subsequent LLVM \acrshort{IR}.
 
 \subsubsection{Code generation}
 
 This is the last stage when producing a binary.
 It includes the call to LLVM for code generation
 and the corresponding optimizations.
-To this effect, the MIR is converted to LLVM IR.
+To this effect, the \acrshort{MIR} is converted to LLVM \acrshort{IR}.
 
-LLVM IR is the standard form of input for the LLVM compiler
+LLVM \acrshort{IR} is the standard form of input for the LLVM compiler
 that all compilers using LLVM, such as the \emph{clang} C compiler, utilize.
 It is a type of assembly language that is well-annotated
 and designed to be easy for other compilers to produce.
 Additionally, it is designed to be rich enough to enable LLVM
 to perform several optimizations on it.
 
-LLVM transforms the LLVM IR to machine code
+LLVM transforms the LLVM \acrshort{IR} to machine code
 and applies many more optimizations.
 Finally, the object files with assembly code in them may be
 linked together to form the binary.

@@ -205,7 +205,7 @@ This is analogous to the state graph shown in Fig. \ref{fig:state-graph-example}
 but with the threads/processes represented in the diagram.
 The state graph may also be applied to deadlock detection \cite{coffman1971deadlocks}.
 
-To detect deadlocks using the RAG, we need to look for cycles in the graph.
+To detect deadlocks using the \acrshort{RAG}, we need to look for cycles in the graph.
 If there is a cycle in the graph, it indicates that
 a set of processes is waiting for resources
 that are currently being held by other processes in the cycle.
@@ -224,7 +224,7 @@ and examining it for any cycles.
 If a cycle (deadlock) is identified, the system must be restarted.
 An excellent overview of deadlock detection
 in distributed database systems is \cite{knapp1987deadlock}.
-The subject of concurrency control and recovery from deadlocks in DBMS is
+The subject of concurrency control and recovery from deadlocks in \acrshort{DBMS} is
 extensively discussed in \cite{bernstein1987concurrency}.
 
 \subsubsection{Acceptance or ignoring deadlocks altogether}
@@ -236,7 +236,7 @@ or detecting deadlocks is too high, or where the frequency of deadlocks is low e
 that the impact on system performance is minimal,
 or where the data loss incurred each time is tolerable.
 
-UNIX is an example of an OS following this principle \cite[p. 477]{shibu2016}.
+UNIX is an example of an \acrshort{OS} following this principle \cite[p. 477]{shibu2016}.
 Other major operating systems also exhibit this behavior.
 On the other hand, a life-critical system cannot afford
 to pretend its operation will be deadlock-free for any reason.

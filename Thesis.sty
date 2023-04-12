@@ -46,9 +46,14 @@
 }
 
 % ACRONYM SUPPORT %
-\usepackage[acronym,nomain]{glossaries}
+% nomain: Do not use a main glossary
+% nopostdot: Do not add a dot at the end of each entry
+% nonumberlist: Do not add numbers at the end of each entry
+% nogroupskip: Do not add a skip between each letter group
+% See example: https://en.wikibooks.org/wiki/LaTeX/Glossary
+\usepackage[acronym,nomain,nopostdot,nonumberlist,nogroupskip]{glossaries}
+\setglossarystyle{list}
 \makeglossaries
-\setglossarystyle{listgroup}
 
 % CODE LISTINGS %
 \usepackage{listings}
