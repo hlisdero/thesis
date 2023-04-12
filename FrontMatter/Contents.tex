@@ -1,19 +1,28 @@
 %*******************************************************
 % Table of Contents
 %*******************************************************
+\clearpage
+\pdfbookmark{\contentsname}{tableofcontents}
 \tableofcontents
 
 %*******************************************************
 % List of Figures
 %*******************************************************
+\clearpage
+\pdfbookmark{\listfigurename}{lof}
 \listoffigures
 
 %*******************************************************
 % List of Listings
 %*******************************************************
+\clearpage
+\renewcommand{\lstlistlistingname}{List of Listings}
+\pdfbookmark{\lstlistlistingname}{lol}
 \lstlistoflistings
 
 %*******************************************************
 % Acronyms
 %*******************************************************
+\clearpage
+\pdfbookmark{Acronyms}{acronyms}
 \printglossary[type=\acronymtype]
