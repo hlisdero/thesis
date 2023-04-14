@@ -55,8 +55,8 @@ a slightly older version of \emph{rustc} and the standard library is used.
 This process is called \emph{bootstrapping} and it implies
 that one of the major users of Rust is the Rust compiler itself.
 Considering that a new stable version is released every six weeks,
-bootstrapping involves a substantial amount of complexity and is described
-in detail in the documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html}}
+bootstrapping involves a substantial amount of complexity and is described in detail
+in the documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html}}
 and in conferences \cite{nelson2022} and tutorials \cite{klock2022} by members of the Rust team.
 
 \subsection{Compilation stages}
@@ -80,8 +80,8 @@ into a stream of atomic source code units known as tokens.
 Then parsing takes place.
 The stream of tokens is converted into an \acrshort{AST}.
 Interning of string values occurs here.
-Macro expansion, \acrshort{AST} validation, name resolution,
-and early linting also take place during this stage.
+Macro expansion, \acrshort{AST} validation,
+name resolution, and early linting also take place during this stage.
 The resulting intermediate representation from this step is thus the \acrshort{AST}.
 
 \subsubsection{HIR lowering}
@@ -141,5 +141,50 @@ LLVM transforms the LLVM \acrshort{IR} to machine code
 and applies many more optimizations.
 Finally, the object files with assembly code in them may be
 linked together to form the binary.
+
+\subsection{Rust nightly}
+
+Understanding the release model of Rust is crucial
+for the successful implementation of the tool proposed in this work.
+The reason is that to use the crates of \emph{rustc} as a dependency in our project,
+it must be compiled with the \emph{nightly} version.
+
+The nightly Rust compiler refers to a specific build of \emph{rustc}
+that is updated every night with the latest changes and improvements
+but also includes experimental or unstable features that are not yet part of the stable release.
+In Rust, the language and its standard library are versioned using a ``release train'' model,
+where there are three main release channels:
+stable, beta, and nightly\footnote{\url{https://forge.rust-lang.org/}}.
+
+The stable release of the Rust compiler is
+the most widely used and recommended version for production use.
+It goes through a rigorous testing and stabilization process
+to ensure that it provides a stable and reliable experience for developers.
+The stable release only includes features and improvements
+that have been thoroughly reviewed, tested, and deemed stable enough for production use.
+
+On the other hand, the nightly Rust compiler is the most bleeding-edge version,
+where new features, bug fixes, and experimental changes are introduced on a daily basis.
+It is used by Rust language developers and contributors for testing and development purposes
+but it is not recommended for production use
+due to the potential instability and lack of long-term support.
+
+Each feature exclusive to the nightly version is behind a so-called \emph{feature flag}.
+They may only be used when compiling with the nightly toolchain.
+Features flags may enable
+
+\begin{itemize}
+      \item syntactic constructs that are not available on the stable version,
+      \item library functions exclusive to the nightly version,
+      \item support for specific hardware instructions of a given \acrshort{ISA} or platform,
+      \item additional compiler flags.
+\end{itemize}
+
+The full list of feature flags is found in \cite{unstable-book}
+and contains more than 500 entries in total.
+In a more concise manner, the Rust language used inside of \emph{rustc} is
+a superset of the stable Rust language used outside of it.
+These differences should be taken into account
+when working on the compiler or building software that directly depends on the compiler.
 
 \end{document}
