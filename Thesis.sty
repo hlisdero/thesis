@@ -55,14 +55,18 @@
 \setglossarystyle{list}
 \makeglossaries
 
-% CODE LISTINGS %
-\usepackage{listings}
-
-% ADD SINTAX HIGHLIGHTING TO CODE LISTINGS %
-\usepackage{minted}
-
-% DEFINE SOME COMMON SYMBOLS (THE INCLUDE IS LOCATION-SENSITIVE) %
-\usepackage{gensymb}
+% CODE LISTINGS WITH SINTAX HIGHLIGHTING %
+% See example: https://www.overleaf.com/learn/latex/Code_Highlighting_with_minted
+% Restart the counter on every chapter
+\usepackage[chapter]{minted}
+\setminted{
+    linenos, % Show line numbers
+    autogobble, % Remove whitespace in front of the code
+    frame=lines, % Use lines to create a frame
+    framesep=2mm, % Separation of the frame from the actual code
+    baselinestretch=1.2, % Line spacing of the code set to 1.2
+    fontsize=\footnotesize % Use a font size equal to the font size of a footnote
+}
 
 % TABLE FORMATTING %
 \usepackage[table]{xcolor}
@@ -83,34 +87,10 @@
 % CORRECT DISPLAY OF THE EURO SIGN %
 \usepackage{eurosym}
 
+% DEFINE SOME COMMON SYMBOLS (THE INCLUDE IS LOCATION-SENSITIVE) %
+\usepackage{gensymb}
+
 % SUPPORT FOR SUBFILES COMPILED SEPARATELY %
 % This should be placed at the end
 % See example on: https://www.overleaf.com/learn/latex/Multi-file_LaTeX_projects
 \usepackage{subfiles}
-
-% LISTING STYLE DEFINITION %
-% See example: https://www.overleaf.com/learn/latex/Code_listing
-\definecolor{codegreen}{rgb}{0,0.6,0}
-\definecolor{codegray}{rgb}{0.5,0.5,0.5}
-\definecolor{codepurple}{rgb}{0.58,0,0.82}
-\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
-
-\lstdefinestyle{ListingStyle}{
-    backgroundcolor=\color{backcolour},
-    commentstyle=\color{codegreen},
-    keywordstyle=\color{magenta},
-    numberstyle=\tiny\color{codegray},
-    stringstyle=\color{codepurple},
-    basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=false,
-    breaklines=true,
-    captionpos=b,
-    keepspaces=true,
-    numbers=left,
-    numbersep=5pt,
-    showspaces=false,
-    showstringspaces=false,
-    showtabs=false,
-    tabsize=2
-}
-\lstset{style=ListingStyle}

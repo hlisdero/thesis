@@ -6,4 +6,24 @@
 
 \section{Mid-level Intermediate Representation (MIR)}
 
+An overview of the \acrfull{MIR} is provided in this section.
+We will explore its different parts,
+how different code fragments are mapped to them,
+and the underlying graph structure.
+Consider the example code listed in Listing \ref{lst:mir-rust-code-example}.
+
+\begin{listing}
+    \begin{minted}{Rust}
+        fn main() {
+            match std::env::args().len() {
+                1 => 2,
+                3 => 6,
+                _ => 0,
+            };
+        }
+    \end{minted}
+    \caption{Simple Rust program to explain the MIR components}
+    \label{lst:mir-rust-code-example}
+\end{listing}
+
 \end{document}

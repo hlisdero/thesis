@@ -85,19 +85,23 @@ which is waiting on \texttt{cv} to know when \texttt{flag} has been set.
 T2 waits on \texttt{cv} until it receives a signal from T1.
 Listing \ref{lst:missed-signal-example} shows the corresponding pseudocode.
 
-\begin{lstlisting}[caption=Pseudocode for a missed signal example, label=lst:missed-signal-example]
-// T1
-lock.acquire()
-flag = true
-cv.signal()   // Signal T2 to wake up
-lock.release()
-
-// T2
-lock.acquire()
-while (flag == false)   // Wait until flag has changed
-    cv.wait(lock)
-lock.release()
-\end{lstlisting}
+\begin{listing}
+      \begin{minted}{C++}
+            // T1
+            lock.acquire()
+            flag = true
+            cv.signal()   // Signal T2 to wake up
+            lock.release()
+            
+            // T2
+            lock.acquire()
+            while (flag == false)   // Wait until flag has changed
+                cv.wait(lock)
+            lock.release()
+      \end{minted}
+      \caption{Pseudocode for a missed signal example}
+      \label{lst:missed-signal-example}
+\end{listing}
 
 Now, suppose that T1 sets \texttt{flag} and signals \texttt{cv},
 but T2 has not yet entered the wait state on \texttt{cv} due to some scheduling delay.
