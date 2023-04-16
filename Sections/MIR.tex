@@ -95,7 +95,10 @@ To illustrate this variability, Listing \ref{lst:mir-output-release-example}
 shows the output when compiling the same program in \emph{release} mode.
 The distinguishing feature found in \emph{release} builds is
 the presence of the \texttt{StorageLive} and \texttt{StorageDead} statements.
-Unless otherwise stated, the listings in this work contain MIR generated in \emph{debug} builds.
+On the other hand, \emph{debug} builds generate
+shorter and clearer MIR that is closer to what the user wrote.
+For this reason, unless otherwise stated,
+the listings in this work contain MIR generated in \emph{debug} builds.
 
 \begin{longlisting}
     \begin{minted}{Rust}
