@@ -58,15 +58,19 @@
 % CODE LISTINGS WITH SINTAX HIGHLIGHTING %
 % See example: https://www.overleaf.com/learn/latex/Code_Highlighting_with_minted
 % Restart the counter on every chapter
-\usepackage[chapter]{minted}
+\usepackage[chapter,newfloat]{minted}
 \setminted{
     linenos, % Show line numbers
+    breaklines, % Wrap lines if necessary
     autogobble, % Remove whitespace in front of the code
     frame=lines, % Use lines to create a frame
     framesep=2mm, % Separation of the frame from the actual code
     baselinestretch=1.2, % Line spacing of the code set to 1.2
     fontsize=\footnotesize % Use a font size equal to the font size of a footnote
 }
+% Define a new environment for long listings as suggested in the documentation
+\usepackage{caption}
+\newenvironment{longlisting}{\captionsetup{type=listing}}{}
 
 % TABLE FORMATTING %
 \usepackage[table]{xcolor}
