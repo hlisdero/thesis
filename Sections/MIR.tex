@@ -97,7 +97,7 @@ Moreover, output depends on the following factors:
 To illustrate this variability, Listing \ref{lst:mir-output-release-example}
 shows the output when compiling the same program in \emph{release} mode.
 The distinguishing feature found in \emph{release} builds is
-the presence of the \texttt{StorageLive} and \texttt{StorageDead} statements.
+the presence of the \Rustinline{StorageLive} and \Rustinline{StorageDead} statements.
 On the other hand, \emph{debug} builds generate
 shorter and clearer \acrshort{MIR} that is closer to what the user wrote.
 For this reason, unless otherwise stated,
@@ -176,10 +176,10 @@ and lastly one \emph{terminator statement}, for short \emph{terminator}.
 The terminator is the only statement in which the program can issue an instruction
 that directs the control flow to another basic block inside the same function
 or to call another function.
-Branching as in Rust's \texttt{match} or \texttt{if} statements can occur only in terminators.
+Branching as in Rust's \Rustinline{match} or \Rustinline{if} statements can occur only in terminators.
 Terminators play the role of mapping the high-level constructs
 for conditional execution and looping to the low-level representation in machine code
-as simple conditional or unconditional \texttt{branch} instructions.
+as simple conditional or unconditional \Rustinline{branch} instructions.
 
 In Fig. \ref{fig:mir-cfg-example}, the graph representation
 for the MIR shown in Listing \ref{lst:mir-output-debug-example} is presented as an example.
@@ -194,7 +194,7 @@ extra annotations as in \texttt{CALL:} or \texttt{DROP:} were added.
     \label{fig:mir-cfg-example}
 \end{figure}
 
-It should be noted that the function call to \mintinline{Rust}{std::env::args().len()}
+It should be noted that the function call to \Rustinline{std::env::args().len()}
 in Line 2 in Listing \ref{lst:rust-code-example} may return successfully or fail.
 The latter triggers an unwinding of the stack, ending the program and reporting an error.
 This is represented by the branching at the end of BB1 where the code execution
@@ -213,7 +213,7 @@ We will introduce some of them to clarify the meaning of the example presented.
           and performs all the necessary cleanup tasks.
           From that point on, the variable cannot be used anymore in the program.
     \item \texttt{RETURN:} returns from the function.
-          The return value is always stored in the local variable \texttt{\_0}, as we will see shortly.
+          The return value is always stored in the local variable \Rustinline{_0}, as we will see shortly.
     \item \texttt{RESUME:} indicates that the process should continue unwinding.
           Analogously to a return, this marks the end of this invocation of the function.
           It is only permitted in cleanup blocks.
@@ -235,9 +235,9 @@ therefore places are not always equivalent to locals.
 Conveniently, all the places are also locals in Fig. \ref{fig:mir-cfg-example}.
 
 Locals are identified by an increasing non-negative index
-and are emitted by the compiler as a string of the form ``\texttt{\_<index>}''.
+and are emitted by the compiler as a string of the form ``\Rustinline{_<index>}''.
 In particular, the return value of the function
-is always stored in the first local \texttt{\_0}.
+is always stored in the first local \Rustinline{_0}.
 This matches closely the low-level representation on the stack.
 
 \subsection{Example step by step}
@@ -251,34 +251,34 @@ often encountered when programming in Rust.
 \subsubsection{BB0}
 
 \begin{itemize}
-    \item The \mintinline{Rust}{main()} function starts at BB0.
-    \item A function is called (\mintinline{Rust}{std::env::args()})
+    \item The \Rustinline{main()} function starts at BB0.
+    \item A function is called (\Rustinline{std::env::args()})
           to obtain an iterator over the arguments provided to the program.
     \item The return value of the function, the iterator,
-          is assigned to the local \texttt{\_3}.
+          is assigned to the local \Rustinline{_3}.
     \item Execution continues in BB1.
 \end{itemize}
 
 \subsubsection{BB1}
 
 \begin{itemize}
-    \item A reference to the iterator stored in \texttt{\_3} is generated
-          and stored in the local \texttt{\_2} (similar to the ``\&'' operator in C).
+    \item A reference to the iterator stored in \Rustinline{_3} is generated
+          and stored in the local \Rustinline{_2} (similar to the ``\&'' operator in C).
           This is necessary for calling methods
           because methods receive a reference
-          to a struct of the same type (\mintinline{Rust}{&self}) as their first argument.
-    \item The reference stored in \texttt{\_2} is passed to
-          the method \mintinline{Rust}{std::env::Args::len()} by moving
+          to a struct of the same type (\Rustinline{&self}) as their first argument.
+    \item The reference stored in \Rustinline{_2} is passed to
+          the method \Rustinline{std::env::Args::len()} by moving
           and the function is called.
     \item The return value of the function,
-          the number of arguments passed to the function, is assigned to the local \texttt{\_1}.
+          the number of arguments passed to the function, is assigned to the local \Rustinline{_1}.
     \item Execution continues in BB2 if successful, in BB4 in case of panic.
 \end{itemize}
 
 \subsubsection{BB2}
 
 \begin{itemize}
-    \item The variable \texttt{\_3}, whose value is the iterator over the arguments,
+    \item The variable \Rustinline{_3}, whose value is the iterator over the arguments,
           is \emph{dropped} since it is no longer needed.
     \item Execution continues in BB3.
 \end{itemize}
@@ -287,15 +287,15 @@ often encountered when programming in Rust.
 
 \begin{itemize}
     \item The function returns.
-          The return value (local \texttt{\_0}) is of type "unit"\footnote{\url{https://doc.rust-lang.org/std/primitive.unit.html}},
+          The return value (local \Rustinline{_0}) is of type "unit"\footnote{\url{https://doc.rust-lang.org/std/primitive.unit.html}},
           which is similar to a \texttt{void} function in C, i.e. it does not return anything.
-          This is how \mintinline{Rust}{main()} was defined in Listing \ref{lst:rust-code-example}.
+          This is how \Rustinline{main()} was defined in Listing \ref{lst:rust-code-example}.
 \end{itemize}
 
 \subsubsection{BB4}
 
 \begin{itemize}
-    \item The variable \texttt{\_3}, whose value is the iterator over the arguments,
+    \item The variable \Rustinline{_3}, whose value is the iterator over the arguments,
           is \emph{dropped} since it is no longer needed.
     \item If the drop is successful, execution continues in BB5,
           otherwise terminate the program immediately.
