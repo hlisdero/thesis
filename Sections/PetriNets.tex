@@ -482,7 +482,7 @@ In general terms, the reachability tree has the following structure:
 Nodes represent markings generated from $M_0$, the root of the tree, and its successors.
 Each arc represents a transition firing, which transforms one marking into another.
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.30]{reachability-tree-example.png}
     \caption{A marked Petri net for illustrating the construction of a reachability tree.}
@@ -500,7 +500,7 @@ An arc, labeled by the transition fired, leads from the initial marking
 After this first step (Fig. \ref{fig:reachability-tree-step-1}),
 the tree contains all markings that are immediately reachable from the initial marking.
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.30]{reachability-tree-step-1.png}
     \caption{The first step building the reachability tree
@@ -519,7 +519,7 @@ From the marking on the right of the tree, denoted $(1, 1, 0)$, we can fire T1 o
 If we fire T1, we obtain $(0, 1, 1)$ and if T3 fires, the resulting marking is $(1, 2, 0)$.
 This produces the tree of Fig. \ref{fig:reachability-tree-step-2}.
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.30]{reachability-tree-step-2.png}
     \caption{The second step building the reachability tree
@@ -555,18 +555,18 @@ This net is even \emph{safe}.
 In conclusion, dealing with a bounded or safe net is not
 a guarantee that the total number of reachable states will be finite.
 
-\begin{figure}
+\begin{figure}[!htb]
     \centering
     \begin{subfigure}
         \centering
         % https://stackoverflow.com/questions/2328403/vertical-alignment-of-subfigures-latex
-        \raisebox{2.5cm}{\includegraphics[scale=0.30]{petri-net-loop.png}}
+        \raisebox{3.5cm}{\includegraphics[scale=0.30]{petri-net-loop.png}}
     \end{subfigure}
     % Horizontal space between the figures. \hfill is too much.
     \hspace{1.5cm}
     \begin{subfigure}
         \centering
-        \includegraphics[scale=0.25]{reachability-tree-bounded-net-counterexample.png}
+        \includegraphics[scale=0.30]{reachability-tree-bounded-net-counterexample.png}
     \end{subfigure}
     \caption{A simple Petri net with an infinite reachability tree.}
     \label{fig:reachability-tree-bounded-net-counterexample}
@@ -599,7 +599,7 @@ to a finite tree is shown in Fig. \ref{fig:reachability-tree-final-step-finite}.
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[scale=0.27]{reachability-tree-final-step-finite.png}
+    \includegraphics[scale=0.30]{reachability-tree-final-step-finite.png}
     \caption{The finite reachability tree for the Petri net in Fig.
         \ref{fig:reachability-tree-example}.}
     \label{fig:reachability-tree-final-step-finite}
