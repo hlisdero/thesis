@@ -164,6 +164,29 @@ the listings in this work contain \acrshort{MIR} generated in \emph{debug} build
 The specific formatting when converting \acrshort{MIR} to a string has changed only slightly over time.
 See \cite[Section 3.3]{meyer2020} for an example of older output from mid-2019.
 
+As stated in Sec. \ref{sec:interception-strategy}, the \acrshort{MIR} is derived
+from a previously existing \acrfull{CFG} in the Rust compiler.
+Fundamentally, a \acrshort{CFG} is a graph representation of a program
+that exposes the underlying control flow.
+
+The MIR is formed by functions.
+Each function is represented as a series of \acrfull{BB} connected by directed edges.
+Each \acrshort{BB} contains zero or more \emph{statements} (usually abbreviated as ``STMT'')
+and lastly one \emph{terminator statement}, for short \emph{terminator}.
+The terminator is the only statement in which the program can issue an instruction
+that directs the control flow to another basic block inside the same function
+or to call another function.
+Branching as in Rust's \texttt{match} or \texttt{if} statements can occur only in terminators.
+Terminators play the role of mapping the high-level constructs
+for conditional execution and looping to the low-level representation in machine code
+as simple conditional or unconditional \texttt{branch} instructions.
+
+In Fig. \ref{fig:mir-cfg-example}, the graph representation
+for the MIR shown in Listing \ref{lst:mir-output-debug-example} is presented as an example.
+The statements are colored in light blue and the terminators in light red.
+To make the kind of terminator statement clearer,
+extra annotations as in \texttt{CALL:} or \texttt{DROP:} were added.
+
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.60]{mir-cfg-example.png}
@@ -171,5 +194,121 @@ See \cite[Section 3.3]{meyer2020} for an example of older output from mid-2019.
     \label{fig:mir-cfg-example}
 \end{figure}
 
+It should be noted that the function call to \mintinline{Rust}{std::env::args().len()}
+in Line 2 in Listing \ref{lst:rust-code-example} may return successfully or fail.
+The latter triggers an unwinding of the stack, ending the program and reporting an error.
+This is represented by the branching at the end of BB1 where the code execution
+may take the left path or the right path down the graph.
+The left branch (BB4 and BB5) corresponds to the correct execution of the program,
+while the right branch relates to the abnormal termination of the program.
+
+There are different kinds of terminators and these are specific to the Rust semantics.
+We will introduce some of them to clarify the meaning of the example presented.
+
+\begin{itemize}
+    \item As expected, a terminator of type \texttt{CALL:} calls a function, which returns a value,
+          and continues execution to the next \acrshort{BB}.
+    \item A terminator of type \texttt{DROP:} frees up the memory of the variable passed in.
+          It executes the destructors\footnote{\url{https://doc.rust-lang.org/stable/reference/destructors.html}}
+          and performs all the necessary cleanup tasks.
+          From that point on, the variable cannot be used anymore in the program.
+    \item \texttt{RETURN:} returns from the function.
+          The return value is always stored in the local variable \texttt{\_0}, as we will see shortly.
+    \item \texttt{RESUME:} indicates that the process should continue unwinding.
+          Analogously to a return, this marks the end of this invocation of the function.
+          It is only permitted in cleanup blocks.
+\end{itemize}
+
+The complete list of terminator kinds can be found in the nightly
+documentation\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/enum.TerminatorKind.html}}.
+Other kinds of terminators will be discussed in detail in Sec. \ref{sec:terminators}.
+
+Regarding the variables, the data in MIR can be divided into two categories:
+\emph{locals} and \emph{places}.
+It is critical to observe that these ``places'' are
+\emph{not} related to the places in Petri nets.
+Places are used to represent all types of memory locations (including aliases),
+while locals are limited to stack-based memory locations
+(i.e. local variables of a function).
+In other words, places are more general and locals are a special case of a place,
+therefore places are not always equivalent to locals.
+Conveniently, all the places are also locals in Fig. \ref{fig:mir-cfg-example}.
+
+Locals are identified by an increasing non-negative index
+and are emitted by the compiler as a string of the form ``\texttt{\_<index>}''.
+In particular, the return value of the function
+is always stored in the first local \texttt{\_0}.
+This matches closely the low-level representation on the stack.
+
+\subsection{Example step by step}
+
+In this subsection, we will give a short explanation of what happens
+in each basic block of Fig. \ref{fig:mir-cfg-example}
+to ensure that all necessary information is covered.
+Moreover, this illustrates how the MIR output represents higher-level constructs
+often encountered when programming in Rust.
+
+\subsubsection{BB0}
+
+\begin{itemize}
+    \item The \mintinline{Rust}{main()} function starts at BB0.
+    \item A function is called (\mintinline{Rust}{std::env::args()})
+          to obtain an iterator over the arguments provided to the program.
+    \item The return value of the function, the iterator,
+          is assigned to the local \texttt{\_3}.
+    \item Execution continues in BB1.
+\end{itemize}
+
+\subsubsection{BB1}
+
+\begin{itemize}
+    \item A reference to the iterator stored in \texttt{\_3} is generated
+          and stored in the local \texttt{\_2} (similar to the ``\&'' operator in C).
+          This is necessary for calling methods
+          because methods receive a reference
+          to a struct of the same type (\mintinline{Rust}{&self}) as their first argument.
+    \item The reference stored in \texttt{\_2} is passed to
+          the method \mintinline{Rust}{std::env::Args::len()} by moving
+          and the function is called.
+    \item The return value of the function,
+          the number of arguments passed to the function, is assigned to the local \texttt{\_1}.
+    \item Execution continues in BB2 if successful, in BB4 in case of panic.
+\end{itemize}
+
+\subsubsection{BB2}
+
+\begin{itemize}
+    \item The variable \texttt{\_3}, whose value is the iterator over the arguments,
+          is \emph{dropped} since it is no longer needed.
+    \item Execution continues in BB3.
+\end{itemize}
+
+\subsubsection{BB3}
+
+\begin{itemize}
+    \item The function returns.
+          The return value (local \texttt{\_0}) is of type "unit"\footnote{\url{https://doc.rust-lang.org/std/primitive.unit.html}},
+          which is similar to a \texttt{void} function in C, i.e. it does not return anything.
+          This is how \mintinline{Rust}{main()} was defined in Listing \ref{lst:rust-code-example}.
+\end{itemize}
+
+\subsubsection{BB4}
+
+\begin{itemize}
+    \item The variable \texttt{\_3}, whose value is the iterator over the arguments,
+          is \emph{dropped} since it is no longer needed.
+    \item If the drop is successful, execution continues in BB5,
+          otherwise terminate the program immediately.
+\end{itemize}
+
+\subsubsection{BB5}
+
+\begin{itemize}
+    \item Continue unwinding the stack.
+          This is the standard protocol defined for handling catastrophic error cases
+          that cannot be handled by the program.
+          Implementation details can be found in the
+          documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/panic-implementation.html}}
+\end{itemize}
 
 \end{document}
