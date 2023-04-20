@@ -1,0 +1,49 @@
+% !TeX root = ../Thesis.tex
+\documentclass[../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../images/}}}
+
+\begin{document}
+
+\section{Function inlining in the translation to Petri nets}
+
+In this section, a concise analysis and motivation for the third design decision
+listed at the beginning of the chapter, namely inlining function calls, is presented.
+
+Modeling functions in \acrshort{PN} is a crucial aspect of the translation
+because it is the basic unit of the MIR representation.
+By representing the functions in the MIR as \acrshort{PN} and connecting them accordingly,
+the control flow and data shared between the threads in the program
+can be captured in a formalized framework.
+Later the Petri net is analyzed by a model checker
+in order to identify potential deadlocks or lost signals.
+This approach is especially useful when working with large and complex systems
+that may have many interrelated threads and functions,
+where the deadlock situation may not be evident even to an experienced code reviewer.
+
+When translating MIR functions to \acrshort{PN}, one key question that arises is
+whether to reuse the same representation for every call to a specific function or
+to ``inline'' the corresponding representation every time the function is called.
+Expressed differently, each function maps to a subnet
+in the final \acrshort{PN} obtained after the translation, i.e.
+a connected subgraph formed by the places and transitions
+that model the behavior of the specific function.
+This smaller part of the net can either be present only once in the \acrshort{PN}
+and all calls to this function connect to it,
+or be repeated for every instance of a call to the function in the Rust code.
+
+Reusing the same model for every function call can be more efficient,
+as the \acrshort{PN} obtained is smaller.
+However, this approach can also lead to invalid sequences of markings
+that were not present in the original program.
+These can be the source of false positives in deadlock detection,
+as these extraneous states may lead the program to
+incorrect states where the safety guarantees made by the compiler do not longer hold.
+
+On the other hand, inlining the model every time a function is called results in
+a bigger \acrshort{PN}, which requires more memory and processing time to be analyzed,
+but it can also improve the accuracy of the analysis by ensuring
+that each function call is represented by a unique Petri net structure
+that captures its specific control flow and data dependencies in the context
+in which the function call occurs in the code.
+
+\end{document}
