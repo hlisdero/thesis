@@ -1,0 +1,10 @@
+digraph function {
+    nodesep=1.5;
+    FUNCTION_START [width=0.6 shape="circle" xlabel="FUNCTION_START" label="•"];
+    FUNCTION_END [width=0.6 shape="circle" xlabel="FUNCTION_END" label=""];
+
+    FUNCTION_NAME [height=0.1 shape="box" xlabel="" label="FUNCTION_NAME"];
+    
+    FUNCTION_START -> FUNCTION_NAME;
+    FUNCTION_NAME -> FUNCTION_END;
+}

@@ -13,8 +13,8 @@ Modeling functions in \acrshort{PN} is a crucial aspect of the translation
 because it is the basic unit of the MIR representation.
 By representing the functions in the MIR as \acrshort{PN} and connecting them accordingly,
 the control flow and data shared between the threads in the program
-can be captured in a formalized framework.
-Later the Petri net is analyzed by a model checker
+can be captured in a formal framework.
+Afterward, the Petri net is analyzed by a model checker
 in order to identify potential deadlocks or lost signals.
 This approach is especially useful when working with large and complex systems
 that may have many interrelated threads and functions,
@@ -40,10 +40,60 @@ as these extraneous states may lead the program to
 incorrect states where the safety guarantees made by the compiler do not longer hold.
 
 On the other hand, inlining the model every time a function is called results in
-a bigger \acrshort{PN}, which requires more memory and processing time to be analyzed,
+a larger \acrshort{PN}, which requires more memory and processor time to be analyzed,
 but it can also improve the accuracy of the analysis by ensuring
 that each function call is represented by a unique Petri net structure
-that captures its specific control flow and data dependencies in the context
+that captures its specific data dependencies in the context
 in which the function call occurs in the code.
+
+The impact of these subtle details can only
+be fully comprehended with an appropriate example.
+Therefore, consider first the most simple abstraction of a function call in
+the language of Petri nets, formed by a single transition and
+two places representing the start and end of the function.
+This is seen in Fig. \ref{fig:simplest-function}.
+The function call is treated as a black box,
+all details are abstracted away in the transition.
+We care only about where the function starts and where it ends.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[scale=0.25]{simplest-function.png}
+    \caption{The simplest Petri net model for a function call}
+    \label{fig:simplest-function}
+\end{figure}
+
+Observe now such a function in the context of a Rust program.
+Listing \ref{lst:repeated-function-call} shows a simple example
+in which one function is called
+five times consecutively in a \Rustinline{for} loop.
+A possible \acrshort{PN} that models the program
+is found in Fig. \ref{fig:repeated-function-call}.
+It should be emphasized that
+this net does \emph{not} result from a translation of the MIR.
+It is a simplification to showcase the difficulties
+of dealing with functions called in various places in the code.
+
+\begin{listing}
+    \begin{minted}{Rust}
+        fn simple_function() {}
+
+        pub fn main() {
+            for i in 0..5 {
+                simple_function();
+            }
+        }
+    \end{minted}
+    \caption{A simple Rust program with a repeated function call}
+    \label{lst:repeated-function-call}
+\end{listing}
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[scale=0.25]{repeated-function-call.png}
+    \caption{A possible \acrshort{PN} for the code in Listing \ref{lst:repeated-function-call}
+        which applies the model shown in Fig. \ref{fig:simplest-function}}
+    \label{fig:repeated-function-call}
+\end{figure}
 
 \end{document}
