@@ -10,7 +10,7 @@ In this section, a thorough analysis and motivation for the third design decisio
 listed at the beginning of the chapter, namely inlining function calls, is presented.
 
 Modeling functions in \acrshort{PN} is a crucial aspect of the translation
-because it is the basic unit of the MIR representation.
+because it is the basic unit of the MIR.
 By representing the functions in the MIR as \acrshort{PN} and connecting them accordingly,
 the control flow and data shared between the threads in the program
 can be captured in a formal framework.
@@ -61,7 +61,7 @@ We care only about where the function starts and where it ends.
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.25]{simplest-function.png}
-    \caption{The simplest Petri net model for a function call}
+    \caption{The simplest Petri net model for a function call.}
     \label{fig:simplest-function}
 \end{figure}
 
@@ -86,7 +86,7 @@ of dealing with functions called in various places in the code.
             }
         }
     \end{minted}
-    \caption{A simple Rust program with a repeated function call}
+    \caption{A simple Rust program with a repeated function call.}
     \label{lst:repeated-function-call}
 \end{listing}
 
@@ -94,7 +94,7 @@ of dealing with functions called in various places in the code.
     \centering
     \includegraphics[scale=0.25]{repeated-function-call.png}
     \caption{A possible \acrshort{PN} for the code in Listing \ref{lst:repeated-function-call}
-        applying the model of Fig. \ref{fig:simplest-function}}
+        applying the model of Fig. \ref{fig:simplest-function}.}
     \label{fig:repeated-function-call}
 \end{figure}
 
@@ -122,7 +122,7 @@ the extraneous behavior described at the beginning of the section.
             simple_function();
         }
     \end{minted}
-    \caption{A simple Rust program that calls a function in two different places}
+    \caption{A simple Rust program that calls a function in two different places.}
     \label{lst:two-simple-function-calls}
 \end{listing}
 
@@ -132,9 +132,9 @@ This is shown in Fig. \ref{fig:two-function-calls-incorrect-1}.
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[scale=0.25]{two-function-calls-incorrect-1.png}
+    \includegraphics[scale=0.28]{two-function-calls-incorrect-1.png}
     \caption{A first (incorrect) \acrshort{PN} for the code
-        in Listing \ref{lst:two-simple-function-calls}}
+        in Listing \ref{lst:two-simple-function-calls}.}
     \label{fig:two-function-calls-incorrect-1}
 \end{figure}
 
@@ -174,9 +174,9 @@ as illustrated in Fig. \ref{fig:two-function-calls-incorrect-2}.
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[scale=0.25]{two-function-calls-incorrect-2.png}
+    \includegraphics[scale=0.28]{two-function-calls-incorrect-2.png}
     \caption{A second (also incorrect) \acrshort{PN} for the code
-        in Listing \ref{lst:two-simple-function-calls}}
+        in Listing \ref{lst:two-simple-function-calls}.}
     \label{fig:two-function-calls-incorrect-2}
 \end{figure}
 
