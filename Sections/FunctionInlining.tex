@@ -31,18 +31,18 @@ This smaller part of the net can either be present only once in the \acrshort{PN
 and all calls to this function connect to it,
 or be repeated for every instance of a call to the function in the Rust code.
 
-Reusing the same model for every function call can be more efficient,
+Reusing the same model for every function seems at first glance more efficient,
 as the \acrshort{PN} obtained is smaller.
-However, this approach can also lead to invalid sequences of markings
-that were not present in the original program.
-These can be the source of false positives in deadlock detection,
-as these extraneous states may lead the program to
-incorrect states where the safety guarantees made by the compiler do not longer hold.
+However, this approach can also lead to invalid states
+that were not present in the original Rust program.
+These can be the source of false positives during deadlock detection,
+as these extraneous states may violate
+the safety guarantees offered by the compiler.
 
 On the other hand, inlining the model every time a function is called results in
 a larger \acrshort{PN}, which requires more memory and processor time to be analyzed,
 but it can also improve the accuracy of the analysis by ensuring
-that each function call is represented by a unique Petri net structure
+that each function call is represented by a separate Petri net structure
 that captures its specific data dependencies in the context
 in which the function call occurs in the code.
 
@@ -66,14 +66,15 @@ We care only about where the function starts and where it ends.
 \end{figure}
 
 Observe now such a function in the context of a Rust program.
-Listing \ref{lst:repeated-function-call} shows a simple example
+Listing \ref{lst:repeated-function-call} provides a simple example
 in which one function is called
 five times consecutively in a \Rustinline{for} loop.
 A possible \acrshort{PN} that models the program
 is found in Fig. \ref{fig:repeated-function-call}.
 It should be emphasized that
-this net does \emph{not} result from a translation of the MIR.
-It is a simplification to showcase the difficulties
+this net and the subsequent ones in this section
+do \emph{not} result from a translation of the MIR.
+They are simplifications to showcase the difficulties
 of dealing with functions called in various places in the code.
 
 \begin{listing}
@@ -127,7 +128,7 @@ the extraneous behavior described at the beginning of the section.
 \end{listing}
 
 As stated before, the first approach to modeling the program consists
-in re-using the function model for both calls.
+in reusing the function model for both calls.
 This is shown in Fig. \ref{fig:two-function-calls-incorrect-1}.
 
 \begin{figure}[!htb]
@@ -138,10 +139,11 @@ This is shown in Fig. \ref{fig:two-function-calls-incorrect-1}.
     \label{fig:two-function-calls-incorrect-1}
 \end{figure}
 
-It must be evident to the reader that
+It is evident to the reader that
 the program in Listing \ref{lst:two-simple-function-calls}
-never calls the \Rustinline{panic!()} macro and always terminates successfully.
-The variable \Rustinline{second_call} is never \Rustinline{true} before line 9.
+never calls the \Rustinline{panic!()} macro and always terminates successfully,
+given that the variable \Rustinline{second_call}
+is never \Rustinline{true} before line 9.
 
 Yet, the \acrshort{PN} depicted in Fig. \ref{fig:two-function-calls-incorrect-1}.
 is conspicuously flawed, making it unsuitable as a model for the program.
@@ -162,7 +164,7 @@ but also \emph{always} ends normally, as seen in the previous paragraph.
 The situation becomes worse if we follow the path of firing \texttt{flag\_is\_false}.
 In that case, the token triggers another function call, which is in principle correct,
 but nothing prevents it from doing this over and over again.
-The result is that an infinite amount of tokens could accumulate
+The conclusion is that an infinite amount of tokens could accumulate
 in \texttt{main\_end\_place} or \texttt{PROGRAM\_END}
 in the circumstance that, by pure chance,
 the transition \texttt{flag\_is\_true} does not fire.
@@ -248,7 +250,7 @@ for a tool that aims to be user-friendly and easy to set up.
 
 One disadvantage mentioned earlier is that the size of the resulting net is larger.
 The exact penalty in the number of additional places and transitions depends
-on the frequency with which functions are re-used on average in the codebase.
+on the frequency with which functions are reused on average in the codebase.
 It is reasonable to assume that functions are called from several places.
 However, certain optimizations can be applied,
 which can reduce the size of the net considerably,
