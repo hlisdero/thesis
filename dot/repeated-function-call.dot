@@ -1,31 +1,31 @@
 digraph repeated_function_call {
     nodesep=1.0;
     
-    // Main function places
-    main_START [width=0.6 shape="circle" xlabel="main_START" label="•"];
-    main_END [width=0.6 shape="circle" xlabel="main_END" label=""];
-    // Loop places
-    loop_START [width=0.6 shape="circle" xlabel="loop_START" label=""];
+    // Program places
+    PROGRAM_START [width=0.6 shape="circle" xlabel="PROGRAM_START" label="•"];
+    PROGRAM_END [width=0.6 shape="circle" xlabel="PROGRAM_END" label=""];
+    // main function places
+    main_START [width=0.6 shape="circle" xlabel="main_START" label=""];
     check_condition [width=0.6 shape="circle" xlabel="check_condition" label=""];
-    loop_END [width=0.6 shape="circle" xlabel="loop_END" label=""];
+    main_END [width=0.6 shape="circle" xlabel="main_END" label=""];
     // Simple function places
     simple_function_START [width=0.6 shape="circle" xlabel="simple_function_START" label=""];
     simple_function_END [width=0.6 shape="circle" xlabel="simple_function_END" label=""];
     
     // Transitions
-    main_STMT_1 [height=0.1 shape="box" xlabel="" label="main_STMT_1"];
-    main_STMT_2 [height=0.1 shape="box" xlabel="" label="main_STMT_2"];
+    CALL_main [height=0.1 shape="box" xlabel="" label="CALL_main"];
+    enter_loop [height=0.1 shape="box" xlabel="" label="enter_loop"];
     CALL_simple_function [height=0.1 shape="box" xlabel="" label="CALL_simple_function"];
     simple_function [height=0.1 shape="box" xlabel="" label="simple_function"];
     RETURN_simple_function [height=0.1 shape="box" xlabel="" label="RETURN_simple_function"];
     exit_loop [height=0.1 shape="box" xlabel="" label="exit_loop"];
-    main_STMT_3 [height=0.1 shape="box" xlabel="" label="main_STMT_3"];
+    RETURN_main [height=0.1 shape="box" xlabel="" label="RETURN_main"];
     
     // Before the loop
-    main_START -> main_STMT_1;
-    main_STMT_1 -> loop_START;
-    loop_START -> main_STMT_2;
-    main_STMT_2 -> check_condition [weight=10];
+    PROGRAM_START -> CALL_main;
+    CALL_main -> main_START;
+    main_START -> enter_loop;
+    enter_loop -> check_condition [weight=10];
     // Function call
     check_condition -> CALL_simple_function  [weight=5];
     CALL_simple_function -> simple_function_START [weight=5];
@@ -35,16 +35,16 @@ digraph repeated_function_call {
     RETURN_simple_function -> check_condition [weight=5];
     // Exit loop
     check_condition -> exit_loop [weight=10];
-    exit_loop -> loop_END;
-    loop_END -> main_STMT_3;
-    main_STMT_3 -> main_END;
+    exit_loop -> main_END;
+    main_END -> RETURN_main;
+    RETURN_main -> PROGRAM_END;
     
     // Order the nodes in different levels
-    {rank = min; main_START;}    
-    {rank = same; loop_START; CALL_simple_function;}
-    {rank = same; main_STMT_2; simple_function_START;}
+    {rank = min; PROGRAM_START;}    
+    {rank = same; main_START; CALL_simple_function;}
+    {rank = same; enter_loop; simple_function_START;}
     {rank = same; check_condition; simple_function;}
     {rank = same; exit_loop; simple_function_END;}
-    {rank = same; loop_END; RETURN_simple_function;}
-    {rank = max; main_END;} 
+    {rank = same; main_END; RETURN_simple_function;}
+    {rank = max; PROGRAM_END;} 
 }
