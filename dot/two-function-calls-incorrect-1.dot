@@ -1,0 +1,50 @@
+digraph two_function_call_incorrect {
+    nodesep=1.0;
+    
+    // Program places
+    PROGRAM_START [width=0.6 shape="circle" xlabel="PROGRAM_START" label="•"];
+    PROGRAM_PANIC [width=0.6 shape="circle" xlabel="PROGRAM_PANIC" label=""];
+    PROGRAM_END [width=0.6 shape="circle" xlabel="PROGRAM_END" label=""];
+    // main function places
+    flag_set_false [width=0.6 shape="circle" xlabel="flag_set_false" label=""];
+    check_flag [width=0.6 shape="circle" xlabel="check_flag" label=""];
+    flag_set_true [width=0.6 shape="circle" xlabel="flag_set_true" label=""];
+    main_end_place [width=0.6 shape="circle" xlabel="main_end_place" label=""];
+    // Simple function places
+    simple_function_START [width=0.6 shape="circle" xlabel="simple_function_START" label=""];
+    simple_function_END [width=0.6 shape="circle" xlabel="simple_function_END" label=""];
+    
+    // Transitions
+    CALL_main [height=0.1 shape="box" xlabel="" label="CALL_main"];
+    CALL_simple_function [height=0.1 shape="box" xlabel="" label="CALL_simple_function"];
+    simple_function [height=0.1 shape="box" xlabel="" label="simple_function"];
+    RETURN_simple_function [height=0.1 shape="box" xlabel="" label="RETURN_simple_function"];
+    flag_is_false [height=0.1 shape="box" xlabel="" label="flag_is_false"];
+    flag_is_true [height=0.1 shape="box" xlabel="" label="flag_is_true"];
+    RETURN_main [height=0.1 shape="box" xlabel="" label="RETURN_main"];
+     
+    // Before the first function call
+    PROGRAM_START -> CALL_main;
+    CALL_main -> flag_set_false;
+    // First function call
+    flag_set_false -> CALL_simple_function [weight=10];
+    CALL_simple_function -> simple_function_START [weight=10];
+    simple_function_START -> simple_function [weight=10];
+    simple_function -> simple_function_END [weight=10];
+    simple_function_END -> RETURN_simple_function [weight=10];
+    RETURN_simple_function -> check_flag [weight=10];
+    // Check flag
+    check_flag -> flag_is_true;
+    flag_is_true -> PROGRAM_PANIC;
+    check_flag -> flag_is_false;
+    flag_is_false -> flag_set_true;
+    // Second function call
+    flag_set_true -> CALL_simple_function;
+    RETURN_simple_function -> main_end_place;
+    main_end_place -> RETURN_main;
+    RETURN_main -> PROGRAM_END;
+    
+    // Put the program start at the top and the program end at the bottom
+    {rank = min; PROGRAM_START;}
+    {rank = max; PROGRAM_PANIC; PROGRAM_END;} 
+}
