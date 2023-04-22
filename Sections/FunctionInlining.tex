@@ -194,7 +194,79 @@ There is no guarantee that the transitions fire in a specific order.
 As seen in Sec. \ref{sec:transition-firing},
 the transition firing is non-deterministic.
 
-Having observed this, we turn our attention to the other approach to modeling
-function calls: Inlining the \acrshort{PN} representation.
+\clearpage
+\subsection{A feasible solution}
+
+Having observed the difficulties of modeling function calls,
+we turn our attention to the other approach to modeling function calls:
+Inlining the \acrshort{PN} representation.
+Some of the lessons learned from the preceding subsection are:
+
+\begin{itemize}
+    \item Creating a loop in the net where there is no loop in the original program
+          opens the door to infinite sequences of transition firings.
+          This could in turn break the \emph{safety} property of the \acrshort{PN}.
+    \item As the token symbolizes the program counter,
+          there must be only one token in the \acrshort{PN} at any given time.
+    \item The program state may change between function calls.
+          Accordingly, separate places should model these states.
+          Put differently, the state when calling a function the first time
+          may not be the same as when calling the function a second time.
+\end{itemize}
+
+Fig. \ref{fig:two-function-calls-correct} introduces
+the inlining approach implemented in the tool.
+The \acrshort{PN} therein is correct.
+It matches the structure of the Rust code more closely.
+It does not contain any loops nor
+it creates additional tokens when firing transitions,
+i.e. none of the transitions has two outputs.
+It is worth mentioning that the resulting \acrshort{PN} is a state machine
+(Definition \ref{definition:state-machines}),
+as expected for a single-threaded program.
+
+\begin{figure}[!htb]
+    \centering
+    \includegraphics[scale=0.25]{two-function-calls-correct.png}
+    \caption{A correct \acrshort{PN} for the code
+        in Listing \ref{lst:two-simple-function-calls} using inlining.}
+    \label{fig:two-function-calls-correct}
+\end{figure}
+
+A significant advantage of the inlining approach is
+that every function call is unequivocally identified.
+This proves helpful when interpreting the output of the model checker or
+error messages during the translation of a given program.
+The use of an incremental non-negative id is arbitrary but convenient.
+Moreover, the accuracy of deadlock detection is increased because
+certain classes of extraneous states
+such as those in the \acrshort{PN} shown in the previous section
+are not present.
+Minimizing the number of false positives plays an important role
+when considering which approach to implement
+for a tool that aims to be user-friendly and easy to set up.
+
+One disadvantage mentioned earlier is that the size of the resulting net is larger.
+The exact penalty in the number of additional places and transitions depends
+on the frequency with which functions are re-used on average in the codebase.
+It is reasonable to assume that functions are called from several places.
+However, certain optimizations can be applied,
+which can reduce the size of the net considerably,
+thus compensating for the effect of using inlining.
+These optimizations are discussed in detail in Chapter \ref{chap:future-work}.
+
+Lastly, an attentive reader may notice that
+the analysis of the \acrshort{PN} in Fig. \ref{fig:two-function-calls-correct}
+leads to the conclusion that
+the program may call \Rustinline{panic!()} and terminate abruptly,
+which does not match the execution of the Rust program.
+This is correct but it is a limitation of low-level Petri nets
+that cannot be solved in the framework of the model and
+goes beyond the scope of this work.
+Chapter \ref{chap:future-work} explores
+the consequences of this restriction and proposes potential remedies.
+
+Armed with these insights and knowledge about the design choices,
+we are now able to fully describe the implementation.
 
 \end{document}
