@@ -1,0 +1,19 @@
+digraph program {
+    nodesep=1.7;
+    
+    subgraph cluster_0 {
+        style="dashed"
+        label="Program"
+        
+        PROGRAM_END [width=0.6 shape="circle" xlabel="PROGRAM_END" label=""];
+        PROGRAM_PANIC [width=0.6 shape="circle" xlabel="PROGRAM_PANIC" label=""];
+        PROGRAM_START [width=0.6 shape="circle" xlabel="PROGRAM_START" label="•"];
+        PHANTOM1 [width=0.1 shape="none" label=""]
+        PHANTOM2 [width=0.1 shape="none" label=""]
+
+        # Invisible edge to force two ranks
+        PROGRAM_START -> PROGRAM_END [color="none"]
+        {rank = min; PROGRAM_START; PHANTOM1;}
+        {rank = max; PROGRAM_PANIC; PROGRAM_END;}
+    }
+}
