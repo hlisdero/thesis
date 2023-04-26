@@ -1,6 +1,6 @@
-% !TeX root = ../Thesis.tex
-\documentclass[../Thesis.tex]{subfiles}
-\graphicspath{{\subfix{../images/}}}
+% !TeX root = ../../Thesis.tex
+\documentclass[../../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
 
 \begin{document}
 
@@ -96,14 +96,14 @@ For instance, all \texttt{while} and \texttt{for} loops are converted into simpl
 The \acrshort{HIR} is used to perform some important steps:
 
 \begin{enumerate}
-      \item \emph{type inference}: The automatic detection of a type
-            of an expression, e.g. when declaring variables with \texttt{let}.
-      \item \emph{trait solving}: Ensuring that each implementation block (\texttt{impl})
-            refers to a valid, existing trait.
-      \item \emph{type checking}: This process converts the types written by the user
-            into the internal representation used by the compiler.
-            It is, in other words, where types are interned.
-            Then, using this information, the type safety, correctness, and coherence are verified.
+    \item \emph{type inference}: The automatic detection of a type
+          of an expression, e.g. when declaring variables with \texttt{let}.
+    \item \emph{trait solving}: Ensuring that each implementation block (\texttt{impl})
+          refers to a valid, existing trait.
+    \item \emph{type checking}: This process converts the types written by the user
+          into the internal representation used by the compiler.
+          It is, in other words, where types are interned.
+          Then, using this information, the type safety, correctness, and coherence are verified.
 \end{enumerate}
 
 \subsubsection{MIR lowering}
@@ -174,10 +174,10 @@ They may only be used when compiling with the nightly toolchain.
 Features flags may enable
 
 \begin{itemize}
-      \item syntactic constructs that are not available on the stable version,
-      \item library functions exclusive to the nightly version,
-      \item support for specific hardware instructions of a given \acrshort{ISA} or platform,
-      \item additional compiler flags.
+    \item syntactic constructs that are not available on the stable version,
+    \item library functions exclusive to the nightly version,
+    \item support for specific hardware instructions of a given \acrshort{ISA} or platform,
+    \item additional compiler flags.
 \end{itemize}
 
 The full list of feature flags is found in \cite{unstable-book}

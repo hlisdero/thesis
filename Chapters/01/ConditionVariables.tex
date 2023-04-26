@@ -1,6 +1,6 @@
-% !TeX root = ../Thesis.tex
-\documentclass[../Thesis.tex]{subfiles}
-\graphicspath{{\subfix{../images/}}}
+% !TeX root = ../../Thesis.tex
+\documentclass[../../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
 
 \begin{document}
 
@@ -17,13 +17,13 @@ Following the classic definition, two main operations
 can be called on a condition variable:
 
 \begin{itemize}
-      \item \texttt{wait}: Blocks the current thread or process.
-            In some implementations, the associated mutex
-            is released as part of the operation.
-      \item \texttt{signal}: Wakes up one thread or process
-            waiting on the condition variable.
-            In some implementations, the associated mutex lock is immediately
-            acquired by the signaled thread or process.
+    \item \texttt{wait}: Blocks the current thread or process.
+          In some implementations, the associated mutex
+          is released as part of the operation.
+    \item \texttt{signal}: Wakes up one thread or process
+          waiting on the condition variable.
+          In some implementations, the associated mutex lock is immediately
+          acquired by the signaled thread or process.
 \end{itemize}
 
 Condition variables are typically associated
@@ -55,12 +55,12 @@ and they are now widely used in concurrent programming languages and systems.
 They are found among others in:
 
 \begin{itemize}
-      \item UNIX\footnote{\url{https://man7.org/linux/man-pages/man3/pthread_cond_init.3p.html}},
-      \item Rust\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html}}
-      \item Python\footnote{\url{https://docs.python.org/3/library/threading.html}}
-      \item Go\footnote{\url{https://pkg.go.dev/sync}}
-      \item Java\footnote{
-                  \url{https://docs.oracle.com/en/java/javase/20/docs/api/java.base/java/util/concurrent/locks/Condition.html}}
+    \item UNIX\footnote{\url{https://man7.org/linux/man-pages/man3/pthread_cond_init.3p.html}},
+    \item Rust\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html}}
+    \item Python\footnote{\url{https://docs.python.org/3/library/threading.html}}
+    \item Go\footnote{\url{https://pkg.go.dev/sync}}
+    \item Java\footnote{
+              \url{https://docs.oracle.com/en/java/javase/20/docs/api/java.base/java/util/concurrent/locks/Condition.html}}
 \end{itemize}
 
 Despite their widespread use, condition variables can be tricky to use correctly,
@@ -85,7 +85,7 @@ T2 waits on \texttt{cv} until it receives a signal from T1.
 Listing \ref{lst:missed-signal-example} shows the corresponding pseudocode.
 
 \begin{listing}
-      \begin{minted}{C++}
+    \begin{minted}{C++}
             // T1
             lock.acquire()
             flag = true
@@ -98,8 +98,8 @@ Listing \ref{lst:missed-signal-example} shows the corresponding pseudocode.
                 cv.wait(lock)
             lock.release()
       \end{minted}
-      \caption{Pseudocode for a missed signal example.}
-      \label{lst:missed-signal-example}
+    \caption{Pseudocode for a missed signal example.}
+    \label{lst:missed-signal-example}
 \end{listing}
 
 Now, suppose that T1 sets \texttt{flag} and signals \texttt{cv},
@@ -108,15 +108,15 @@ In this case, the signal emitted by T1 could be missed by T2,
 as shown in the following sequence of events:
 
 \begin{enumerate}
-      \item T1 acquires the lock and sets \texttt{flag} to \texttt{true}.
-      \item T1 signals \texttt{cv} to wake up T2.
-      \item T1 releases the lock.
-      \item T2 acquires the lock and checks if \texttt{flag} has changed.
-            Since \texttt{flag} is still \texttt{false},
-            T2 enters the wait state on \texttt{cv}.
-      \item Due to scheduling delays or other factors,
-            T2 does not receive the signal emitted by T1
-            and remains stuck in the wait state forever.
+    \item T1 acquires the lock and sets \texttt{flag} to \texttt{true}.
+    \item T1 signals \texttt{cv} to wake up T2.
+    \item T1 releases the lock.
+    \item T2 acquires the lock and checks if \texttt{flag} has changed.
+          Since \texttt{flag} is still \texttt{false},
+          T2 enters the wait state on \texttt{cv}.
+    \item Due to scheduling delays or other factors,
+          T2 does not receive the signal emitted by T1
+          and remains stuck in the wait state forever.
 \end{enumerate}
 
 This scenario illustrates the concept of a missed signal,
@@ -145,16 +145,16 @@ This is precisely the spurious wakeup.
 The following sequence of events leads to this unfortunate outcome:
 
 \begin{enumerate}
-      \item T1 acquires the lock and sets \texttt{flag} to \texttt{true}.
-      \item T1 signals \texttt{cv} to wake up T2.
-      \item T1 releases the lock.
-      \item T2 acquires the lock and checks if \texttt{flag} is \texttt{true}.
-            Since \texttt{flag} is still \texttt{false},
-            T2 enters the wait state on \texttt{cv}.
-      \item Due to some internal implementation detail
-            of the condition variable or other unpredictable factors,
-            T2 wakes up without receiving the signal emitted by T1
-            and continues executing the next statement in its code.
+    \item T1 acquires the lock and sets \texttt{flag} to \texttt{true}.
+    \item T1 signals \texttt{cv} to wake up T2.
+    \item T1 releases the lock.
+    \item T2 acquires the lock and checks if \texttt{flag} is \texttt{true}.
+          Since \texttt{flag} is still \texttt{false},
+          T2 enters the wait state on \texttt{cv}.
+    \item Due to some internal implementation detail
+          of the condition variable or other unpredictable factors,
+          T2 wakes up without receiving the signal emitted by T1
+          and continues executing the next statement in its code.
 \end{enumerate}
 
 This example demonstrates the idea of a spurious wakeup,

@@ -1,6 +1,6 @@
-% !TeX root = ../Thesis.tex
-\documentclass[../Thesis.tex]{subfiles}
-\graphicspath{{\subfix{../images/}}}
+% !TeX root = ../../Thesis.tex
+\documentclass[../../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
 
 \begin{document}
 
@@ -20,16 +20,16 @@ In the literature \cite{ben-ari2006,coulouris2012,tanenbaum2017},
 two types of correctness properties are defined:
 
 \begin{itemize}
-  \item \textbf{Safety properties}: The property must \emph{always} be true.
-  \item \textbf{Liveness properties}: The property must \emph{eventually} become true.
+    \item \textbf{Safety properties}: The property must \emph{always} be true.
+    \item \textbf{Liveness properties}: The property must \emph{eventually} become true.
 \end{itemize}
 
 Two desirable safety properties in a concurrent program are:
 
 \begin{itemize}
-  \item \textbf{Mutual exclusion}: Two processes must not access shared resources at the same time.
-  \item \textbf{Absence of deadlock}: A running system must be able to continue performing its task,
-        that is, progressing and producing useful work.
+    \item \textbf{Mutual exclusion}: Two processes must not access shared resources at the same time.
+    \item \textbf{Absence of deadlock}: A running system must be able to continue performing its task,
+          that is, progressing and producing useful work.
 \end{itemize}
 
 Synchronization primitives such as mutexes,

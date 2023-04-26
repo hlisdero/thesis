@@ -1,6 +1,6 @@
-% !TeX root = ../Thesis.tex
-\documentclass[../Thesis.tex]{subfiles}
-\graphicspath{{\subfix{../images/}}}
+% !TeX root = ../../Thesis.tex
+\documentclass[../../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
 
 \begin{document}
 
@@ -82,10 +82,10 @@ These nets are construction blocks that can be combined to form a more complex s
 To put these models to use, there are two possibilities:
 
 \begin{itemize}
-      \item One is designing the system in terms of Petri nets
-            and then translating the Petri nets to the source code.
-      \item The other one is to translate the existing source code to a Petri net representation
-            and then verify that the Petri net model satisfies the desired properties.
+    \item One is designing the system in terms of Petri nets
+          and then translating the Petri nets to the source code.
+    \item The other one is to translate the existing source code to a Petri net representation
+          and then verify that the Petri net model satisfies the desired properties.
 \end{itemize}
 
 For the purposes of this work, we are interested in the latter.
@@ -99,13 +99,13 @@ the POSIX library of threads (\texttt{pthread}) in C to Petri nets is described.
 In particular, the translation supports:
 
 \begin{itemize}
-      \item The creation of threads with the function \texttt{pthread\_create}
-            and the handling of the variable of type \texttt{pthread\_t}.
-      \item The thread join operation with the \texttt{pthread\_join} function.
-      \item The operation of acquiring a mutex with \texttt{pthread\_mutex\_lock}
-            and its eventual manual release with \texttt{pthread\_mutex\_unlock}.
-      \item The \texttt{pthread\_cond\_wait} and \texttt{pthread\_cond\_signal} functions
-            for working with condition variables.
+    \item The creation of threads with the function \texttt{pthread\_create}
+          and the handling of the variable of type \texttt{pthread\_t}.
+    \item The thread join operation with the \texttt{pthread\_join} function.
+    \item The operation of acquiring a mutex with \texttt{pthread\_mutex\_lock}
+          and its eventual manual release with \texttt{pthread\_mutex\_unlock}.
+    \item The \texttt{pthread\_cond\_wait} and \texttt{pthread\_cond\_signal} functions
+          for working with condition variables.
 \end{itemize}
 
 In his master's thesis, \cite{meyer2020} establishes
@@ -145,14 +145,14 @@ revealed that there is, unfortunately, no well-maintained library.
 Some Petri net simulators were found such as:
 
 \begin{itemize}
-      \item pns\footnote{\url{https://gitlab.com/porky11/pns}}:
-            Programmed in C. It does not offer the option
-            to export the resulting network to a standard format.
-      \item PetriSim\footnote{\url{https://staff.um.edu.mt/jskl1/petrisim/index.html}}:
-            An old DOS/PC simulator programmed in Bordland Pascal.
-      \item WOLFGANG\footnote{\url{https://github.com/iig-uni-freiburg/WOLFGANG}}:
-            A Petri net editor in Java, maintained by the Department of Computer Science
-            at the University of Freiburg, Germany.
+    \item pns\footnote{\url{https://gitlab.com/porky11/pns}}:
+          Programmed in C. It does not offer the option
+          to export the resulting network to a standard format.
+    \item PetriSim\footnote{\url{https://staff.um.edu.mt/jskl1/petrisim/index.html}}:
+          An old DOS/PC simulator programmed in Bordland Pascal.
+    \item WOLFGANG\footnote{\url{https://github.com/iig-uni-freiburg/WOLFGANG}}:
+          A Petri net editor in Java, maintained by the Department of Computer Science
+          at the University of Freiburg, Germany.
 \end{itemize}
 
 Regrettably, none of them meet the requirements of the task.
@@ -162,11 +162,11 @@ of using a graph library and modifying it to suit the objectives of this work wa
 Two graph libraries were found in Rust:
 
 \begin{itemize}
-      \item petgraph\footnote{\url{https://docs.rs/petgraph/latest/petgraph/}}:
-            The most widely used library for graphs in \textit{crates.io}.
-            It offers an option to export to the DOT format.
-      \item gamma\footnote{\url{https://github.com/metamolecular/gamma}}:
-            Unstable and unchanged since 2021. It does not offer the ability to export the graph.
+    \item petgraph\footnote{\url{https://docs.rs/petgraph/latest/petgraph/}}:
+          The most widely used library for graphs in \textit{crates.io}.
+          It offers an option to export to the DOT format.
+    \item gamma\footnote{\url{https://github.com/metamolecular/gamma}}:
+          Unstable and unchanged since 2021. It does not offer the ability to export the graph.
 \end{itemize}
 
 None of the possibilities satisfies the requirement
@@ -215,13 +215,13 @@ a standardized and widely accepted format for Petri net models.
 PNML is an ISO standard consisting, as of 2023, of three parts:
 
 \begin{itemize}
-      \item ISO/IEC 15909-1:2004\footnote{\url{https://www.iso.org/standard/38225.html}}
-            (and its latest revision ISO/IEC 15909-1:2019\footnote{\url{https://www.iso.org/standard/67235.html}})
-            for concepts, definitions, and graphical notation.
-      \item ISO/IEC 15909-2:2011\footnote{\url{https://www.iso.org/standard/43538.html}}
-            for defining a transfer format based on XML.
-      \item ISO/IEC 15909-3:2021\footnote{\url{https://www.iso.org/standard/81504.html}}
-            for the extensions and structuring mechanisms.
+    \item ISO/IEC 15909-1:2004\footnote{\url{https://www.iso.org/standard/38225.html}}
+          (and its latest revision ISO/IEC 15909-1:2019\footnote{\url{https://www.iso.org/standard/67235.html}})
+          for concepts, definitions, and graphical notation.
+    \item ISO/IEC 15909-2:2011\footnote{\url{https://www.iso.org/standard/43538.html}}
+          for defining a transfer format based on XML.
+    \item ISO/IEC 15909-3:2021\footnote{\url{https://www.iso.org/standard/81504.html}}
+          for the extensions and structuring mechanisms.
 \end{itemize}
 
 It has become a de-facto standard
