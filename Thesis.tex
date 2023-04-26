@@ -35,21 +35,14 @@
 \input{Chapters/03/FunctionInlining.tex}
 
 \chapter{Implementation of the translation}
-\label{chap:implementation}
-
+\input{Chapters/04/Implementation.tex}
 \input{Chapters/04/TranslationEntryPoint.tex}
 \input{Chapters/04/FunctionCall.tex}
 \input{Chapters/04/FunctionMemory.tex}
 \input{Chapters/04/MIRFunction.tex}
-
-\section{Panic handling}
-\section{Multithreading}
-\section{Emulation of Rust synchronization primitives}
-
-\subsection{Mutex (\texttt{std::sync::Mutex})}
-\subsection{Mutex lock guard (\texttt{std::sync::MutexGuard})}
-\subsection{Condition variables (\texttt{std::sync::Condvar})}
-\subsection{Atomic Refence Counter (\texttt{std::sync::Arc})}
+\input{Chapters/04/PanicHandling.tex}
+\input{Chapters/04/Multithreading.tex}
+\input{Chapters/04/SyncPrimitives.tex}
 
 \chapter{Testing the implementation}
 
