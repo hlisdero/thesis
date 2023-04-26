@@ -39,11 +39,11 @@
 % HYPERLINK CONFIGURATION %
 \usepackage[colorlinks=true, allcolors=blue]{hyperref}
 \hypersetup{
-    colorlinks=true,
-    linkcolor=black,
-    filecolor=blue,
-    citecolor=blue,
-    urlcolor=blue,
+      colorlinks=true,
+      linkcolor=black,
+      filecolor=blue,
+      citecolor=blue,
+      urlcolor=blue,
 }
 
 % ACRONYM SUPPORT %
@@ -61,13 +61,13 @@
 % Restart the counter on every chapter
 \usepackage[chapter,newfloat]{minted}
 \setminted{
-    linenos, % Show line numbers
-    breaklines, % Wrap lines if necessary
-    autogobble, % Remove whitespace in front of the code
-    frame=lines, % Use lines to create a frame
-    framesep=2mm, % Separation of the frame from the actual code
-    baselinestretch=1.2, % Line spacing of the code set to 1.2
-    fontsize=\footnotesize % Use a font size equal to the font size of a footnote
+      linenos, % Show line numbers
+      breaklines, % Wrap lines if necessary
+      autogobble, % Remove whitespace in front of the code
+      frame=lines, % Use lines to create a frame
+      framesep=2mm, % Separation of the frame from the actual code
+      baselinestretch=1.2, % Line spacing of the code set to 1.2
+      fontsize=\footnotesize % Use a font size equal to the font size of a footnote
 }
 % Define a new environment for long listings as suggested in the documentation
 \usepackage{caption}
@@ -89,15 +89,10 @@
 % See example format: https://github.com/T-F-S/tcolorbox/blob/master/doc/latex/tcolorbox/tcolorbox-example.tex
 \newtcbtheorem[auto counter]{definition}
 {Definition}{fonttitle=\bfseries\upshape, fontupper=\slshape,
-    arc=0mm, colback=blue!5!white,colframe=blue!75!black}{definition}
+      arc=0mm, colback=blue!5!white,colframe=blue!75!black}{definition}
 
 % CORRECT DISPLAY OF THE EURO SIGN %
 \usepackage{eurosym}
 
 % DEFINE SOME COMMON SYMBOLS (THE INCLUDE IS LOCATION-SENSITIVE) %
 \usepackage{gensymb}
-
-% SUPPORT FOR SUBFILES COMPILED SEPARATELY %
-% This should be placed at the end
-% See example on: https://www.overleaf.com/learn/latex/Multi-file_LaTeX_projects
-\usepackage{subfiles}

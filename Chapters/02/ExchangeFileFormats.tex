@@ -1,9 +1,3 @@
-% !TeX root = ../../Thesis.tex
-\documentclass[../../Thesis.tex]{subfiles}
-\graphicspath{{\subfix{../../images/}}}
-
-\begin{document}
-
 \section{Exchange file formats for Petri nets}
 
 As observed in the preceding chapter,
@@ -39,13 +33,13 @@ a standardized and widely accepted format for Petri net models.
 PNML is an ISO standard consisting, as of 2023, of three parts:
 
 \begin{itemize}
-    \item ISO/IEC 15909-1:2004\footnote{\url{https://www.iso.org/standard/38225.html}}
-          (and its latest revision ISO/IEC 15909-1:2019\footnote{\url{https://www.iso.org/standard/67235.html}})
-          for concepts, definitions, and graphical notation.
-    \item ISO/IEC 15909-2:2011\footnote{\url{https://www.iso.org/standard/43538.html}}
-          for defining a transfer format based on XML.
-    \item ISO/IEC 15909-3:2021\footnote{\url{https://www.iso.org/standard/81504.html}}
-          for the extensions and structuring mechanisms.
+      \item ISO/IEC 15909-1:2004\footnote{\url{https://www.iso.org/standard/38225.html}}
+            (and its latest revision ISO/IEC 15909-1:2019\footnote{\url{https://www.iso.org/standard/67235.html}})
+            for concepts, definitions, and graphical notation.
+      \item ISO/IEC 15909-2:2011\footnote{\url{https://www.iso.org/standard/43538.html}}
+            for defining a transfer format based on XML.
+      \item ISO/IEC 15909-3:2021\footnote{\url{https://www.iso.org/standard/81504.html}}
+            for the extensions and structuring mechanisms.
 \end{itemize}
 
 It has become a de-facto standard
@@ -124,5 +118,3 @@ such as deadlock freedom or reachability as stated on the website.
 This is the model checker used in \cite{meyer2020} and in this work.
 Therefore, it is necessary to implement the file format required by the tool.
 Examples will be presented in Chapter \ref{chap:implementation}.
-
-\end{document}
