@@ -1,0 +1,34 @@
+% !TeX root = ../../Thesis.tex
+\documentclass[../../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
+
+\begin{document}
+
+\section{Formal verification of Rust code}
+
+There are numerous automatic verification tools available for Rust code.
+A recommended first approximation to the topic is
+the survey produced by Alastair Reid, a researcher at Intel.
+It explicitly lists that most formal verification tools
+do not support concurrency \cite{reid2021}.
+
+The \emph{Miri}\footnote{\url{https://github.com/rust-lang/miri}} interpreter
+developed by the Rust project on GitHub is an experimental interpreter
+for the intermediate representation of the Rust language
+(Mid-level Intermediate Representation, commonly known as ``\acrshort{MIR}'')
+that allows executing standard cargo project binaries
+in a granularized way, instruction by instruction,
+to check for the absence of \acrfull{UB}
+and other errors in memory handling.
+It detects memory leaks, unaligned memory accesses, data races,
+and precondition or invariant violations in code marked as \texttt{unsafe}.
+
+\cite{toman2015crust} introduces a formal checker for Rust
+that does not require modifications to the source code.
+It was tested on past versions of modules from the Rust standard library.
+As a result, errors were detected in the use of memory in unsafe Rust code
+which in reality took months to be discovered manually by the development team.
+This exemplifies the importance of using automatic verification tools
+to complement manual code reviews.
+
+\end{document}

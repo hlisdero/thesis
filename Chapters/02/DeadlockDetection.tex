@@ -1,0 +1,98 @@
+% !TeX root = ../../Thesis.tex
+\documentclass[../../Thesis.tex]{subfiles}
+\graphicspath{{\subfix{../../images/}}}
+
+\begin{document}
+
+\section{Deadlock detection using Petri nets}
+
+Deadlock prevention is one of the classic strategies
+to address this crucial problem in concurrent programming,
+as discussed in Sec. \ref{sec:deadlock-strategies}.
+The main problem with the approach of detecting deadlocks before they occur
+is proving that the desired type of deadlock is detected in all cases
+and that no false negatives are produced in the process.
+The Petri net-based approach, being a formal method, satisfies these conditions.
+However, the difficulty of adoption lies mainly in the practicability of the solution
+due to the large number of possible states in a real software project.
+
+In \cite{karatkevich2014deadlock}, a method is proposed
+to reduce the number of explored states
+during the detection of deadlocks using reachability analysis.
+These heuristics help improve the performance of the Petri net-based approach.
+Another optimization is presented in \cite{kungas2005petri}.
+The author proposes a very promising polynomial order method to avoid the problem
+of the state explosion that underlies the naïve deadlock detection algorithm.
+Through an algorithm that abstracts a given Petri net to a simpler representation,
+a hierarchy of networks of increasing size is obtained
+for which the verification of the absence of deadlocks is substantially faster.
+It is, crudely put, a ``divide and conquer'' strategy
+that checks for the absence of deadlocks in parts of the network
+to later build the verification of the final whole
+by adding parts to the initial small network.
+
+Despite the previously mentioned caveats,
+the use of Petri nets as a formal software verification method
+has been established since the late 1980s.
+Petri nets allow for intuitive modeling of synchronization primitives,
+such as sending a message or waiting for the reception of a message.
+Examples of these simple nets with correspondingly simple behavior
+are found in \cite{heiner1992petri}.
+These nets are construction blocks that can be combined to form a more complex system.
+
+To put these models to use, there are two possibilities:
+
+\begin{itemize}
+    \item One is designing the system in terms of Petri nets
+          and then translating the Petri nets to the source code.
+    \item The other one is to translate the existing source code to a Petri net representation
+          and then verify that the Petri net model satisfies the desired properties.
+\end{itemize}
+
+For the purposes of this work, we are interested in the latter.
+This approach is not novel.
+It has been implemented for other programming languages like C and Rust already,
+as seen in the literature.
+
+In \cite{kavi2002modeling} and \cite{moshtaghi2001},
+a translation of some synchronization primitives available as part of
+the POSIX library of threads (\texttt{pthread}) in C to Petri nets is described.
+In particular, the translation supports:
+
+\begin{itemize}
+    \item The creation of threads with the function \texttt{pthread\_create}
+          and the handling of the variable of type \texttt{pthread\_t}.
+    \item The thread join operation with the \texttt{pthread\_join} function.
+    \item The operation of acquiring a mutex with \texttt{pthread\_mutex\_lock}
+          and its eventual manual release with \texttt{pthread\_mutex\_unlock}.
+    \item The \texttt{pthread\_cond\_wait} and \texttt{pthread\_cond\_signal} functions
+          for working with condition variables.
+\end{itemize}
+
+In his master's thesis, \cite{meyer2020} establishes
+the bases for a Petri net semantic for the Rust programming language.
+He focuses his efforts however on single-threaded code,
+limiting himself to the detection of deadlocks caused by
+executing the \texttt{lock} operation twice on the same mutex in the main thread.
+Unfortunately, the code available on GitHub\footnote{\url{https://github.com/Skasselbard/Granite}}
+as part of the thesis is no longer valid for the new version of \emph{rustc}
+since the internals of the compiler changed significantly in the last three years.
+
+In a late 2022 pre-print, \cite{zhang2022deadlocks} implement a translation
+of Rust source code to Petri nets for checking deadlocks.
+The translation focuses on deadlocks caused by two types of locks
+in the standard library: \texttt{std::sync::Mutex} and \texttt{std::sync::RwLock}.
+The resulting Petri net is expressed in the \acrfull{PNML}
+and fed into the model checker \acrfull{PIPE2}\footnote{\url{https://pipe2.sourceforge.net/}}
+to perform reachability analysis.
+Function calls are handled in a very different way compared to this work and
+missed signals are not modeled at all.
+The source code of their tool, named TRustPN, is not publicly available as of this writing.
+Despite these limitations, the authors offer a very detailed and up-to-date survey
+of static analysis tools for checking Rust code,
+which could be appealing to the interested reader.
+Moreover, they list several papers dedicated to
+formalizing the semantics of the Rust programming language,
+which are out of the scope of this work.
+
+\end{document}
