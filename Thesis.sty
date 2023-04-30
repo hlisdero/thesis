@@ -26,6 +26,11 @@
 \usepackage{graphicx}
 \graphicspath{{images/}}
 
+% ADD SUPPORT FOR SVG FILES %
+\usepackage[notransparent]{svg}
+\svgsetup{inkscape=newer,inkscapelatex=false}
+\svgpath{{svg/}}
+
 % ADD SUPPORT FOR SUBFIGURE %
 \usepackage{subfigure}
 
@@ -76,7 +81,6 @@
 \newmintinline{Rust}{}
 
 % TABLE FORMATTING %
-\usepackage[table]{xcolor}
 \usepackage{multicol}
 \setlength{\columnsep}{1cm}
 
