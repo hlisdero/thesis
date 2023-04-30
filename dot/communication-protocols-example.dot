@@ -1,20 +1,20 @@
 digraph communication_protocol {
     nodesep=1.0;
-    P1 [shape="circle" xlabel="Ready to send" label="•"];
-    P2 [shape="circle" xlabel="Wait for ACK" label=""];
-    P3 [shape="circle" xlabel="ACK received" label=""];
-    P4 [shape="circle" xlabel="Ready to receive" label="•"];
-    P5 [shape="circle" xlabel="Message received" label=""];
-    P6 [shape="circle" xlabel="ACK sent" label=""];
-    P7 [shape="circle" xlabel="Buffer full" label=""];
-    P8 [shape="circle" xlabel="Buffer full" label=""];
+    P1 [width=0.6 shape="circle" xlabel="Ready to send" label="•"];
+    P2 [width=0.6 shape="circle" xlabel="Wait for ACK" label=""];
+    P3 [width=0.6 shape="circle" xlabel="ACK received" label=""];
+    P4 [width=0.6 shape="circle" xlabel="Ready to receive" label="•"];
+    P5 [width=0.6 shape="circle" xlabel="Message received" label=""];
+    P6 [width=0.6 shape="circle" xlabel="ACK sent" label=""];
+    P7 [width=0.6 shape="circle" xlabel="Buffer full" label=""];
+    P8 [width=0.6 shape="circle" xlabel="Buffer full" label=""];
     
-    T1 [shape="box" xlabel="" label="Process 1"];
-    T2 [shape="box" xlabel="" label="Send message"];
-    T3 [shape="box" xlabel="" label="Receive ACK"];
-    T4 [shape="box" xlabel="" label="Process 2"];
-    T5 [shape="box" xlabel="" label="Receive message"];
-    T6 [shape="box" xlabel="" label="Send ACK"];
+    T1 [height=0.1 shape="box" xlabel="" label="Process 1"];
+    T2 [height=0.1 shape="box" xlabel="" label="Send message"];
+    T3 [height=0.1 shape="box" xlabel="" label="Receive ACK"];
+    T4 [height=0.1 shape="box" xlabel="" label="Process 2"];
+    T5 [height=0.1 shape="box" xlabel="" label="Receive message"];
+    T6 [height=0.1 shape="box" xlabel="" label="Send ACK"];
 
     // Process 1 loop
     T1 -> P1 [weight=0.25];

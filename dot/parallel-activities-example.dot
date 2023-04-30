@@ -1,15 +1,15 @@
 digraph parallel_activities {
     rankdir="LR";
-    P1 [shape="circle" xlabel="P1" label="•"];
-    P2 [shape="circle" xlabel="P2" label="•"];
-    P3 [shape="circle" xlabel="P3" label=""];
-    P4 [shape="circle" xlabel="P4" label=""];
-    P5 [shape="circle" xlabel="P5" label=""];
+    P1 [width=0.6 shape="circle" xlabel="P1" label="•"];
+    P2 [width=0.6 shape="circle" xlabel="P2" label="•"];
+    P3 [width=0.6 shape="circle" xlabel="P3" label=""];
+    P4 [width=0.6 shape="circle" xlabel="P4" label=""];
+    P5 [width=0.6 shape="circle" xlabel="P5" label=""];
     
-    T1 [shape="box" xlabel="" label="Fork"];
-    T2 [shape="box" xlabel="" label="Task 1"];
-    T3 [shape="box" xlabel="" label="Task 2"];
-    T4 [shape="box" xlabel="" label="Join"];
+    T1 [height=0.1 shape="box" xlabel="" label="Fork"];
+    T2 [height=0.1 shape="box" xlabel="" label="Task 1"];
+    T3 [height=0.1 shape="box" xlabel="" label="Task 2"];
+    T4 [height=0.1 shape="box" xlabel="" label="Join"];
 
     T1 -> P1 -> T2 -> P3 -> T4;
     T1 -> P2 -> T3 -> P4 -> T4;
