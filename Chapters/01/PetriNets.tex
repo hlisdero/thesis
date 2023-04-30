@@ -551,17 +551,7 @@ a guarantee that the total number of reachable states will be finite.
 
 \begin{figure}[!htb]
     \centering
-    \begin{subfigure}
-        \centering
-        % https://stackoverflow.com/questions/2328403/vertical-alignment-of-subfigures-latex
-        \raisebox{3.5cm}{\includegraphics[scale=0.30]{petri-net-loop.png}}
-    \end{subfigure}
-    % Horizontal space between the figures. \hfill is too much.
-    \hspace{1.5cm}
-    \begin{subfigure}
-        \centering
-        \includegraphics[scale=0.30]{reachability-tree-bounded-net-counterexample.png}
-    \end{subfigure}
+    \includesvg[width=0.9\linewidth]{reachability-tree-bounded-net-counterexample.svg}
     \caption{A simple Petri net with an infinite reachability tree.}
     \label{fig:reachability-tree-bounded-net-counterexample}
 \end{figure}
@@ -593,7 +583,7 @@ to a finite tree is shown in Fig. \ref{fig:reachability-tree-final-step-finite}.
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[scale=0.30]{reachability-tree-final-step-finite.png}
+    \includesvg[width=0.7\linewidth]{reachability-tree-final-step-finite.svg}
     \caption{The finite reachability tree for the Petri net in Fig.
         \ref{fig:reachability-tree-example}.}
     \label{fig:reachability-tree-final-step-finite}

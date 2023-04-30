@@ -1,13 +1,39 @@
-digraph reachability_tree {
-    nodesep=1.5;
-    M0 [shape="plaintext" label="M0 = (1, 0)"];
-    M1 [shape="plaintext" label="M1 = (0, 1)"];
-    M2 [shape="plaintext" label="M2 = (1, 0)"];
-    M3 [shape="plaintext" label="M3 = (0, 1)"];
-    M4 [shape="plaintext" label="•\n•\n•\n"];
- 
-    M0 -> M1 [xlabel="T1  "];
-    M1 -> M2 [xlabel="T2  "];
-    M2 -> M3 [xlabel="T1  "];
-    M3 -> M4 [xlabel="T2  "];
+digraph petrinet {
+    nodesep=0.7;
+    rankdir="LR";
+
+    subgraph cluster_0 {
+        style="invis";
+        P1 [width=0.6 shape="circle" xlabel="P1" label="•"];
+        P2 [width=0.6 shape="circle" xlabel="P2" label=""];
+
+        T1 [height=0.1 shape="box" xlabel="" label="T1"];
+        T2 [height=0.1 shape="box" xlabel="" label="T2"];
+
+        // Loop
+        P1 -> T1 [weight=0.5];
+        T1 -> P2;
+        P2 -> T2 [weight=0.5];
+        T2 -> P1;
+        
+        // Order the nodes in 2 different levels
+        {rank = min; P1; T1;}
+        {rank = same; T2; P2;}
+    }
+
+    subgraph cluster_1 {
+        style="invis";
+        M0 [shape="plaintext" label="M0 = (1, 0)"];
+        M1 [shape="plaintext" label="M1 = (0, 1)"];
+        M2 [shape="plaintext" label="M2 = (1, 0)"];
+        M3 [shape="plaintext" label="M3 = (0, 1)"];
+        M4 [shape="plaintext" label="• • •"];
+    
+        M0 -> M1 [xlabel="\nT1"];
+        M1 -> M2 [xlabel="\nT2"];
+        M2 -> M3 [xlabel="\nT1"];
+        M3 -> M4 [xlabel="\nT2"];
+    }
+
+    P1 -> M2 [style="invis"];
 }
