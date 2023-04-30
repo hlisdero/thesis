@@ -2,7 +2,7 @@ digraph petrinet {
     rankdir="LR";
     // Initial state
     subgraph cluster_0 {
-        style="invis"
+        style="invis";
         PLACE_1_A [width=0.6 shape="circle" xlabel="PLACE 1" label=""];
         PLACE_2_A [width=0.6 shape="circle" xlabel="PLACE 2" label=""];
         PLACE_3_A [width=0.6 shape="circle" xlabel="PLACE 3" label=""];
@@ -21,7 +21,7 @@ digraph petrinet {
 
     // Medial state 
     subgraph cluster_1 {
-        style="invis"
+        style="invis";
         PLACE_1_B [width=0.6 shape="circle" xlabel="PLACE 1" label=""];
         PLACE_2_B [width=0.6 shape="circle" xlabel="PLACE 2" label="•"];
         PLACE_3_B [width=0.6 shape="circle" xlabel="PLACE 3" label="•"];
@@ -40,7 +40,7 @@ digraph petrinet {
 
     // Final state
     subgraph cluster_2 {
-        style="invis"
+        style="invis";
         PLACE_1_C [width=0.6 shape="circle" xlabel="PLACE 1" label="•"];
         PLACE_2_C [width=0.6 shape="circle" xlabel="PLACE 2" label=""];
         PLACE_3_C [width=0.6 shape="circle" xlabel="PLACE 3" label=""];
