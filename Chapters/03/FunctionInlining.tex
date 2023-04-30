@@ -54,7 +54,7 @@ We care only about where the function starts and where it ends.
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[scale=0.25]{simplest-function.png}
+    \includesvg[width=0.3\linewidth]{simplest-function.svg}
     \caption{The simplest Petri net model for a function call.}
     \label{fig:simplest-function}
 \end{figure}
@@ -87,7 +87,7 @@ of dealing with functions called in various places in the code.
 
 \begin{figure}[!htb]
     \centering
-    \includegraphics[scale=0.25]{repeated-function-call.png}
+    \includesvg[width=0.7\linewidth]{repeated-function-call.svg}
     \caption{A possible \acrshort{PN} for the code in Listing \ref{lst:repeated-function-call}
         applying the model of Fig. \ref{fig:simplest-function}.}
     \label{fig:repeated-function-call}
@@ -125,9 +125,9 @@ As stated before, the first approach to modeling the program consists
 in reusing the function model for both calls.
 This is shown in Fig. \ref{fig:two-function-calls-incorrect-1}.
 
-\begin{figure}[!htb]
+\begin{figure}[!htbp]
     \centering
-    \includegraphics[scale=0.28]{two-function-calls-incorrect-1.png}
+    \includesvg[width=0.9\linewidth]{two-function-calls-incorrect-1.svg}
     \caption{A first (incorrect) \acrshort{PN} for the code
         in Listing \ref{lst:two-simple-function-calls}.}
     \label{fig:two-function-calls-incorrect-1}
@@ -168,9 +168,9 @@ One possibility is to split the transition labeled \texttt{RETURN\_simple\_funct
 in two separate transitions depending on the function call order
 as illustrated in Fig. \ref{fig:two-function-calls-incorrect-2}.
 
-\begin{figure}[!htb]
+\begin{figure}[!htbp]
     \centering
-    \includegraphics[scale=0.28]{two-function-calls-incorrect-2.png}
+    \includesvg[width=0.9\linewidth]{two-function-calls-incorrect-2.svg}
     \caption{A second (also incorrect) \acrshort{PN} for the code
         in Listing \ref{lst:two-simple-function-calls}.}
     \label{fig:two-function-calls-incorrect-2}
@@ -223,9 +223,9 @@ as expected for a single-threaded program.
 This was not the case for Fig. \ref{fig:two-function-calls-incorrect-1}
 and \ref{fig:two-function-calls-incorrect-2}.
 
-\begin{figure}[!htb]
+\begin{figure}[!htbp]
     \centering
-    \includegraphics[scale=0.25]{two-function-calls-correct.png}
+    \includesvg[width=0.9\linewidth]{two-function-calls-correct.svg}
     \caption{A correct \acrshort{PN} for the code
         in Listing \ref{lst:two-simple-function-calls} using inlining.}
     \label{fig:two-function-calls-correct}
