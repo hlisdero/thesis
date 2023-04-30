@@ -224,9 +224,9 @@ Assume that the machine can hold up to \EUR{4} and does not return any change.
 Then, the state diagram of the machine can be represented
 by the Petri net shown in Fig. \ref{fig:state-machine-example}.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[scale=0.30]{state-machine-example.png}
+    \includesvg[width=\linewidth]{state-machine-example.svg}
     \caption{The Petri net for a coffee vending machine.
         It is equivalent to a state diagram.}
     \label{fig:state-machine-example}
@@ -236,7 +236,7 @@ The transitions represent the insertion of a coin of the labeled value,
 e.g. ``Insert \EUR{1} coin''.
 The places represent a possible state of the machine,
 i.e. the amount of money currently stored inside.
-The place labeled \uppercase{P1} is marked with a token
+The leftmost place labeled ``\EUR{0}'' is marked with a token
 and corresponds to the initial state of the system.
 
 We can now present the following definition of this subclass of Petri nets.
@@ -250,8 +250,8 @@ We can now present the following definition of this subclass of Petri nets.
 
 The structure of a place $p_1$ having two (or more) output transitions $t_1$ and $t_2$ is called
 a \emph{conflict}, \emph{decision}, or \emph{choice}, depending on the application.
-This is seen in the initial place \uppercase{P1} of Fig. \ref{fig:state-machine-example},
-where the user must select which coin to insert.
+This is seen in the initial place of Fig. \ref{fig:state-machine-example},
+where the user must select which coin to insert first.
 
 \subsubsection{Parallel activities}
 

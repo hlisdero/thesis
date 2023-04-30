@@ -1,20 +1,20 @@
 digraph state_machine {
     rankdir="LR";
-    P1 [shape="circle" xlabel="0 €\nP1" label="•"];
-    P2 [shape="circle" xlabel="1 €" label=""];
-    P3 [shape="circle" xlabel="2 €" label=""];
-    P4 [shape="circle" xlabel="3 €" label=""];
-    P5 [shape="circle" xlabel="4 €" label=""];
+    P1 [width=0.6 shape="circle" xlabel="0 €" label="•"];
+    P2 [width=0.6 shape="circle" xlabel="1 €" label=""];
+    P3 [width=0.6 shape="circle" xlabel="2 €" label=""];
+    P4 [width=0.6 shape="circle" xlabel="3 €" label=""];
+    P5 [width=0.6 shape="circle" xlabel="4 €" label=""];
     
-    T1 [shape="box" xlabel="" label="Insert 1 €"];
-    T2 [shape="box" xlabel="" label="Insert 2 €"];
-    T3 [shape="box" xlabel="" label="Insert 1 €"];
-    T4 [shape="box" xlabel="" label="Insert 2 €"];
-    T5 [shape="box" xlabel="" label="Insert 1 €"];
-    T6 [shape="box" xlabel="" label="Insert 2 €"];
-    T7 [shape="box" xlabel="" label="Insert 1 €"];
-    T8 [shape="box" xlabel="" label="Get 3 € coffee"];
-    T9 [shape="box" xlabel="" label="Get 4 € coffee"];
+    T1 [height=0.1 shape="box" xlabel="" label="Insert 1 €"];
+    T2 [height=0.1 shape="box" xlabel="" label="Insert 2 €"];
+    T3 [height=0.1 shape="box" xlabel="" label="Insert 1 €"];
+    T4 [height=0.1 shape="box" xlabel="" label="Insert 2 €"];
+    T5 [height=0.1 shape="box" xlabel="" label="Insert 1 €"];
+    T6 [height=0.1 shape="box" xlabel="" label="Insert 2 €"];
+    T7 [height=0.1 shape="box" xlabel="" label="Insert 1 €"];
+    T8 [height=0.1 shape="box" xlabel="" label="Get 3 € coffee"];
+    T9 [height=0.1 shape="box" xlabel="" label="Get 4 € coffee"];
 
     P1 -> T1 -> P2;
     P1 -> T2 -> P3;
