@@ -12,7 +12,7 @@ digraph program {
         PHANTOM2 [width=0.1 shape="none" label=""]
 
         # Invisible edge to force two ranks
-        PROGRAM_START -> PROGRAM_END [color="none"]
+        PROGRAM_START -> PROGRAM_END [style="invis"]
         {rank = min; PROGRAM_START; PHANTOM1;}
         {rank = max; PROGRAM_PANIC; PROGRAM_END;}
     }

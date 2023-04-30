@@ -32,11 +32,6 @@
 <text text-anchor="middle" x="85.2244" y="-142.2" font-family="Times,serif" font-size="14.00" fill="#000000">PROGRAM_START</text>
 </g>
 <!-- PROGRAM_START&#45;&gt;PROGRAM_END -->
-<g id="edge1" class="edge">
-<title>PROGRAM_START-&gt;PROGRAM_END</title>
-<path fill="none" stroke="transparent" d="M167,-94.9129C167,-86.9881 167,-77.8428 167,-69.2138"/>
-<polygon fill="transparent" stroke="transparent" points="170.5001,-69.061 167,-59.061 163.5001,-69.061 170.5001,-69.061"/>
-</g>
 <!-- PHANTOM1 -->
 <g id="node4" class="node">
 <title>PHANTOM1</title>
