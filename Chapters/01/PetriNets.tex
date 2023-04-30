@@ -35,9 +35,9 @@ places are depicted using circles, while transitions are depicted as rectangles.
 Tokens are represented as black dots inside of the places,
 as seen in Fig. \ref{fig:petri-net-example}.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[scale=0.25]{petri-net-example.png}
+    \includesvg[width=0.9\linewidth]{petri-net-example.svg}
     \caption{Example of a Petri net. \uppercase{PLACE 1} contains a token.}
     \label{fig:petri-net-example}
 \end{figure}
@@ -45,13 +45,13 @@ as seen in Fig. \ref{fig:petri-net-example}.
 When a transition fires, it consumes tokens from its input places and
 produces tokens in its output places, reflecting a change in the state of the system.
 The firing of a transition is enabled when there are sufficient tokens in its input places.
-In Fig. \ref{fig:petri-net-transition-firing-example}, we can see how successive firings happen.
+In Fig. \ref{fig:petri-net-transition-example}, we can see how successive firings happen.
 
-\begin{figure}[H]
+\begin{figure}[!htb]
     \centering
-    \includegraphics[scale=0.25]{petri-net-transition-firing-example.png}
+    \includesvg[width=0.9\linewidth]{petri-net-transition-example.svg}
     \caption{Example of transition firing: Transition 1 fires first, then transition 2 fires.}
-    \label{fig:petri-net-transition-firing-example}
+    \label{fig:petri-net-transition-example}
 \end{figure}
 
 The firing of enabled transitions is not deterministic,

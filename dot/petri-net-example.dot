@@ -1,11 +1,13 @@
 digraph petrinet {
     rankdir="LR";
-    PLACE_1_A [shape="circle" xlabel="PLACE 1" label="•"];
-    PLACE_2_A [shape="circle" xlabel="PLACE 2" label=""];
-    PLACE_3_A [shape="circle" xlabel="PLACE 3" label=""];
-    PLACE_4_A [shape="circle" xlabel="PLACE 4" label=""];
-    TRANSITION_1_A [shape="box" xlabel="" label="TRANSITION 1"];
-    TRANSITION_2_A [shape="box" xlabel="" label="TRANSITION 2"];
+    PLACE_1_A [width=0.6 shape="circle" xlabel="PLACE 1" label="•"];
+    PLACE_2_A [width=0.6 shape="circle" xlabel="PLACE 2" label=""];
+    PLACE_3_A [width=0.6 shape="circle" xlabel="PLACE 3" label=""];
+    PLACE_4_A [width=0.6 shape="circle" xlabel="PLACE 4" label=""];
+    
+    TRANSITION_1_A [height=0.1 shape="box" xlabel="" label="TRANSITION 1"];
+    TRANSITION_2_A [height=0.1 shape="box" xlabel="" label="TRANSITION 2"];
+    
     PLACE_1_A -> TRANSITION_1_A;
     TRANSITION_1_A -> PLACE_2_A;
     TRANSITION_1_A -> PLACE_3_A;
