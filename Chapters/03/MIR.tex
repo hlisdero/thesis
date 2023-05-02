@@ -190,7 +190,7 @@ extra annotations as in \texttt{CALL:} or \texttt{DROP:} were added.
 
 It should be noted that the function call to \Rustinline{std::env::args().len()}
 in Line 2 in Listing \ref{lst:rust-code-example} may return successfully or fail.
-The latter triggers an unwinding of the stack, ending the program and reporting an error.
+A failure triggers an unwinding of the stack, ending the program and reporting an error.
 This is represented by the branching at the end of BB1 where the code execution
 may take the left path or the right path down the graph.
 The left branch (BB4 and BB5) corresponds to the correct execution of the program,

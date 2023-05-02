@@ -92,3 +92,52 @@ since they provide an excellent short working example of
 how to interact with \emph{rustc}.
 In simpler terms, they are the ``Hello, World!''
 of working side-by-side with the Rust compiler.
+
+\subsection{Compilation requirements}
+
+As briefly mentioned in Sec. \ref{sec:rust-nightly}, the tool must be compiled
+with the nightly version of \emph{rustc} to access its internal crates and modules.
+The crucial section in the file
+\emph{lib.rs}\footnote{\url{https://github.com/hlisdero/granite2/blob/main/src/lib.rs}} is
+depicted in Listing \ref{lst:use-rustc-crates}.
+
+\begin{listing}
+  \begin{minted}[firstnumber=13]{Rust}
+    // This feature gate is necessary to access the internal crates of the compiler.
+    // It has existed for a long time and since the compiler internals will never be stabilized,
+    // the situation will probably stay like this.
+    // <https://doc.rust-lang.org/unstable-book/language-features/rustc-private.html>
+    #![feature(rustc_private)]
+    
+    // Compiler crates need to be imported in this way because they are not published on crates.io.
+    // These crates are only available when using the nightly toolchain.
+    // It suffices to declare them once to use their types and methods in the whole crate.
+    extern crate rustc_ast_pretty;
+    extern crate rustc_const_eval;
+    extern crate rustc_driver;
+    extern crate rustc_error_codes;
+    extern crate rustc_errors;
+    extern crate rustc_hash;
+    extern crate rustc_hir;
+    extern crate rustc_interface;
+    extern crate rustc_middle;
+    extern crate rustc_session;
+    extern crate rustc_span;
+  \end{minted}
+  \caption{Excerpt of the file \emph{lib.rs} showcasing how to use the \emph{rustc} internals.}
+  \label{lst:use-rustc-crates}
+\end{listing}
+
+The \Rustinline{rustc_private} is a feature flag
+that controls access to the compiler's private crates.
+These crates are not installed by default when installing the Rust toolchain
+using \emph{rustup}\footnote{\url{https://rustup.rs/}}.
+Hence, it is necessary to install the additional components \emph{rustc-dev},
+\emph{rust-src}, and \emph{llvm-tools-preview}.
+The purpose of each component is detailed in \cite{rustup-book}.
+Straightforward instructions to set up a development environment are also found
+in the \texttt{README}\footnote{\url{https://github.com/hlisdero/granite2/blob/main/README.md}}
+of the repository.
+
+To the best knowledge of this author,
+an alternative method of accessing the internals of the Rust compiler does not exist.
