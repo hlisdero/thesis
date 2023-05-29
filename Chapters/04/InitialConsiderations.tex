@@ -82,7 +82,7 @@ library \texttt{clap} library\footnote{\url{https://docs.rs/clap/latest/clap/}},
 the program enters a query to the \emph{rustc} compiler
 to start the translation process.
 The majority of the work from that point on is coordinated
-by the struct of type \texttt{Translator}\footnote{\url{https://github.com/hlisdero/granite2/blob/main/src/translator.rs}}.
+by the struct of type \texttt{Translator}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator.rs}}.
 
 The query system was described briefly in Sec. \ref{sec:rustc}.
 Two examples of the use of this mechanism are provided in the
@@ -98,7 +98,7 @@ of working side-by-side with the Rust compiler.
 As briefly mentioned in Sec. \ref{sec:rust-nightly}, the tool must be compiled
 with the nightly version of \emph{rustc} to access its internal crates and modules.
 The crucial section in the file
-\emph{lib.rs}\footnote{\url{https://github.com/hlisdero/granite2/blob/main/src/lib.rs}} is
+\emph{lib.rs}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/lib.rs}} is
 depicted in Listing \ref{lst:use-rustc-crates}.
 
 \begin{listing}
@@ -136,7 +136,7 @@ Hence, it is necessary to install the additional components \emph{rustc-dev},
 \emph{rust-src}, and \emph{llvm-tools-preview}.
 The purpose of each component is detailed in \cite{rustup-book}.
 Straightforward instructions to set up a development environment are also found
-in the \texttt{README}\footnote{\url{https://github.com/hlisdero/granite2/blob/main/README.md}}
+in the \texttt{README}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/README.md}}
 of the repository.
 
 To the best knowledge of this author,
