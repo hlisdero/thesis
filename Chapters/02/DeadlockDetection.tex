@@ -37,10 +37,10 @@ These nets are construction blocks that can be combined to form a more complex s
 To put these models to use, there are two possibilities:
 
 \begin{itemize}
-    \item One is designing the system in terms of Petri nets
-          and then translating the Petri nets to the source code.
-    \item The other one is to translate the existing source code to a Petri net representation
-          and then verify that the Petri net model satisfies the desired properties.
+      \item One is designing the system in terms of Petri nets
+            and then translating the Petri nets to the source code.
+      \item The other one is to translate the existing source code to a Petri net representation
+            and then verify that the Petri net model satisfies the desired properties.
 \end{itemize}
 
 For the purposes of this work, we are interested in the latter.
@@ -54,16 +54,19 @@ the POSIX library of threads (\texttt{pthread}) in C to Petri nets is described.
 In particular, the translation supports:
 
 \begin{itemize}
-    \item The creation of threads with the function \texttt{pthread\_create}
-          and the handling of the variable of type \texttt{pthread\_t}.
-    \item The thread join operation with the \texttt{pthread\_join} function.
-    \item The operation of acquiring a mutex with \texttt{pthread\_mutex\_lock}
-          and its eventual manual release with \texttt{pthread\_mutex\_unlock}.
-    \item The \texttt{pthread\_cond\_wait} and \texttt{pthread\_cond\_signal} functions
-          for working with condition variables.
+      \item The creation of threads with the function \texttt{pthread\_create}
+            and the handling of the variable of type \texttt{pthread\_t}.
+      \item The thread join operation with the \texttt{pthread\_join} function.
+      \item The operation of acquiring a mutex with \texttt{pthread\_mutex\_lock}
+            and its eventual manual release with \texttt{pthread\_mutex\_unlock}.
+      \item The \texttt{pthread\_cond\_wait} and \texttt{pthread\_cond\_signal} functions
+            for working with condition variables.
 \end{itemize}
 
-In his master's thesis, \cite{meyer2020} establishes
+The source code for this library named ``C2Petri'' is disappointingly not found online,
+as the publications are fairly old.
+
+In a more recent master's thesis, \cite{meyer2020} establishes
 the bases for a Petri net semantic for the Rust programming language.
 He focuses his efforts however on single-threaded code,
 limiting himself to the detection of deadlocks caused by
