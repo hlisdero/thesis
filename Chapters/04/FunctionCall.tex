@@ -27,8 +27,81 @@ For the same reasons, mirroring the call stack in the translator
 is the most suitable approach for tracking function calls to be translated
 because it aligns with the logical flow of program execution.
 As functions are translated, they are pushed and popped
-from the call stack of the \Rustinline{Translator},
+from the call stack of the \texttt{Translator},
 reflecting the order in which they are called at runtime.
 This enables us to handle nested function invocations and
 follow the control flow from one function to the other during the translation process.
 
+\subsection{MIR functions}
+
+In the implementation, the \texttt{Translator} has a stack
+that supports the usual operations \texttt{push}, \texttt{pop}, and \texttt{peek}.
+This stack stores structures of type \texttt{MirFunction}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function.rs}}.
+Later, we will see that not all functions are translated as \acrshort{MIR} functions
+since not all functions have a representation in \acrshort{MIR}
+and, in other cases, it is convenient to handle them differently.
+Nevertheless, \acrshort{MIR} functions are the ``common case'' in the translation process,
+the default case for the majority of user-defined functions.
+
+The available interface provided by \emph{rustc}
+allows for querying the \acrshort{MIR} body of only one function at a time,
+which can be done using the \texttt{optimized\_mir}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.optimized\_mir}}
+method.
+This implies that it is not possible to get the \acrshort{MIR} of the whole program initially
+and the translator must obtain the \acrshort{MIR} from each function as it reaches them in the code.
+But how to identify each function?
+It is known from experience that functions in distinct modules may have the same name,
+making the name unsuitable as an identifier.
+Luckily, this problem is already solved in the compiler.
+The functions are uniquely identified by the compiler type \Rustinline{rustc_hir::def_id::DefId}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_hir/def_id/struct.DefId.html}}.
+This ID is valid for the crate currently being compiled and it is already present in the \acrshort{HIR}.
+The high-level algorithm can be described as follows.
+
+When the translation starts:
+
+\begin{enumerate}
+    \item Query the id of the entry point of the program (the \Rustinline{main} function).
+    \item Create a \texttt{MirFunction} with the necessary information.
+    \item Push it to the stack.
+    \item If necessary, modify the \acrshort{MIR} function contents using \texttt{peek}.
+    \item Translate the top of the call stack.
+    \item When \Rustinline{main} finishes, remove it (\texttt{pop}) from the call stack.
+\end{enumerate}
+
+When a terminator of type ``call'' (see Sec. \ref{sec:mir-components}) is encountered:
+
+\begin{enumerate}
+    \item Query the id of the called function.
+    \item Create a \texttt{MirFunction} with the necessary information.
+    \item Push it to the stack.
+    \item If necessary, modify the \acrshort{MIR} function contents using \texttt{peek}.
+    \item Translate the top of the call stack.
+    \item When the function finishes, remove it (\texttt{pop}) from the call stack.
+\end{enumerate}
+
+As seen, the approach is consistent for every \acrshort{MIR} function
+and thus is easier to implement.
+
+The use of a call stack in the translation process enables context switching
+between \acrshort{MIR} functions and facilitates the ability to return to the specific basic block
+from which a function was called.
+This allows for the translation of the program to be performed function by function,
+in a linear fashion, ensuring that the structure and order of the original program are maintained.
+
+However, employing the call stack approach does come with certain limitations.
+First, if the same function is called multiple times within the program,
+it will be translated multiple times as well.
+This is related to the inlining strategy elaborated in Sec. \ref{sec:function-inlining}.
+Although this can potentially be mitigated through the use of some sort of cache,
+it is out of the scope of this thesis.
+This optimization will be discussed in Sec. \ref{sec:future-work-function-cache}.
+
+The more severe implication of using the call stack approach
+is the inability to handle recursive functions effectively.
+When encountering a recursive function within the translation process,
+the process becomes trapped in an endless loop
+where the stack grows indefinitely as new stack frames are pushed to it,
+leading to a stack overflow and a subsequent crash of the translation process.
+This problem is addressed in Sec. \ref{sec:future-work-recursion} too.
+For now, it is necessary to accept the limitation that recursive functions
+cannot be translated using this framework.
