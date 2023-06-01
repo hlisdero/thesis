@@ -215,7 +215,7 @@ We have gathered some tools for this purpose to ease the burden on the reader.
           A tutorial video on Youtube and example nets are included in the tool.
     \item A complement to this is a series of interactive tutorials by Prof. Wil van der Aalst
           at the University of Hamburg. These tutorials are Adobe Flash Player files (with extension \texttt{.swf})
-          that modern web browsers can not execute.
+          that modern web browsers cannot execute.
           Luckily, an online Flash emulator like the one found on \url{https://flashplayer.fullstacks.net/?kind=Flash_Emulator}
           can be used to upload the files and execute them.
     \item Another online Petri net editor and simulator is \url{http://www.biregal.com/}.
@@ -422,7 +422,7 @@ we are interested that the buffer will never overflow.
 
 \begin{definition}{Boundedness}{boundedness}
     A place in a Petri net is k-bounded or k-safe
-    if the number of tokens in that place can not exceed a finite integer $k$
+    if the number of tokens in that place cannot exceed a finite integer $k$
     for any marking reachable from $M_0$.
 
     A Petri net is k-bounded or simply bounded if all places are bounded.
@@ -465,9 +465,9 @@ This is equivalent to saying that the Petri net is \emph{deadlock-free}.
 Let us now define what constitutes a deadlock and show examples of it.
 
 \begin{definition}{Deadlock in Petri nets}{petri-net-deadlock}
-    A deadlock in a Patri net is a transition (or a set of transitions) that can not fire
+    A deadlock in a Patri net is a transition (or a set of transitions) that cannot fire
     for any marking reachable from $M_0$.
-    The transition (or a set of transitions) can not become enabled again
+    The transition (or a set of transitions) cannot become enabled again
     after a certain point in the execution.
 \end{definition}
 
@@ -524,7 +524,7 @@ the tree contains all markings that are immediately reachable from the initial m
 
 Now we must consider all markings reachable from the leaves of the tree.
 
-From marking $(0,0,1)$ we can not fire any transition.
+From marking $(0,0,1)$ we cannot fire any transition.
 This is known as a \emph{dead marking}.
 In other words, it is a ``dead-end'' node.
 This class of end-states is particularly relevant for deadlock analysis.

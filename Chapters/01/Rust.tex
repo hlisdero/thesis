@@ -60,7 +60,7 @@ Some of Rust's main features are:
             who contribute to the language's development and ecosystem.
             Anyone can contribute to the language's development and suggest improvements.
             The documentation is also open-source and important decisions are documented
-            in form of \acrfull{RFCs}\footnote{\url{https://rust-lang.github.io/rfcs/}}.
+            in the form of \acrfull{RFCs}\footnote{\url{https://rust-lang.github.io/rfcs/}}.
 \end{itemize}
 
 The release cycle of the official Rust compiler, \textit{rustc}, is remarkably fast.
@@ -98,14 +98,14 @@ For clarity, we will now present some of the key rules enforced by the borrow ch
       \item No two mutable references to the same memory location can exist simultaneously.
             This prevents data races, where two threads
             try to modify the same memory location at the same time.
-      \item Mutable references can not exist at the same time
+      \item Mutable references cannot exist at the same time
             as immutable references to the same memory location.
             This ensures that mutable and immutable references
-            can not be used simultaneously, preventing inconsistent reads and writes.
-      \item References can not outlive the value they reference.
+            cannot be used simultaneously, preventing inconsistent reads and writes.
+      \item References cannot outlive the value they reference.
             This ensures that references do not point to invalid memory locations,
             preventing null pointer dereferences and other memory errors.
-      \item References can not be used after their owner has been moved or destroyed.
+      \item References cannot be used after their owner has been moved or destroyed.
             This ensures that references do not point to memory that has been deallocated,
             preventing use-after-free errors.
 \end{itemize}
