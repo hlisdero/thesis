@@ -1,1 +1,34 @@
 \section{Function calls}
+
+\subsection{The call stack}
+
+A Rust program is composed, as in other programming languages, of functions.
+The program begins (except for the caveats seen in Sec. \ref{sec:basic-places})
+with a call to the \Rustinline{main} function, which then may call other functions.
+It is important to note that function calls can occur at any step in the code.
+A function can be called from another function or even from within itself, resulting in recursive calls.
+
+Function calls are stored in memory in a data structure called the \emph{call stack}.
+When a function is called in Rust, it gets pushed onto the call stack, creating a new stack frame.
+A stack frame contains important information such as the function's local variables, arguments,
+and the return address indicating where the program should resume once the function finishes its execution.
+
+The call stack operates based on the principle of \acrfull{LIFO}.
+As functions are called, each new stack frame is placed on top of the previous one.
+This allows the program to execute the most recently called function first.
+Once a function completes its execution, it is popped off the stack,
+and the program continues from the point where it left off in the previous function.
+
+Hence, the call stack plays an essential role in managing function calls and returns,
+since it keeps track of the flow of function calls and maintains the necessary information
+for the program to return to the correct execution point after a function completes its task.
+
+For the same reasons, mirroring the call stack in the translator
+is the most suitable approach for tracking function calls to be translated
+because it aligns with the logical flow of program execution.
+As functions are translated, they are pushed and popped
+from the call stack of the \Rustinline{Translator},
+reflecting the order in which they are called at runtime.
+This enables us to handle nested function invocations and
+follow the control flow from one function to the other during the translation process.
+
