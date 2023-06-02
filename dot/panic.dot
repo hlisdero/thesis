@@ -1,0 +1,14 @@
+digraph panic {
+    PROGRAM_START [width=0.6 shape="circle" xlabel="PROGRAM_START" label="•"];
+    GHOST [width=1.0 shape="none" label=""];
+    PROGRAM_END [width=0.6 shape="circle" xlabel="PROGRAM_END" label=""];
+    PROGRAM_PANIC [width=0.6 shape="circle" xlabel="PROGRAM_PANIC" label=""];
+    
+    PROGRAM_START -> main_PANIC;
+    main_PANIC [height=0.1 shape="box" xlabel="" label="main_PANIC"];
+    main_PANIC -> PROGRAM_PANIC;
+    
+    // Order the nodes in 2 different levels
+    {rank = min; PROGRAM_START;}
+    {rank = same; PROGRAM_END; GHOST; PROGRAM_PANIC;}
+}

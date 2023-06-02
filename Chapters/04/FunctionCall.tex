@@ -220,3 +220,42 @@ in an end state without tokens in the places
 \Rustinline{PROGRAM_END} or \Rustinline{PROGRAM_PANIC} shown in Fig. \ref{fig:program-places}.
 Consequently, the model checker is able to distinguish this end state from the other cases
 and conclude that a diverging function has been called.
+
+\subsection{Explicit calls to panic}
+
+The \Rustinline{panic!()} macro can be seen as a special case of a divergent function
+where the transition representing the function call is connected to
+the place labeled \Rustinline{PROGRAM_PANIC} described in Sec. \ref{sec:basic-places}.
+The translator detects an explicit call to panic,
+which is one of the following functions:
+
+\begin{itemize}
+    \item \Rustinline{core::panicking::assert_failed}
+    \item \Rustinline{core::panicking::panic}
+    \item \Rustinline{core::panicking::panic_fmt}
+    \item \Rustinline{std::rt::begin_panic}
+    \item \Rustinline{std::rt::begin_panic_fmt}
+\end{itemize}
+
+The documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/panic-implementation.html}}
+elaborates on why panic is defined in the core-crate and the std-crate and how it is implemented.
+
+See Listing \ref{lst:panic} for a simple program that panics. The corresponding Petri net model is depicted in Fig. \ref{fig:panic}.
+This is one of the illustrative examples included in the repository.
+
+\begin{listing}[!htb]
+    \begin{minted}{Rust}
+        fn main() {
+            panic!();
+        }        
+    \end{minted}
+    \caption{A simple Rust program that calls \Rustinline{panic!()}}
+    \label{lst:panic}
+\end{listing}
+
+\begin{figure}[!htb]
+    \centering
+    \includesvg[width=0.5\linewidth]{panic.svg}
+    \caption{The Petri net model for Listing \ref{lst:panic}}
+    \label{fig:panic}
+\end{figure}
