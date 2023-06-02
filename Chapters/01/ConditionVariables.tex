@@ -78,7 +78,7 @@ which is waiting on \texttt{cv} to know when \texttt{flag} has been set.
 T2 waits on \texttt{cv} until it receives a signal from T1.
 Listing \ref{lst:missed-signal-example} shows the corresponding pseudocode.
 
-\begin{listing}
+\begin{listing}[!htb]
       \begin{minted}{C++}
             // T1
             lock.acquire()
