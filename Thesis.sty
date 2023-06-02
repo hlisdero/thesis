@@ -72,7 +72,9 @@
 \usepackage{caption}
 \newenvironment{longlisting}{\captionsetup{type=listing}}{}
 % Define a new environment for inline Rust code
-\newmintinline{Rust}{}
+\newmintinline{Rust}{
+      fontsize=\small
+}
 
 % BETTER ENUMERATE ENVIRONMENTS: SUPPORT USING ROMAN NUMERALS % 
 \usepackage{enumitem}

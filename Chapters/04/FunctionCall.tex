@@ -27,16 +27,16 @@ For the same reasons, mirroring the call stack in the translator
 is the most suitable approach for tracking function calls to be translated
 because it aligns with the logical flow of program execution.
 As functions are translated, they are pushed and popped
-from the call stack of the \texttt{Translator},
+from the call stack of the \Rustinline{Translator},
 reflecting the order in which they are called at runtime.
 This enables us to handle nested function invocations and
 follow the control flow from one function to the other during the translation process.
 
 \subsection{MIR functions}
 
-In the implementation, the \texttt{Translator} has a stack
-that supports the usual operations \texttt{push}, \texttt{pop}, and \texttt{peek}.
-This stack stores structures of type \texttt{MirFunction}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function.rs}}.
+In the implementation, the \Rustinline{Translator} has a stack
+that supports the usual operations \Rustinline{push}, \Rustinline{pop}, and \Rustinline{peek}.
+This stack stores structures of type \Rustinline{MirFunction}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function.rs}}.
 Later, we will see that not all functions are translated as \acrshort{MIR} functions
 since not all functions have a representation in \acrshort{MIR}
 and, in other cases, it is convenient to handle them differently.
@@ -45,7 +45,7 @@ the default case for the majority of user-defined functions.
 
 The available interface provided by \emph{rustc}
 allows for querying the \acrshort{MIR} body of only one function at a time,
-which can be done using the \texttt{optimized\_mir}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.optimized\_mir}}
+which can be done using the \Rustinline{optimized_mir}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.optimized\_mir}}
 method.
 This implies that it is not possible to get the \acrshort{MIR} of the whole program initially
 and the translator must obtain the \acrshort{MIR} from each function as it reaches them in the code.
@@ -61,22 +61,22 @@ When the translation starts:
 
 \begin{enumerate}
     \item Query the id of the entry point of the program (the \Rustinline{main} function).
-    \item Create a \texttt{MirFunction} with the necessary information.
+    \item Create a \Rustinline{MirFunction} with the necessary information.
     \item Push it to the stack.
-    \item If necessary, modify the \acrshort{MIR} function contents using \texttt{peek}.
+    \item If necessary, modify the \acrshort{MIR} function contents using \Rustinline{peek}.
     \item Translate the top of the call stack.
-    \item When \Rustinline{main} finishes, remove it (\texttt{pop}) from the call stack.
+    \item When \Rustinline{main} finishes, remove it (\Rustinline{pop}) from the call stack.
 \end{enumerate}
 
 When a terminator of type ``call'' (see Sec. \ref{sec:mir-components}) is encountered:
 
 \begin{enumerate}
     \item Query the id of the called function.
-    \item Create a \texttt{MirFunction} with the necessary information.
+    \item Create a \Rustinline{MirFunction} with the necessary information.
     \item Push it to the stack.
-    \item If necessary, modify the \acrshort{MIR} function contents using \texttt{peek}.
+    \item If necessary, modify the \acrshort{MIR} function contents using \Rustinline{peek}.
     \item Translate the top of the call stack.
-    \item When the function finishes, remove it (\texttt{pop}) from the call stack.
+    \item When the function finishes, remove it (\Rustinline{pop}) from the call stack.
 \end{enumerate}
 
 As seen, the approach is consistent for every \acrshort{MIR} function
@@ -105,3 +105,35 @@ leading to a stack overflow and a subsequent crash of the translation process.
 This problem is addressed in Sec. \ref{sec:future-work-recursion} too.
 For now, it is necessary to accept the limitation that recursive functions
 cannot be translated using this framework.
+
+\subsection{Foreign functions and functions in the standard library}
+
+In Rust, the compiler includes by default
+the standard library in all compiled binaries, effectively linking it statically.
+To override this behavior, the crate-level attribute \Rustinline{#![no_std]}
+is used to indicate that the crate will link to the core-crate instead of the std-crate.
+See \cite{embedded-book} for more details.
+
+This means that the standard library's functionality becomes an integral part of the resulting executable.
+Function calls to the standard library appear often in Rust code and occur in various contexts,
+such as when accessing command line arguments, invoking iterators,
+utilizing traits like \Rustinline{std::clone::Clone}, \Rustinline{std::deref::Deref::deref},
+or employing standard library types like \Rustinline{std::result::Result} or \Rustinline{std::option::Option}.
+Given the prevalence of these function calls throughout Rust programs,
+it becomes essential to handle them separately in the translation process.
+It is evident that these standard library functions, due to their purpose, cannot lead to a deadlock.
+Therefore, it is more practical to treat them as black boxes within the translation process,
+bypassing the need to translate their MIR representations.
+This approach is indispensable in order to avoid generating
+an excessively large and convoluted Petri net that would hinder readability and comprehension.
+
+The focus of the translation effort lies primarily on the user code, specifically
+the functions that developers write to implement their desired functionalities.
+By directing attention to the user code and excluding the translation of standard library functions,
+the resulting Petri net remains more manageable,
+facilitating the analysis and verification of potential deadlocks within the user's codebase.
+The calls to the standard library constitute, in other words,
+the ``frontier'' or ``boundary'' of the translation,
+the point at which we stop translating the \acrshort{MIR} accurately
+and rely instead on a simplified model.
+
