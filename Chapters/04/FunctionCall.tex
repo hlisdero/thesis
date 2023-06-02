@@ -179,7 +179,7 @@ Surprisingly, they include a considerable number of functions.
     \item Functions without a \acrshort{MIR} representation
           This can be checked with the \Rustinline{is_mir_available}
           method\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.is\_mir\_available}}.
-    \item Functions which are a foreign item i.e., linked via \Rustinline{extern { ... })}.
+    \item Functions which are a foreign item i.e., linked via \Rustinline{extern { ... }}.
           This can be checked with the \Rustinline{is_foreign_item}
           method\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.is\_foreign\_item}}.
 \end{itemize}
@@ -187,3 +187,36 @@ Surprisingly, they include a considerable number of functions.
 In the future, calls to functions in dependencies, i.e. in other crates, should also be handled in this fashion.
 In conclusion, the default case for functions that are \emph{not} user-defined
 is to treat them as a foreign function and use an abridged Petri net model to translate them.
+
+\subsection{Diverging functions}
+
+Diverging functions are a special case that is relatively easy to support.
+It is simply a function that never returns to the caller.
+Examples of this are a wrapper around an infinite \Rustinline{while} loop,
+a function that exits the process,
+or a function that starts an \acrshort{OS}.
+It suffices to connect the start place of the function to
+a sink transition (Definition \ref{definition:sink-transition})
+as seen in Fig. \ref{fig:diverging-function}.
+
+\begin{figure}[!htb]
+    \centering
+    \includesvg[width=0.5\linewidth]{diverging-function.svg}
+    \caption{The Petri net model for a diverging function (a function that does not return)}
+    \label{fig:diverging-function}
+\end{figure}
+
+Note that this special case does not constitute a deadlock and must \emph{not} be treated as such.
+An infinite loop, i.e. a ``busy wait'', is in its inherent nature distinct from the infinite wait that
+characterizes a deadlock as seen in Sec. \ref{sec:coffman-conditions}.
+In other words, detecting infinite loops is closer to the problem of detecting livelocks,
+which are out of the scope of this thesis.
+Besides, the translator cannot tell ahead of time
+if the diverging call is benign like a call to \Rustinline{std::process::exit}
+or a call to some kind of function carefully designed to block the program.
+
+In the current \acrshort{PN} model, the token is consumed and the net is left
+in an end state without tokens in the places
+\Rustinline{PROGRAM_END} or \Rustinline{PROGRAM_PANIC} shown in Fig. \ref{fig:program-places}.
+Consequently, the model checker is able to distinguish this end state from the other cases
+and conclude that a diverging function has been called.

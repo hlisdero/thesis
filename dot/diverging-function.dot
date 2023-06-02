@@ -1,0 +1,8 @@
+digraph function {
+    nodesep=1.5;
+    FUNCTION_START [width=0.6 shape="circle" xlabel="FUNCTION_START" label="•"];
+    
+    FUNCTION_NAME_DIVERGING_CALL [height=0.1 shape="box" xlabel="" label="FUNCTION_NAME_DIVERGING_CALL"];
+    
+    FUNCTION_START -> FUNCTION_NAME_DIVERGING_CALL;
+}
