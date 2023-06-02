@@ -137,3 +137,53 @@ the ``frontier'' or ``boundary'' of the translation,
 the point at which we stop translating the \acrshort{MIR} accurately
 and rely instead on a simplified model.
 
+\subsubsection{Petri net model for a function with cleanup block}
+
+The model presented in Fig. \ref{fig:simplest-function} is the first approximation.
+There is, however, an implementation detail that requires careful attention.
+Numerous functions in the standard library contain not only an end place
+(``target block'', in the \emph{rustc} parlance) but also a cleanup place (``cleanup block'').
+This second execution path is taken when the function explicitly panics
+or more generally fails to achieve its goal for whatever reason.
+In this case, the control flow continues to a different basic block,
+where variables are freed and eventually the program ends with a panic error code.
+Stated differently, the unwind of the stack begins
+as soon as a function encounters a non-recoverable failure.
+
+Considering that the translator cannot tell if this abnormal situation could lead
+to a deadlock later in the translation process, it is imperative to translate
+this alternative execution path whenever possible.
+Only in counted exceptions, all related to the synchronization primitives and discussed in Sec.
+\ref{sec:sync-primitives}, this cleanup block is ignored explicitly.
+The complete model for an abridged function call with a cleanup block
+can be seen in Fig. \ref{fig:function-with-cleanup}.
+
+\begin{figure}[!htb]
+    \centering
+    \includesvg[width=\linewidth]{function-with-cleanup.svg}
+    \caption{The Petri net model for a function with a cleanup block}
+    \label{fig:function-with-cleanup}
+\end{figure}
+
+\subsubsection{Functions translated with the abridged Petri net model}
+
+Having discussed the exclusion of standard library functions from the translation process,
+we now shift our focus towards the functions that indeed require translation using the model we presented earlier.
+Surprisingly, they include a considerable number of functions.
+
+\begin{itemize}
+    \item Functions part of the standard library (the std-crate\footnote{\url{https://doc.rust-lang.org/std/}}),
+          save for some special cases detailed in Sec. \ref{sec:sync-primitives}.
+    \item Functions part of the core library (the core-crate\footnote{\url{https://doc.rust-lang.org/core/}}).
+    \item Functions in the alloc-crate: the core allocation and collections library\footnote{\url{https://doc.rust-lang.org/alloc/}}.
+    \item Functions without a \acrshort{MIR} representation
+          This can be checked with the \Rustinline{is_mir_available}
+          method\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.is\_mir\_available}}.
+    \item Functions which are a foreign item i.e., linked via \Rustinline{extern { ... })}.
+          This can be checked with the \Rustinline{is_foreign_item}
+          method\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.is\_foreign\_item}}.
+\end{itemize}
+
+In the future, calls to functions in dependencies, i.e. in other crates, should also be handled in this fashion.
+In conclusion, the default case for functions that are \emph{not} user-defined
+is to treat them as a foreign function and use an abridged Petri net model to translate them.
