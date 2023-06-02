@@ -144,7 +144,7 @@ Rust functions that may encounter errors return a
 which can hold either the result of the computation
 or a custom error type accompanied by a description of the error.
 \emph{rustc} requires the programmer to write code for both cases
-and the language provides mechanisms to facilitate error handling.
+and the language provides mechanisms to facilitate error handling \cite[Chap. 9.2]{rust-book}.
 
 In Rust, the focus lies on consistently managing the error case.
 Errors can be propagated to higher-level function calls
@@ -153,7 +153,7 @@ However, there may be situations where recovery from an error state is not feasi
 In such cases, the program can be instructed to panic,
 resulting in an abrupt and ungraceful shutdown,
 similar to an uncaught exception in other programming languages.
-During a panic, program execution is aborted, and the stack is unwound.
+During a panic, program execution is aborted, and the stack is unwound \cite[Chap. 9.1]{rust-book}.
 An error message containing details of the panic,
 e.g. the error message itself and its location, is generated.
 While panics can be caught by parent threads and
