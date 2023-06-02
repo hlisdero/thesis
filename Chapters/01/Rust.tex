@@ -120,6 +120,55 @@ the borrow checker eliminates many common programming errors
 that can lead to memory leaks, data races, and other bugs,
 while also teaching good coding practices and patterns.
 
+\subsubsection{Error handling enforced by the compiler}
+
+Error handling is an essential aspect of programming and
+is typically addressed in the design of programming languages.
+The myriad of approaches can be summarized in two separate groups.
+
+One group formed by languages such as C++, Java, or Python employs exceptions,
+utilizing \texttt{try} and \texttt{catch} blocks to handle exceptional conditions.
+When exceptions are thrown and not caught, the program terminates abruptly.
+
+The other group is formed by languages like C or Go, among others,
+where the convention is to communicate an error either through the return value of functions
+or through a function parameter specifically dedicated to this purpose.
+The disadvantage is that the compiler does not enforce error-checking on the programmer,
+which may lead to error cases not being taken into account when adding new functionality.
+
+Rust takes a different approach by promoting the notion that functions should ideally not fail
+and that the function signature should reflect if the function may return an error.
+Instead of exceptions or integer error codes,
+Rust functions that may encounter errors return a
+\Rustinline{std::result::Result}\footnote{\url{https://doc.rust-lang.org/std/result/}} type,
+which can hold either the result of the computation
+or a custom error type accompanied by a description of the error.
+\emph{rustc} requires the programmer to write code for both cases
+and the language provides mechanisms to facilitate error handling.
+
+In Rust, the focus lies on consistently managing the error case.
+Errors can be propagated to higher-level function calls
+until a consistent program state can be restored.
+However, there may be situations where recovery from an error state is not feasible.
+In such cases, the program can be instructed to panic,
+resulting in an abrupt and ungraceful shutdown,
+similar to an uncaught exception in other programming languages.
+During a panic, program execution is aborted, and the stack is unwound.
+An error message containing details of the panic,
+e.g. the error message itself and its location, is generated.
+While panics can be caught by parent threads and
+in specific cases when the programmer so desires\footnote{\url{https://doc.rust-lang.org/std/panic/fn.catch\_unwind.html}},
+they typically lead to the termination of the current program.
+This structured panic mechanism ensures that
+the compiler is aware of potential unrecoverable errors,
+enabling the generation of appropriate code to handle such cases.
+
+Rust also provides a type \Rustinline{std::option::Option}\footnote{\url{https://doc.rust-lang.org/std/option/}}
+that represents either the presence of a value or the absence of it.
+The compiler again enforces discipline on the programmer to always handle the \Rustinline{None} case.
+Thus, Rust eliminates almost completely the need for a NULL pointer
+as found in other languages like C, C++, Java, Python, or Go.
+
 \subsection{Adoption}
 
 In this subsection, we will briefly describe the trend
