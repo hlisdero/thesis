@@ -97,7 +97,7 @@ it is out of the scope of this thesis.
 This optimization will be discussed in Sec. \ref{sec:future-work-function-cache}.
 
 The more severe implication of using the call stack approach
-is the inability to handle recursive functions effectively.
+is the inability to handle recursive functions.
 When encountering a recursive function within the translation process,
 the process becomes trapped in an endless loop
 where the stack grows indefinitely as new stack frames are pushed to it,
@@ -123,7 +123,7 @@ Given the prevalence of these function calls throughout Rust programs,
 it becomes essential to handle them separately in the translation process.
 It is evident that these standard library functions, due to their purpose, cannot lead to a deadlock.
 Therefore, it is more practical to treat them as black boxes within the translation process,
-bypassing the need to translate their MIR representations.
+bypassing the need to translate their \acrshort{MIR}.
 This approach is indispensable in order to avoid generating
 an excessively large and convoluted Petri net that would hinder readability and comprehension.
 
