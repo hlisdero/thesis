@@ -225,8 +225,8 @@ Regarding the variables, the data in MIR can be divided into two categories:
 It is critical to observe that these ``places'' are
 \emph{not} related to the places in Petri nets.
 Places are used to represent all types of memory locations (including aliases),
-while locals are limited to stack-based memory locations
-(i.e. local variables of a function).
+while locals are limited to stack-based memory locations,
+i.e., local variables of a function.
 In other words, places are more general and locals are a special case of a place,
 therefore places are not always equivalent to locals.
 Conveniently, all the places are also locals in Fig. \ref{fig:mir-cfg-example}.
@@ -285,7 +285,7 @@ often encountered when programming in Rust.
 \begin{itemize}
     \item The function returns.
           The return value (local \Rustinline{_0}) is of type "unit"\footnote{\url{https://doc.rust-lang.org/std/primitive.unit.html}},
-          which is similar to a \texttt{void} function in C, i.e. it does not return anything.
+          which is similar to a \texttt{void} function in C, i.e., it does not return anything.
           This is how \Rustinline{main()} was defined in Listing \ref{lst:rust-code-example}.
 \end{itemize}
 

@@ -12,7 +12,7 @@ and can thus be interpreted as the program counter of the \acrshort{CPU}.
 
 Correspondingly, the place labeled \Rustinline{PROGRAM_END} models
 the end state of the program after normal program termination,
-i.e. returning from the \Rustinline{main} function,
+i.e., returning from the \Rustinline{main} function,
 regardless of the specific exit code.
 In other words, a main function that returns an error code because of invalid parameters
 or an internal program error is still considered a ``normal'' program termination.
@@ -65,7 +65,7 @@ On one hand, the runtime code is indeed part of the binary executed by the \acrs
 Nonetheless, it is platform-dependent code
 (the runtime is slightly different for every \acrshort{OS})
 and independent of the program's semantics,
-i.e. of the specific meaning of the program the user wrote.
+i.e., of the specific meaning of the program the user wrote.
 Since the user does not have any influence on this part of the binary,
 synchronization problems cannot be attributed to him/her.
 As such, this code does not add value to the translation

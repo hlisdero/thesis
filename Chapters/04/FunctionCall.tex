@@ -184,7 +184,7 @@ Surprisingly, they include a considerable number of functions.
           method\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.is\_foreign\_item}}.
 \end{itemize}
 
-In the future, calls to functions in dependencies, i.e. in other crates, should also be handled in this fashion.
+In the future, calls to functions in dependencies, i.e., in other crates, should also be handled in this fashion.
 In conclusion, the default case for functions that are \emph{not} user-defined
 is to treat them as a foreign function and use an abridged Petri net model to translate them.
 
@@ -207,7 +207,7 @@ as seen in Fig. \ref{fig:diverging-function}.
 \end{figure}
 
 Note that this special case does not constitute a deadlock and must \emph{not} be treated as such.
-An infinite loop, i.e. a ``busy wait'', is in its inherent nature distinct from the infinite wait that
+An infinite loop, i.e., a ``busy wait'', is in its inherent nature distinct from the infinite wait that
 characterizes a deadlock as seen in Sec. \ref{sec:coffman-conditions}.
 In other words, detecting infinite loops is closer to the problem of detecting livelocks,
 which are out of the scope of this thesis.

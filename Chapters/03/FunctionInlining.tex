@@ -19,7 +19,7 @@ When translating MIR functions to \acrshort{PN}, one key question that arises is
 whether to reuse the same representation for every call to a specific function or
 to ``inline'' the corresponding representation every time the function is called.
 Expressed differently, each function maps to a subnet
-in the final \acrshort{PN} obtained after the translation, i.e.
+in the final \acrshort{PN} obtained after the translation, i.e.,
 a connected subgraph formed by the places and transitions
 that model the behavior of the specific function.
 This smaller part of the net can either be present only once in the \acrshort{PN}
@@ -217,7 +217,7 @@ The \acrshort{PN} therein is correct.
 It matches the structure of the Rust code more closely.
 It does not contain any loops nor
 it creates additional tokens when firing transitions,
-i.e. none of the transitions has two outputs.
+i.e., none of the transitions has two outputs.
 It is worth mentioning that the resulting \acrshort{PN} is a state machine
 (Definition \ref{definition:state-machines})
 as expected for a single-threaded program.
