@@ -155,7 +155,7 @@ resulting in an abrupt and ungraceful shutdown,
 similar to an uncaught exception in other programming languages.
 During a panic, program execution is aborted, and the stack is unwound \cite[Chap. 9.1]{rust-book}.
 An error message containing details of the panic,
-e.g. the error message itself and its location, is generated.
+e.g., the error message itself and its location, is generated.
 While panics can be caught by parent threads and
 in specific cases when the programmer so desires\footnote{\url{https://doc.rust-lang.org/std/panic/fn.catch\_unwind.html}},
 they typically lead to the termination of the current program.
