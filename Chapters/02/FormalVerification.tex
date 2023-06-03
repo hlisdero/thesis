@@ -33,10 +33,10 @@ Additionally, a plugin for cargo and VS Code is available.
 As the documentation in the repository explains\footnote{\url{https://github.com/model-checking/kani}}, Kani verifies (among others):
 
 \begin{itemize}
-  \item Memory safety (e.g., null pointer dereferences)
-  \item User-specified assertions (i.e., \Rustinline{assert!(...)})
-  \item The absence of panics (e.g., \Rustinline{unwrap()} on \Rustinline{None} values)
-  \item The absence of some types of unexpected behavior (e.g., arithmetic overflows)
+  \item Memory safety, e.g., null pointer dereferences
+  \item User-specified assertions, i.e., \Rustinline{assert!(...)}
+  \item The absence of panics, e.g., \Rustinline{unwrap()} on \Rustinline{None} values
+  \item The absence of some types of unexpected behavior, e.g., arithmetic overflows
 \end{itemize}
 
 However, concurrent programs are currently out of scope\footnote{\url{https://model-checking.github.io/kani/rust-feature-support.html}}.

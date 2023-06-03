@@ -47,10 +47,10 @@ Fig. \ref{fig:state-graph-example} illustrates this situation.
 The cycle therein indicates a deadlock, as will be explained in the next section.
 
 \begin{figure}[!htb]
-    \centering
-    \includesvg[width=0.3\linewidth]{state-graph-example.svg}
-    \caption{Example of a state graph with a cycle indicating a deadlock.}
-    \label{fig:state-graph-example}
+      \centering
+      \includesvg[width=0.3\linewidth]{state-graph-example.svg}
+      \caption{Example of a state graph with a cycle indicating a deadlock.}
+      \label{fig:state-graph-example}
 \end{figure}
 \subsection{Necessary conditions}
 \label{sec:coffman-conditions}
@@ -60,17 +60,17 @@ the following conditions need to hold for a deadlock to arise.
 They are sometimes called ``Coffman conditions''.
 
 \begin{enumerate}
-    \item \textbf{Mutual Exclusion}: At least one resource in the system must
-          be held in a non-sharable mode, meaning that only one thread or process can use it at a time
-          (e.g. a variable behind a mutex).
-    \item \textbf{Hold and Wait}: At least one thread or process in the system must
-          be holding a resource and waiting to acquire additional resources
-          that are currently being held by other threads or processes.
-    \item \textbf{No Preemption}: Resources cannot be preempted, which means that a thread or process
-          holding a resource cannot be forced to release it until it has completed its task.
-    \item \textbf{Circular Wait}: There must be a circular chain of two or more threads or processes,
-          where each thread or process is waiting for a resource held by the next one in the chain.
-          This is usually visualized in a graph representing the order in which the resources are acquired.
+      \item \textbf{Mutual Exclusion}: At least one resource in the system must
+            be held in a non-sharable mode, meaning that only one thread or process can use it at a time,
+            e.g., a variable behind a mutex.
+      \item \textbf{Hold and Wait}: At least one thread or process in the system must
+            be holding a resource and waiting to acquire additional resources
+            that are currently being held by other threads or processes.
+      \item \textbf{No Preemption}: Resources cannot be preempted, which means that a thread or process
+            holding a resource cannot be forced to release it until it has completed its task.
+      \item \textbf{Circular Wait}: There must be a circular chain of two or more threads or processes,
+            where each thread or process is waiting for a resource held by the next one in the chain.
+            This is usually visualized in a graph representing the order in which the resources are acquired.
 \end{enumerate}
 
 Usually, the first three conditions are characteristics of the system under study, i.e.
@@ -129,7 +129,7 @@ but may remain unused for long periods.
 In simpler terms, it decreases concurrency.
 
 If the no preemption condition is denied, then resources may be recovered
-in certain circumstances, e.g. using resource allocation algorithms that
+in certain circumstances, e.g., using resource allocation algorithms that
 ensure that resources are never held indefinitely.
 After a timeout or when a condition is satisfied,
 the thread or process releases the resource
