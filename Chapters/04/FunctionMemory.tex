@@ -1,1 +1,30 @@
 \section{Function memory}
+
+We will now proceed to explore the memory characteristics
+of the \acrshort{MIR} function in detail.
+It is important to acknowledge that
+the need to record values being assigned between memory locations in the \acrshort{MIR} arises
+from the requirements of the deadlock and missed signals detection.
+In simpler teams, we are forced to model the memory only
+because the supported synchronization variables need to be tracked
+during the translation process.
+
+The translator must track variables of the following types:
+
+\begin{itemize}
+  \item Mutexes (\Rustinline{std::sync::Mutex}).
+  \item Mutex guards (\Rustinline{std::sync::MutexGuard}).
+  \item Join handles (\Rustinline{std::thread::JoinHandle}).
+  \item Condition variables (\Rustinline{std::sync::Condvar}).
+  \item Aggregates, i.e., wrappers such as \Rustinline{std::sync::Arc} or
+        types that contain multiple values like tuples or a structured type (\Rustinline{struct}).
+\end{itemize}
+
+Before calling methods on these types of synchronization variables,
+immutable or mutable references to the original memory location are created.
+The translator must somehow know
+which specific synchronization variable is behind a given reference.
+Knowing the type of the memory location is \emph{not} enough,
+the \emph{value} must be readily available to the translator
+to operate on the Petri net model of the specific synchronization variable.
+
