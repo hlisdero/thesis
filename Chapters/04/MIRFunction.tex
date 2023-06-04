@@ -1,6 +1,50 @@
 \section{MIR function}
 
+In the following section,
+we will delve into the translation process of a \acrshort{MIR} function.
+This section aims to provide a comprehensive understanding
+of the translation techniques applied to specific MIR elements,
+namely \acrfull{BB}, statements, and terminators.
+These components were introduced previously in Sec. \ref{sec:mir-components}.
+The implementation in the repository is accordingly named
+\Rustinline{MirFunction}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function.rs}}.
+
+We will now explain how each component is expressed in the language of Petri nets.
+Through a detailed exploration of the translation techniques employed for
+basic blocks, statements, and terminators, we will develop a formal model that
+accurately captures the behavior of a \acrshort{MIR} function for deadlock detection.
+
 \subsection{Basic blocks}
+
+One important aspect of the translation process involves transforming basic blocks into Petri nets,
+which serve as a fundamental building block for modeling the control flow within the MIR function.
+As seen in Fig. \ref{fig:mir-cfg-example}, a basic block in \acrshort{MIR} acts as a container
+that houses a sequence of zero or more statements, as well as a mandatory terminator statement.
+
+As nodes in a graph, the main property of basic blocks is
+their ability to direct the flow of control within a program.
+Each basic block may have one or more basic blocks pointing to it,
+indicating the potential paths from which the control flow can reach it.
+Similarly, a basic block can point to one or more other basic blocks,
+signifying the possible paths the control flow may take after executing the current basic block.
+It is worth mentioning that isolated basic blocks with no connections
+do not make sense since they would never be executed, i.e., they are dead code.
+
+This branching behavior allows for dynamic control flow within the program,
+as multiple basic blocks can continue the control flow to the same target basic block
+(for instance to a block that performs cleanup tasks).
+Conversely, a basic block can branch and
+determine the next basic block based on specific conditions or program logic, e.g.,
+in an \Rustinline{if}, \Rustinline{while}, \Rustinline{match} or other control structures.
+This versatility in control flow provides the foundation for modeling complex program behavior.
+
+The Petri net model used in the implementation relies on a single place to model each \acrshort{BB}.
+We can abstract away the inner workings of the \acrshort{BB} and work with a single place.
+The rationale behind it is that the connections to other \acrshort{BB} depend solely on the terminators
+and statements are not modeled at all as we will see shortly.
+Additionally, the implementation\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function/basic_block.rs}}
+keeps track of the function name to which the \acrshort{BB} belongs and
+the \acrshort{BB} number to generate unique labels.
 
 \subsection{Statements}
 
