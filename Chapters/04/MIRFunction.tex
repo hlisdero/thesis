@@ -3,11 +3,27 @@
 In the following section,
 we will delve into the translation process of a \acrshort{MIR} function.
 This section aims to provide a comprehensive understanding
-of the translation techniques applied to specific MIR elements,
+of the translation techniques applied to specific \acrshort{MIR} elements,
 namely \acrfull{BB}, statements, and terminators.
 These components were introduced previously in Sec. \ref{sec:mir-components}.
+
 The implementation in the repository is accordingly named
 \Rustinline{MirFunction}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function.rs}}.
+This type stores the start place and the end place of the function.
+These must be supplied to the \acrshort{MIR} function because
+they also represent where the function call took place and where it should return to.
+The end place is in simpler terms the return place in the Petri net.
+See Fig. \ref{fig:simplest-function} for an illustration.
+
+The start place of the function overlaps with the place
+that models the first basic block in the function.
+This matches more closely the \acrshort{MIR} as the code only lives inside of basic blocks,
+so the function call begins at the first basic block (BB0).
+
+The \Rustinline{MirFunction} also stores the ID that identifies it.
+This is necessary for performing function calls from this function.
+Moreover, the function requires a name that is different for every function call,
+so it receives a name with an index appended, making it unique across the whole Petri net.
 
 We will now explain how each component is expressed in the language of Petri nets.
 Through a detailed exploration of the translation techniques employed for
@@ -17,7 +33,7 @@ accurately captures the behavior of a \acrshort{MIR} function for deadlock detec
 \subsection{Basic blocks}
 
 One important aspect of the translation process involves transforming basic blocks into Petri nets,
-which serve as a fundamental building block for modeling the control flow within the MIR function.
+which serve as a fundamental building block for modeling the control flow within the \acrshort{MIR} function.
 As seen in Fig. \ref{fig:mir-cfg-example}, a basic block in \acrshort{MIR} acts as a container
 that houses a sequence of zero or more statements, as well as a mandatory terminator statement.
 
