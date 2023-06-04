@@ -116,7 +116,7 @@ as shown in the following sequence of events:
 This scenario illustrates the concept of a missed signal,
 where a thread waiting on a condition variable fails
 to receive a signal even though it has been emitted.
-To prevent missed signals, it is important to ensure that
+To prevent missed signals, it is essential to ensure that
 threads waiting on condition variables are properly synchronized
 with the threads emitting signals and
 that there are no race conditions or timing issues
@@ -154,7 +154,7 @@ The following sequence of events leads to this unfortunate outcome:
 This example demonstrates the idea of a spurious wakeup,
 in which a thread waiting on a condition variable wakes up
 without receiving a signal or notification from another thread.
-To prevent spurious wakeups, it is important to use a loop
+To prevent spurious wakeups, it is unavoidable to use a loop
 to recheck the condition after waking up from a wait state,
 as shown in the pseudocode for T2 (line 9).
 This ensures that the thread does not proceed
