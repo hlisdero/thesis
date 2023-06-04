@@ -76,3 +76,31 @@ but this would impact verification results,
 as the properties of programs could vary with different maximum recursion depths.
 For every maximum recursion depth $N$, a counterexample program can be constructed that exhibits
 a different behavior, e.g., a deadlock, at recursion depth $N+1$, hence avoiding detection.
+
+\section{Improvements to the memory model}
+\label{sec:future-work-memory-model}
+
+Despite the seemingly straightforward implementation,
+devising a memory model that works in all cases is a challenging task.
+That being said, the current model is primarily a good first approximation
+and the solution has its drawbacks too.
+
+Passing variables between \acrshort{MIR} functions is not supported yet.
+This is a major drawback since it needs to be solved to support calling methods
+in \Rustinline{impl} blocks that receive synchronization variables.
+For this thesis, it was sufficient to write the programs in a simplified way to
+avoid this limitation but in a real case, this is not feasible.
+
+There is significant coupling between the functions that handle the calls to
+functions in the \Rustinline{std::sync} module of the standard library and the \Rustinline{Memory}.
+A more generalized interface could be useful to add support for external libraries.
+
+The idea of ``linking'' works well but does not match the semantics of Rust programs.
+In the long run, it would be preferable to delete the mapping
+if the variable gets moved to a different function.
+Taking references should also be treated as a distinct case
+from simply copying or using the variable.
+
+The initial size of the \Rustinline{std::collections::HashMap} could be optimized
+for the average number of local variables in a typical \acrshort{MIR} function.
+This could be a configuration parameter for the tool.
