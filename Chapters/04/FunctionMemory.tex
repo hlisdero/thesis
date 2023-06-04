@@ -218,3 +218,81 @@ references to synchronization variables.
 Listing \ref{lst:memory-implementation} depicts an excerpt of the source file
 with the essential type definitions used in the implementation.
 Improvements to the current implementation are discussed in Sec. \ref{sec:future-work-memory-model}.
+
+\subsection{Intercepting assigments}
+
+The missing piece in the puzzle of the memory model is
+where to link the memory locations exactly.
+There are three separate places in the code in which this takes place.
+
+On the one hand, the translator functions responsible for processing the methods
+of mutexes, condition variables, and threads create new synchronization variables
+that are linked to the return value of the corresponding method.
+This is where the lifetime of each synchronization variable starts.
+The specifics are expanded upon in Sec. \ref{sec:sync-primitives}.
+
+On the other hand, the synchronization variable may be assigned in any other \acrshort{BB}.
+For this reason, the translator incorporates a custom implementation of the method
+\Rustinline{visit_assign} to intercept every assignment in the \acrshort{MIR}.
+Listing \ref{lst:visit-assign} shows precisely
+that all cases of copying, moving, or referencing the \acrfull{RHS}
+are handled by the same mechanism:
+The \acrfull{LHS} is linked to the \acrfull{RHS}
+if the type of the variable is a supported synchronization variable.
+The listing also shows how the compiler uses nested enums to model its data.
+Inside the variants of a right-hand side value (\Rustinline{rustc_middle::mir::Rvalue}),
+one can find operands (\Rustinline{rustc_middle::mir::Operand}).
+These operands also appear when passing function arguments.
+
+\begin{listing}[!htb]
+  \begin{minted}{Rust}
+    fn visit_assign(
+        &mut self,
+        place: &rustc_middle::mir::Place<'tcx>,
+        rvalue: &rustc_middle::mir::Rvalue<'tcx>,
+        location: rustc_middle::mir::Location,
+    ) {
+        match rvalue {
+            rustc_middle::mir::Rvalue::Use(
+                rustc_middle::mir::Operand::Copy(rhs) | rustc_middle::mir::Operand::Move(rhs),
+            )
+            | rustc_middle::mir::Rvalue::Ref(_, _, rhs) => {
+                let function = self.call_stack.peek_mut();
+                link_if_sync_variable(place, rhs, &mut function.memory, function.def_id, self.tcx);
+            }
+            rustc_middle::mir::Rvalue::Aggregate(_, operands) => {
+                let function = self.call_stack.peek_mut();
+                handle_aggregate_assignment(
+                    place,
+                    &operands.raw,
+                    &mut function.memory,
+                    function.def_id,
+                    self.tcx,
+                );
+            }
+            // No need to do anything for the other cases for now.
+            _ => {}
+        }
+
+        self.super_assign(place, rvalue, location);
+    }
+  \end{minted}
+  \caption{The custom implementation of \Rustinline{visit_assign} to track synchronization variables.}
+  \label{lst:visit-assign}
+\end{listing}
+
+The most peculiar case is the aggregate assignment.
+It materializes from assignments in Rust source code
+that create tuples, closures, or \Rustinline{structs}.
+It necessitates special handling as the value to be linked in memory must be assembled
+from the constituents of the aggregated value that are a synchronization variable.
+This implies that the \Rustinline{Memory} solely retains the portion of the aggregated value
+formed by the synchronization variables.
+
+In every instance, the handling of assignments has no impact on the Petri net.
+No places or transitions are added when intercepting assignments.
+
+Finally, some memory locations are passed to a new thread when
+calling \Rustinline{std::thread::spawn}
+and mapped again to the memory of the thread's function.
+The next section will demonstrate the method used to accomplish this.
