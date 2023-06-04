@@ -42,7 +42,7 @@ for condition variables to improve performance and reduce overhead.
 For example, some implementations allow multiple threads to be awakened at once
 (an operation called \emph{broadcast}),
 while others use a priority queue
-to ensure that the most important threads are awakened first.
+to ensure that the higher-priority threads are awakened first.
 
 Condition variables are part of the POSIX standard library for threads \cite{nichols1996pthreads}
 and they are now widely used in concurrent programming languages and systems.

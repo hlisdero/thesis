@@ -32,7 +32,7 @@ accurately captures the behavior of a \acrshort{MIR} function for deadlock detec
 
 \subsection{Basic blocks}
 
-One important aspect of the translation process involves transforming basic blocks into Petri nets,
+One aspect of the translation process involves transforming basic blocks into Petri nets,
 which serve as a fundamental building block for modeling the control flow within the \acrshort{MIR} function.
 As seen in Fig. \ref{fig:mir-cfg-example}, a basic block in \acrshort{MIR} acts as a container
 that houses a sequence of zero or more statements, as well as a mandatory terminator statement.
@@ -139,7 +139,7 @@ This creates a \emph{conflict} as defined in Sec. \ref{sec:transition-firing}.
 
 The label must also contain some kind of unique identifier of the block from where the
 jump starts.
-This is important to support multiple basic blocks with a \Rustinline{SwitchInt}
+This is a precondition to correctly translate multiple basic blocks with a \Rustinline{SwitchInt}
 that jumps to the same block.
 
 \subsubsection{Resume or Terminate}

@@ -33,7 +33,7 @@ which happens when the program calls the \Rustinline{panic!()} macro.
 \end{figure}
 
 Two reasons for considering a separate panic end-state place can be argued.
-First, it is important for formal verification to distinguish the panic case
+First, it is helpful for formal verification to distinguish the panic case
 from the normal termination case.
 A program may panic when detecting a possible violation of its memory safety guarantees.
 This is in most circumstances a wiser choice than simply ignoring the error and continuing.
