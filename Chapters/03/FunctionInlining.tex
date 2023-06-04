@@ -252,7 +252,8 @@ It is reasonable to assume that functions are called from several places.
 However, certain optimizations can be applied,
 which can reduce the size of the net considerably,
 thus compensating for the effect of using inlining.
-These optimizations are discussed in detail in Chapter \ref{chap:future-work}.
+These optimizations are discussed in detail in
+Sec. \ref{sec:future-work-petri-net-reduction} and \ref{sec:future-work-no-cleanup}.
 
 Lastly, an attentive reader may notice that
 the analysis of the \acrshort{PN} in Fig. \ref{fig:two-function-calls-correct}
@@ -262,7 +263,7 @@ which does not match the execution of the Rust program.
 This is correct but it is a limitation of low-level Petri nets
 that cannot be solved in the framework of the model and
 goes beyond the scope of this work.
-Chapter \ref{chap:future-work} explores
+Sec. \ref{sec:future-work-higher-level-models} explores
 the consequences of this restriction and proposes potential remedies.
 
 Armed with new insights and knowledge about the design choices,
