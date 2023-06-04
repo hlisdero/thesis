@@ -37,7 +37,7 @@ As it should be evident to the reader, this program deadlocks when executed.
 The reason is that the \Rustinline{std::sync::Mutex::lock} method is
 being called twice on the same mutex.
 To detect this deadlock, the translator must be able to at the very least
-identify that both calls to \Rustinline{lock} occur on the same mutex.
+identify that the invocation of \Rustinline{lock} takes place on the same mutex.
 
 \begin{listing}[!htb]
   \begin{minted}{Rust}

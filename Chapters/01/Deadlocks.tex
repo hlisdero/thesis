@@ -1,6 +1,6 @@
 \section{Deadlocks}
 
-Deadlocks are a common problem that can occur in concurrent systems,
+Deadlocks are a common problem that arises in concurrent systems,
 which are systems where multiple threads or processes are
 running simultaneously and potentially sharing resources.
 They have been studied at least since \cite{dijkstra1964},
@@ -17,7 +17,7 @@ in terms of program states can be found in \cite{holt1972some}.
 Deadlocks can be a serious problem in concurrent systems,
 as they can cause the system to become unresponsive or even crash.
 Therefore, it would be advantageous to be able to detect and prevent deadlocks.
-They can occur in any concurrent system where multiple threads or processes
+They can happen in any concurrent system where multiple threads or processes
 are competing for shared resources.
 Examples of shared resources that can lead to deadlocks include system memory,
 input/output devices, locks, and other types of synchronization primitives.
@@ -75,11 +75,11 @@ They are sometimes called ``Coffman conditions''.
 
 Usually, the first three conditions are characteristics of the system under study, i.e.,
 the protocols used for acquiring and releasing resources,
-while the fourth may or may not occur depending
+while the fourth may or may not materialize depending
 on the interleaving of instructions during the execution.
 
 It is worth noting that the Coffman conditions are in general necessary
-but not sufficient for a deadlock to occur.
+but not sufficient for a deadlock to manifest.
 The conditions are indeed sufficient in the case of single-instance resource systems.
 But they only indicate the possibility of deadlock in systems
 where there are multiple indistinguishable instances of the same resource.
@@ -163,7 +163,7 @@ when none of them is entirely applicable.
 
 Avoidance is another strategy for dealing with deadlocks,
 which involves dynamically detecting and
-avoiding potential deadlocks \emph{before} they occur.
+avoiding potential deadlocks \emph{before} they arise.
 For this, the system requires global knowledge in advance regarding
 which resources a thread or process will request during its lifetime.
 Note that, in linguistic terms,
@@ -183,7 +183,7 @@ applicable to a broad range of situations.
 \subsubsection{Detection and Recovery}
 
 Another strategy to handle deadlocks is to detect them
-\emph{after} they occur and recover from them.
+\emph{after} they take place and recover from them.
 For a survey of algorithms for deadlock detection
 in distributed systems, see \cite{singhal1989deadlock}.
 We will briefly present the general idea behind one of them for illustration purposes.
@@ -224,7 +224,7 @@ extensively discussed in \cite{bernstein1987concurrency}.
 \subsubsection{Acceptance or ignoring deadlocks altogether}
 
 In some cases, it may be admissible
-to simply accept the risk of deadlocks and manage them as they occur.
+to simply accept the risk of deadlocks and manage them as they surface.
 This approach may be appropriate in systems where the cost of preventing
 or detecting deadlocks is too high, or where the frequency of deadlocks is low enough
 that the impact on system performance is minimal,

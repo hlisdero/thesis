@@ -6,7 +6,7 @@
 A Rust program is composed, as in other programming languages, of functions.
 The program begins (except for the caveats seen in Sec. \ref{sec:basic-places})
 with a call to the \Rustinline{main} function, which then may call other functions.
-It is important to note that function calls can occur at any step in the code.
+It should be emphasized that function calls may be placed at any point within the code.
 A function can be called from another function or even from within itself, resulting in recursive calls.
 
 Function calls are stored in memory in a data structure called the \emph{call stack}.
@@ -116,7 +116,7 @@ is used to indicate that the crate will link to the core-crate instead of the st
 See \cite{embedded-book} for more details.
 
 This means that the standard library's functionality becomes an integral part of the resulting executable.
-Function calls to the standard library appear often in Rust code and occur in various contexts,
+Function calls to the standard library appear in various contexts in Rust code,
 such as when accessing command line arguments, invoking iterators,
 utilizing traits like \Rustinline{std::clone::Clone}, \Rustinline{std::deref::Deref::deref},
 or employing standard library types like \Rustinline{std::result::Result} or \Rustinline{std::option::Option}.
