@@ -104,3 +104,53 @@ the subsequent simplification achieved in the resulting Petri net.
 
 \subsection{Terminators}
 \label{sec:terminators}
+
+As seen in Sec. \ref{sec:mir-components}, terminator statements come in different shapes.
+The documentation for the enum \Rustinline{TerminatorKind}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/enum.TerminatorKind.html}}
+lists as of this writing 14 different variants.
+The implementation is required to support most of them,
+since they appear sooner or later in the test programs included in the repository
+and their translation directly influences the connections between the basic blocks.
+The remaining terminators that are not implemented are not present
+when querying the \Rustinline{optimized_mir}, i.e., they are used only in previous compiler passes.
+
+The implementation of the MIR
+Visitor\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_visitor.rs}}
+includes the \Rustinline{visit_terminator} method as seen before.
+This is where the edges connecting one \acrshort{BB} to another are created.
+In the next paragraphs, the high-level details of each handler are discussed.
+Some implementation details are omitted as they do not affect the Petri net.
+
+\subsubsection{Goto}
+
+This is an elementary terminator kind.
+The end place of the currently active \acrshort{BB} is connected
+to the start place of the target \acrshort{BB}
+through a new transition with an appropriate label.
+
+\subsubsection{SwitchInt}
+
+This terminator kind comes with a collection of target basic blocks.
+For each target \acrshort{BB},
+we connect the end place of the currently active \acrshort{BB}
+to the start place of the target \acrshort{BB}
+through a new transition with an appropriate label.
+The label must also contain some kind of unique identifier of the block from where the
+jump starts.
+This is important to support multiple basic blocks with a \Rustinline{SwitchInt}
+that jumps to the same block.
+
+\subsubsection{Resume or Terminate}
+
+These are terminators that model respectively an unwinding of the stack
+and the immediate abort of the program.
+Both are treated in the same way:
+Connecting the end place of the currently active \acrshort{BB}
+to the \Rustinline{PROGRAM_PANIC} place seen in Fig. \ref{fig:program-places}.
+
+\subsubsection{Return}
+
+This is the terminator that causes the \acrshort{MIR} function to return.
+This is where the end place of the function is used.
+The end place of the currently active \acrshort{BB} is connected to it.
+
