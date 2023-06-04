@@ -1,11 +1,11 @@
 \section{MIR visitor}
 
 This section is dedicated to a pivotal component that serves as the backbone of the translator:
-the MIR Visitor trait\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/visit/trait.Visitor.html}}.
+the \acrshort{MIR} Visitor trait\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/visit/trait.Visitor.html}}.
 This trait enables straightforward navigation of the \acrshort{MIR} of the Rust source code.
 In other words, it acts as the glue that seamlessly binds the various components of the translator together.
 
-The MIR Visitor trait plays a fundamental role in the translation process
+The \acrshort{MIR} Visitor trait plays a fundamental role in the translation process
 by providing a structured approach to traverse and analyze the \acrshort{MIR}.
 It offers a set of methods that can be implemented to perform specific actions
 at different points during the traversal.
@@ -13,16 +13,16 @@ By employing this trait,
 the translator gains the ability to systematically explore the \acrshort{MIR}
 and extract the necessary information for generating the corresponding Petri net.
 
-The implemented methods within the MIR Visitor trait serve
+The implemented methods within the \acrshort{MIR} Visitor trait serve
 as entry points for handling different elements encountered during the traversal.
 These methods allow for customized processing of specific \acrshort{MIR} constructs,
 e.g., basic blocks, statements, terminators, assignments, constants, etc.
 By defining appropriate behavior for each method,
 the translator can efficiently extract relevant data and
-make informed decisions based on the encountered MIR elements.
+make informed decisions based on the encountered \acrshort{MIR} elements.
 
 It was not required to implement all possible methods.
-If not defined, the methods in MIR Visitor simply call
+If not defined, the methods in \acrshort{MIR} Visitor simply call
 the corresponding \Rustinline{super} method and continue the traversal.
 For instance, \Rustinline{visit_statement} calls
 \Rustinline{super_statement} if no custom implementation is present.
@@ -61,13 +61,13 @@ Listing \ref{lst:mir-visit-body} shows the corresponding function in the transla
   \label{lst:mir-visit-body}
 \end{listing}
 
-In conclusion, the MIR Visitor trait simplifies remarkably the translation
+In conclusion, the \acrshort{MIR} Visitor trait simplifies remarkably the translation
 as it is not necessary to implement a traversal mechanism thanks to the provided
 compiler interfaces.
 This also makes the translator more robust and resistant to changes in \emph{rustc}.
 If the string representation of the \acrshort{MIR} changes, the translator is left unaffected.
-As long as the internal interfaces for accessing the MIR stay the same,
-the translator can navigate the MIR semantically and not based on how it is printed to the user.
+As long as the internal interfaces for accessing the \acrshort{MIR} stay the same,
+the translator can navigate the \acrshort{MIR} semantically and not based on how it is printed to the user.
 
 As a last remark, similar traits exist for other intermediate representations:
 

@@ -166,7 +166,7 @@ that exposes the underlying control flow.
 \subsection{MIR components}
 \label{sec:mir-components}
 
-The MIR is formed by functions.
+The \acrshort{MIR} is formed by functions.
 Each function is represented as a series of \acrfull{BB} connected by directed edges.
 Each \acrshort{BB} contains zero or more \emph{statements} (usually abbreviated as ``STMT'')
 and lastly one \emph{terminator statement}, for short \emph{terminator}.
@@ -179,7 +179,7 @@ for conditional execution and looping to the low-level representation in machine
 as simple conditional or unconditional \Rustinline{branch} instructions.
 
 In Fig. \ref{fig:mir-cfg-example}, the graph representation
-for the MIR shown in Listing \ref{lst:mir-output-debug-example} is presented as an example.
+for the \acrshort{MIR} shown in Listing \ref{lst:mir-output-debug-example} is presented as an example.
 The statements are colored in light blue and the terminators in light red.
 To make the kind of terminator statement clearer,
 extra annotations as in \texttt{CALL:} or \texttt{DROP:} were added.
@@ -220,7 +220,7 @@ The complete list of terminator kinds can be found in the nightly
 documentation\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/enum.TerminatorKind.html}}.
 Other kinds of terminators will be discussed in detail in Sec. \ref{sec:terminators}.
 
-Regarding the variables, the data in MIR can be divided into two categories:
+Regarding the variables, the data in \acrshort{MIR} can be divided into two categories:
 \emph{locals} and \emph{places}.
 It is critical to observe that these ``places'' are
 \emph{not} related to the places in Petri nets.
@@ -242,7 +242,7 @@ This matches closely the low-level representation on the stack.
 In this subsection, we will give a short explanation of what happens
 in each basic block of Fig. \ref{fig:mir-cfg-example}
 to ensure that all necessary information is covered.
-Moreover, this illustrates how the MIR output represents higher-level constructs
+Moreover, this illustrates how the \acrshort{MIR} output represents higher-level constructs
 often encountered when programming in Rust.
 
 \subsubsection{BB0}
