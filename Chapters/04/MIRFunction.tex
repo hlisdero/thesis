@@ -135,6 +135,8 @@ For each target \acrshort{BB},
 we connect the end place of the currently active \acrshort{BB}
 to the start place of the target \acrshort{BB}
 through a new transition with an appropriate label.
+This creates a \emph{conflict} as defined in Sec. \ref{sec:transition-firing}.
+
 The label must also contain some kind of unique identifier of the block from where the
 jump starts.
 This is important to support multiple basic blocks with a \Rustinline{SwitchInt}
@@ -154,3 +156,56 @@ This is the terminator that causes the \acrshort{MIR} function to return.
 This is where the end place of the function is used.
 The end place of the currently active \acrshort{BB} is connected to it.
 
+\subsubsection{Unreachable}
+
+This is a border case that appears
+in some \Rustinline{match}, \Rustinline{while} loops, or other control structures.
+The documentation states: \emph{Indicates a terminator that can never be reached}.
+To handle this case, the decision was to connect
+the end place of the currently active \acrshort{BB}
+to the \Rustinline{PROGRAM_END} place seen in Fig. \ref{fig:program-places}.
+See the comments in the repository for more details.
+
+\subsubsection{Drop}
+
+The \Rustinline{std::ops::Drop} trait is used to specify code that should be executed
+when the type goes out of scope \cite[Chap. 15.3]{rust-book}.
+It is equivalent to the concept of destructors found in other programming languages.
+
+The drop terminator behaves like a function call with a cleanup transition.
+Therefore, we apply the model shown in Fig. \ref{fig:function-with-cleanup}
+with modified transition labels.
+
+An important check happens here too, namely checking if a mutex guard is being dropped.
+If that is the case, then the corresponding mutex should be unlocked
+as part of the transition firing.
+More details will be explained in Sec. \ref{sec:sync-primitives}.
+
+\subsubsection{Call}
+
+This is the terminator kind for executing function calls.
+The presence of a cleanup block and the particular
+\Rustinline{UnwindAction}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/syntax/enum.UnwindAction.html}}
+as well as the function name and type is analyzed to handle it
+according to the strategy elaborated in Sec. \ref{sec:function-calls}.
+
+Note that \Rustinline{UnwindAction} is a refactor of \emph{rustc}
+that was introduced on April 7th, 2023.
+It is a good example of a regression that required significant changes to accommodate.
+The interested reader is referred to the corresponding
+commit\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/8cf95cd54b29c210801cae2941abcbbb85051b92}}.
+
+\subsubsection{Assert}
+
+This terminator kind is related to the
+\Rustinline{assert!()}\footnote{\url{https://doc.rust-lang.org/std/macro.assert.html}}
+macro and the default overflow checks that \emph{rustc} incorporates when
+performing arithmetic operations.
+
+The implementation does not model the condition for the assert.
+It simply connects the end place of the currently active \acrshort{BB}
+to the start place of the target \acrshort{BB}
+through a new transition with an appropriate label.
+
+In some cases, a cleanup block is present too.
+For this, a second transition is needed, analogously to the \Rustinline{Drop} case.
