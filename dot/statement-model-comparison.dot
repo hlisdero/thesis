@@ -1,0 +1,42 @@
+digraph statement_model_comparison {
+    nodesep=1.5;
+    
+    start_1 [shape="none", xlabel="", label="• • •"];
+    start_2 [shape="none", xlabel="", label="• • •"];
+    end_1 [shape="none", xlabel="", label="• • •"];
+    end_2 [shape="none", xlabel="", label="• • •"];
+    
+    
+  subgraph cluster_0 {
+    color=red;
+    label="Old model";
+
+    BB0_START [width=0.6 shape="circle" xlabel="BB0_START" label="•"];
+    BB0_STMT0_END [width=0.6 shape="circle" xlabel="BB0_STMT0_END" label=""];
+    BB0_STMT1_END [width=0.6 shape="circle" xlabel="BB0_STMT1_END" label=""];
+    BB0_END  [width=0.6 shape="circle" xlabel="BB0_END" label=""];
+
+    BB0_STMT0 [height=0.1 shape="box" xlabel="" label="BB0_STMT0"];
+    BB0_STMT1 [height=0.1 shape="box" xlabel="" label="BB0_STMT1"];
+    BB0_STMT2 [height=0.1 shape="box" xlabel="" label="BB0_STMT2"];
+    
+    BB0_START -> BB0_STMT0 -> BB0_STMT0_END -> BB0_STMT1;
+    BB0_STMT1 -> BB0_STMT1_END -> BB0_STMT2 -> BB0_END;
+  }
+
+  subgraph cluster_1 {
+    color=green;
+    label="New model";
+    
+    BB0 [width=0.6 shape="circle" xlabel="BB0" label="•"];
+    
+  }
+  
+  start_1 -> BB0_START;
+  start_2 -> BB0;
+  BB0 -> end_1;
+  BB0_END -> end_2;
+  
+  {rank = min; start_1;}
+  {rank = max; end_1;}
+}

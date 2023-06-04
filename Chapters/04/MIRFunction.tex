@@ -64,5 +64,43 @@ the \acrshort{BB} number to generate unique labels.
 
 \subsection{Statements}
 
+\acrshort{MIR} statements are intentionally \emph{not} incorporated into the Petri net model.
+Considering the reasons for this and the benefits may not be immediately apparent,
+we will provide a detailed explanation for this implementation decision.
+
+The approach that was previously implemented did include the modeling of statements.
+It was based on the approach seen in \cite{meyer2020}.
+However, it was observed that this led to the creation of a long chain of places and transitions
+that did not significantly contribute to the detection of deadlocks or missed signals.
+Furthermore, it unnecessarily inflated the size of the Petri net representation,
+making it more difficult to debug and understand.
+Consequently, this approach was later revised and removed in a later
+commit\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/b27403b6a5b2bb020a5d7ab2a9b1cacefb48be82}}.
+
+In all the programs we had tested so far, the statements did not perform any action
+that may justify their addition to the Petri net.
+On the contrary, the nets that include the statements were larger and more difficult to read.
+In order to facilitate the use and adoption of the tool,
+it is crucial to optimize the Petri net for the purpose of the tool.
+The decision was therefore to eliminate all the code related to the modeling of the statements
+and fix the tests accordingly to match the new output.
+
+The alternative was to disable the statements with a compile flag
+but that would complicate testing and
+since there is no use case for modeling the \acrshort{MIR} statements anyway, this option was discarded.
+
+For illustrative purposes, we can refer to Fig. \ref{fig:statement-model-comparison},
+which showcases a comparison between the old model and the new model.
+The differences between these two representations are evident,
+highlighting the removal of statements from the model and
+the subsequent simplification achieved in the resulting Petri net.
+
+\begin{figure}[!htb]
+  \centering
+  \includesvg[width=0.5\linewidth]{statement-model-comparison.svg}
+  \caption{A side-by-side comparison of two possibilities to model the MIR statements.}
+  \label{fig:statement-model-comparison}
+\end{figure}
+
 \subsection{Terminators}
 \label{sec:terminators}
