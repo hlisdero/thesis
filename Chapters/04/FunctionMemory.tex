@@ -28,3 +28,108 @@ Knowing the type of the memory location is \emph{not} enough,
 the \emph{value} must be readily available to the translator
 to operate on the Petri net model of the specific synchronization variable.
 
+\subsection{A guided example to introduce the challenges}
+
+To illustrate the situation described previously, consider the Rust program
+shown in Listing \ref{lst:double-lock-deadlock}.
+It is again one of the example programs found in the repository.
+As it should be evident to the reader, this program deadlocks when executed.
+The reason is that the \Rustinline{std::sync::Mutex::lock} method is
+being called twice on the same mutex.
+To detect this deadlock, the translator must be able to at the very least
+identify that both calls to \Rustinline{lock} occur on the same mutex.
+
+\begin{listing}[!htb]
+  \begin{minted}{Rust}
+    fn main() {
+      let data = std::sync::Mutex::new(0);
+      let _d1 = data.lock();
+      let _d2 = data.lock(); // cannot lock, since d1 is still active
+    }
+  \end{minted}
+  \caption{A deadlock caused by calling \Rustinline{lock} twice on the same mutex.}
+  \label{lst:double-lock-deadlock}
+\end{listing}
+
+Observe now an excerpt of the \acrshort{MIR}
+of the same erroneous program in Listing \ref{lst:double-lock-deadlock-mir}.
+The comments have been removed for clarity.
+In BB0 the mutex is created through a call to \Rustinline{std::sync::Mutex::new}.
+The new mutex is the return value of the function.
+It is assigned to the local variable \Rustinline{_1}.
+Then the execution continues in BB1.
+Focus on the first statement of BB1:
+An immutable reference to the local variable \Rustinline{_1} is stored in \Rustinline{_3}.
+Next, the reference is moved to the function \Rustinline{std::sync::Mutex::lock}.
+This reference is consumed by lock, that is to say,
+the local variable \Rustinline{_3} is not used anywhere else in the \acrshort{MIR}
+because, from that point on, the ownership of the reference is transferred
+to the \Rustinline{std::sync::Mutex::lock} function.
+
+\begin{listing}[!htb]
+  \begin{minted}{Rust}
+    fn main() -> () {
+      let mut _0: ();
+      let _1: std::sync::Mutex<i32>;
+      let mut _3: &std::sync::Mutex<i32>;
+      let mut _5: &std::sync::Mutex<i32>;
+      scope 1 {
+          debug data => _1;
+          let _2: std::result::Result<std::sync::MutexGuard<'_, i32>, std::sync::PoisonError<std::sync::MutexGuard<'_, i32>>>;
+          scope 2 {
+              debug _d1 => _2;
+              let _4: std::result::Result<std::sync::MutexGuard<'_, i32>, std::sync::PoisonError<std::sync::MutexGuard<'_, i32>>>; 
+              scope 3 {
+                  debug _d2 => _4;
+              }
+          }
+      }
+  
+      bb0: {
+          _1 = Mutex::<i32>::new(const 0_i32) -> bb1;
+      }
+  
+      bb1: {
+          _3 = &_1;
+          _2 = Mutex::<i32>::lock(move _3) -> bb2;
+      }
+  
+      bb2: {
+          _5 = &_1;
+          _4 = Mutex::<i32>::lock(move _5) -> [return: bb3, unwind: bb6];
+      }
+  \end{minted}
+  \caption{An except of the MIR of the program from Listing \ref{lst:double-lock-deadlock}.}
+  \label{lst:double-lock-deadlock-mir}
+\end{listing}
+
+Immediately after the statement, the translator encounters the terminator of BB1.
+It contains a call to \Rustinline{std::sync::Mutex::lock}.
+How would the translator know, when translating this call,
+that \Rustinline{_3} is indeed the mutex stored in \Rustinline{_1}?
+This is the problem that the modeling of the function's memory aims to solve.
+
+The problem goes even further.
+The local variable \Rustinline{_2} contains a mutex guard after the call to lock,
+which should be recorded too.
+Notice how BB2 repeats the same operations as BB1 but uses different local variables,
+\Rustinline{_5} and \Rustinline{_4}.
+The translator should know that \Rustinline{_5} is an alias for \Rustinline{_1} as well.
+Furthermore, the mutex guards in \Rustinline{_2} and \Rustinline{_4} will eventually be dropped,
+which indirectly unlocks the mutex.
+There has to be a link from the mutex guard in \Rustinline{_2} and \Rustinline{_4}
+to the mutex in \Rustinline{_1}.
+More concisely, the translator should monitor which mutex is behind each mutex guard.
+
+To make matters more complex, each \acrshort{MIR} function has its own stack memory,
+with its separate local variables \Rustinline{_0}, \Rustinline{_1},
+\Rustinline{_2}, \Rustinline{_3}, and so on.
+Thus, the mapping of memory locations to synchronization variables
+cannot be a single global structure.
+It is instead dependent on the context of the current function being translated.
+Lastly, a synchronization variable could migrate from one function to another
+and the translator must be able to re-map them correctly.
+
+This suffices as a brief practical example of the challenges of memory modeling.
+We can now introduce the solution that has been implemented.
+
