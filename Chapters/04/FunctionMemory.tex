@@ -203,9 +203,8 @@ which is a critical requirement for supporting more complex programs with nested
     /// A condvar reference is just a shared pointer to the condition variable.
     pub type CondvarRef = std::rc::Rc<Condvar>;
 
-    /// A thread reference is just a shared pointer to a `RefCell` containing the thread.
-    /// This enables the Interior Mutability pattern needed to set the join transition later on.
-    pub type ThreadRef = std::rc::Rc<std::cell::RefCell<Thread>>;
+    /// A thread reference is just a shared pointer to the thread.
+    pub type ThreadRef = std::rc::Rc<Thread>;
   \end{minted}
   \caption{A summary of the type definitions of the \Rustinline{Memory} implementation.}
   \label{lst:memory-implementation}
