@@ -1,6 +1,52 @@
 \section{Reducing the size of the Petri net in postprocessing}
 \label{sec:future-work-petri-net-reduction}
 
+\cite{murata1989} describes in a Section titled ``Simple Reduction Rules for Analysis''
+six operations that preserve the properties of safeness, liveness, and boundedness of \acrshort{PN}.
+See Definitions \ref{definition:safeness}, \ref{definition:liveness} and \ref{definition:boundedness}
+respectively for a refresher of what these properties mean.
+
+The six operations involve simplifications that reduce the number of places or transitions
+in the Petri net. Next, we reproduce the names used for the reduction rules in the paper and
+Fig. \ref{fig:petri-net-reduction-rules} depicts the transformation that takes place in each case.
+
+\begin{enumerate}[label={\alph*)}]
+  \item Fusion of Series Places.
+  \item Fusion of Series Transitions.
+  \item Fusion of Parallel Places.
+  \item Fusion of Parallel Transitions.
+  \item Elimination of Self-Loop Places.
+  \item Elimination of Self-Loop Transitions.
+\end{enumerate}
+
+\begin{figure}[!htb]
+  \centering
+  \includegraphics[width=0.9\linewidth]{petri-net-reduction-rules.png}
+  \caption{The reduction rules presented in Murata's paper}
+  \label{fig:petri-net-reduction-rules}
+\end{figure}
+
+As these operations do not impact the liveness property,
+the outcome of the deadlock detection remains unchanged.
+Consequently, it might be advantageous to reduce the size of the \acrshort{PN}
+after the translation process using specific methods available in the \Rustinline{netcrab} library.
+This step should be performed after translating all threads but before invoking the model checker.
+
+Incorporating this functionality into the \acrshort{PN} library itself would be more suitable,
+as it would allow other applications to benefit from this feature.
+It would be interesting to investigate whether
+this approach proves helpful when translating larger programs
+that contain hundreds or thousands of places and transitions.
+
+One notable drawback of applying these operations is
+that it could obscure the source of the deadlock.
+It is valuable for the user to have precise information
+about the line in the source code where the deadlock occurs.
+If the corresponding transitions or places representing this line are merged,
+this information is lost.
+However, this disadvantage may be deemed acceptable when dealing with extensive models,
+and the feature could be enabled or disabled at the discretion of the user.
+
 \section{Eliminating the cleanup paths from the translation}
 \label{sec:future-work-no-cleanup}
 
