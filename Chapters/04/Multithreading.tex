@@ -104,3 +104,34 @@ that interfaces with the main net only at three places:
   \item The (optional) \Rustinline{join} transition where the join handle is utilized.
   \item The connections due to synchronization variables, analyzed in Sec. \ref{sec:sync-primitives}.
 \end{itemize}
+
+\subsection{A practical example}
+
+Observe Listing \ref{lst:multithreading-example}
+and its corresponding \acrshort{PN} model in Fig. \ref{fig:multithreading-example}.
+This is one of the test programs found in the repository.
+Note the ``fork'' described in the previous subsection.
+The left branch is the thread, while the right branch is the main thread.
+It is clear that the paths split at the \Rustinline{spawn} and merge
+at the \Rustinline{join}.
+
+\begin{listing}[!htb]
+  \begin{minted}{Rust}
+    fn main() {
+      let thread_join_handle = std::thread::spawn(move || {
+          // some work here
+      });
+      // some work here
+      let _res = thread_join_handle.join();
+    }  
+  \end{minted}
+  \caption{A basic program with two threads to demonstrate multithreading support.}
+  \label{lst:multithreading-example}
+\end{listing}
+
+\begin{figure}[!htb]
+  \centering
+  \includesvg[width=0.5\linewidth]{multithreading-example.svg}
+  \caption{The Petri net model for the program in Listing \ref{lst:multithreading-example}.}
+  \label{fig:multithreading-example}
+\end{figure}
