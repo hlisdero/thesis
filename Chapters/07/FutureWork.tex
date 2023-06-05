@@ -202,3 +202,26 @@ This could be a configuration parameter for the tool.
 
 \section{Higher-level models}
 \label{sec:future-work-higher-level-models}
+
+The field of higher-level Petri net models is vast
+and encompasses numerous branches and potential methodologies.
+Exploring this domain offers a wide range of possibilities for advancing the modeling capabilities.
+
+One notable advancement lies in the utilization of \acrfull{CPN}.
+Data values could then be modeled as tokens of different types,
+thereby enhancing the expressiveness and accuracy of the Petri net representation.
+A related paper in this regard is presented in the next chapter.
+\cite{meyer2020} also mentioned higher-level models
+when discussing improvements to his Petri net semantics for Rust.
+For an introduction to higher-level Petri nets, see \cite{murata1989}
+
+Another intriguing addition to the current Petri net model
+involves the incorporation of inhibitor arcs.
+These arcs provide a means to model conditions in the source code
+where the presence of a zero value is checked.
+By introducing inhibitor arcs,
+Petri nets can effectively capture situations
+where the absence of a specific token is required for a transition to occur.
+For example, when checking a boolean flag used as a condition for a condition variable.
+Inhibitor arcs raise the expressive power of Petri nets
+to the level of Turing machines \cite{peterson1981}.
