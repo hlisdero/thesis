@@ -52,7 +52,55 @@ does not need to wait for the thread to complete its task.
 For example, in long-running background tasks or
 when the main thread terminates independently of the detached thread's progress.
 However, it's important to stress that
-the execution of detached threads may continue \emph{even} after the main thread has completed.
-However, it's important to stress that detached threads operate independently
-and their execution may continue \emph{even} after the main thread has completed.
+the execution of detached threads may continue \emph{even} after the main thread exited.
 
+\subsection{Petri net model for a thread}
+
+To incorporate additional threads into the \acrshort{PN} model,
+a distinct subnet is appended to the main net to represent each thread.
+This subnet encapsulates the execution path of the newly spawned thread
+and operates as an isolated context.
+It establishes precise interfaces that connect back to the main net.
+The closure provided to the \Rustinline{spawn} function, being a MIR function,
+can invoke other functions that in turn require translation.
+Therefore, processing a thread's function follows
+a similar approach to the usual translation logic.
+
+The concurrency aspect of the execution of the new thread is modeled by the generation
+of a new token at the transition that represents the call to \Rustinline{spawn}.
+This token can be interpreted, in the same manner as the token in \Rustinline{PROGRAM_START},
+as the instruction counter of the new thread.
+Essentially, the spawn operation constitutes a ``fork'' in the token flow:
+One token enters the transition and two tokens exit from it.
+The first proceeds along the main thread's path to execute the subsequent statement,
+while the second is directed to the first \acrshort{BB} of the function passed to the thread.
+
+Each thread identified in the source code possesses designated start and end places
+labeled \Rustinline{THREAD_<index>_START} and \Rustinline{THREAD_<index>_END}, respectively.
+The index is mandatory to preserve the label uniqueness property across the entire program.
+It should be emphasized that
+this mimics the basic places for the program detailed in Sec. \ref{sec:basic-places}.
+
+Threads lack a separate panic place
+as invoking \Rustinline{panic!()} inside a thread
+only terminates that specific thread's execution.
+We are not interested in differentiating between thread end states;
+the main requirement is to determine whether a thread is finished or not.
+A single end place for both cases suffices here.
+
+The joining behavior serves as the inverse operation of the spawn.
+The transition corresponding to the \Rustinline{join} call consumes two tokens
+but generates only one token.
+As a result, the waiting condition is straightforward:
+The main thread can continue, i.e, the \Rustinline{join} transition can fire,
+if and only if the thread to be joined has finished execution,
+reaching its respective \Rustinline{THREAD_END} place.
+
+To recapitulate, the thread is translated to a separate subnet
+that interfaces with the main net only at three places:
+
+\begin{itemize}
+  \item The \Rustinline{spawn} transition where the thread starts.
+  \item The (optional) \Rustinline{join} transition where the join handle is utilized.
+  \item The connections due to synchronization variables, analyzed in Sec. \ref{sec:sync-primitives}.
+\end{itemize}
