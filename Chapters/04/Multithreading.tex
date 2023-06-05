@@ -1,1 +1,56 @@
 \section{Multithreading}
+
+Multithreading support is a prerequisite for deadlock and missed signal detection.
+In order to support real-world programs
+where deadlocks or missed signals are possible in the first place,
+it becomes essential to support having several threads that share resources.
+First, the basics will be presented to later devise a \acrshort{PN} model that captures
+the behavior of threads in Rust code.
+
+\subsection{Thread lifetime in Rust}
+
+The lifetime of a thread begins when it is started by invoking the
+\Rustinline{std::thread::spawn}\footnote{\url{https://doc.rust-lang.org/std/thread/fn.spawn.html}}
+function.
+It receives a closure or function as an argument,
+representing the code that the new thread will execute concurrently
+with the other threads of the program.
+The spawned thread may start running immediately after it is spawned
+but there is no guarantee that it will do so.
+
+Contrary to other programming languages like C, C++ or Java,
+Rust does not have the notion of a thread variable
+initialized previously to the start of the thread.
+Instead, the function \Rustinline{std::thread::spawn} returns
+a \Rustinline{std::thread::JoinHandle},
+which is, as the name suggests, a handle to call \Rustinline{join}
+at the end of the thread's lifetime.
+
+During its existence, a thread can independently execute its designated code
+and perform various operations concurrently with other threads.
+It can access shared resources and communicate with other threads
+through synchronization mechanisms like
+mutexes, condition variables, channels, or atomic operations.
+This enables concurrent processing and parallelism in Rust programs.
+
+To ensure proper coordination between threads,
+Rust provides a mechanism to join threads.
+The \Rustinline{std::thread::JoinHandle::join}\footnote{\url{https://doc.rust-lang.org/std/thread/struct.JoinHandle.html\#method.join}} method
+allows the main thread or another thread
+to wait for the completion of a different thread.
+By calling join on a join handle,
+the calling thread blocks until the spawned thread finishes its execution.
+Once a thread completes its execution and is joined by another thread,
+its lifetime ends, and the corresponding system resources are released.
+Otherwise, threads that were not joined correctly may potentially leak resources.
+
+If the join handle is dropped, the thread may no longer be joined and it implicitly becomes \emph{detached}.
+A detached thread refers to a thread without a valid join handle,
+which will continue its execution independently until it completes or the program terminates.
+They are useful in scenarios where the spawning thread
+does not need to wait for the thread to complete its task.
+For example, in long-running background tasks or
+when the main thread terminates independently of the detached thread's progress.
+However, it's important to stress that detached threads operate independently
+and their execution may continue \emph{even} after the main thread has completed.
+
