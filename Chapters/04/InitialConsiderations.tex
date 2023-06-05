@@ -41,7 +41,7 @@ Therefore, such programs should not be flagged in principle as erroneous or defe
 it is advisable to record the end state for troubleshooting and debugging purposes.
 Second, even if the user's code does not resort to \Rustinline{panic!()}
 as an error-handling mechanism, numerous functions in the Rust standard library
-may panic under extraordinary circumstances, e.g., due to out-of-memory or hardware errors,
+may panic under extraordinary circumstances, e.g., due to \acrfull{OOM} or hardware errors,
 or when the \acrshort{OS} fails to allocate a new thread, mutex, etc.
 Consequently, it is essential to capture this eventual failure in the \acrshort{PN} model.
 

@@ -50,6 +50,49 @@ and the feature could be enabled or disabled at the discretion of the user.
 \section{Eliminating the cleanup paths from the translation}
 \label{sec:future-work-no-cleanup}
 
+The error handling mechanism in the \acrshort{MIR}
+must account for every possible scenario of failure during runtime.
+The aim of the \emph{rustc} compiler is to ensure
+that compiled code fails gracefully,
+even in the most extreme circumstances,
+e.g., when the program is running out of memory or system calls fail unexpectedly
+due to hard limits on the resources available or other causes.
+However, the majority of this safeguarding cleanup code is never executed in practice.
+\acrshort{OOM} errors and \acrshort{OS} failures are uncommon
+and if they indeed emerge, a deadlock in user code is the least of our problems.
+
+\cite{meyer2020} argues that
+the program will always terminate in a panic end-state
+once a single function call or assertion fails.
+Instead of translating the alternative path that the execution follows in the MIR,
+he proposes to set a token in the place \Rustinline{PROGRAM_PANIC} directly.
+This is equivalent to ignoring the specific cleanup target \acrshort{BB}
+during the translation process
+and connecting the \acrshort{BB} to the \Rustinline{PROGRAM_PANIC} place
+as if it were an \Rustinline{Unwind} terminator (Sec. \ref{sec:terminators}).
+
+This reduces the size of the Petri net model substantially.
+It comes with the disadvantage that cleanup \acrshort{BB} are visited but never connected
+to other \acrshort{BB}.
+These must be removed in a postprocessing step to not clutter the final model.
+Meyer's implementation does not seem to have performed this crucial step.
+It is unclear whether the implementation matches what the thesis proposed because
+the source code cannot be compiled anymore and no output examples are present in the
+repository\footnote{\url{https://github.com/Skasselbard/Granite}}.
+
+The claim that the panic state is unrecoverable necessitates thorough examination,
+as we have previously observed in the introduction to Rust
+that the programmer has the option to utilize \Rustinline{std::panic::catch_unwind}.
+Furthermore, this intuitive reasoning might overlook situations
+in which a deadlock arises following a panic.
+This need not be a catastrophic failure.
+Consider for instance a thread that deadlocks while waiting on a message
+from another thread that panicked due to incorrect user input.
+
+In conclusion, this modification of the translation logic looks promising
+to significantly reduce the number of places and transitions in the \acrshort{PN},
+especially in larger models, but more research is needed.
+
 \section{Translated function cache}
 \label{sec:future-work-function-cache}
 
