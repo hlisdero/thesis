@@ -116,7 +116,7 @@ The left branch is the thread, while the right branch is the main thread.
 It is clear that the paths split at the \Rustinline{spawn} and merge
 at the \Rustinline{join}.
 Notice also that there is no separate panic place for the thread,
-thus a failure in one thread does not affect other threads.
+indicating that a failure in one thread does not impact the other threads.
 
 \begin{listing}[!htb]
       \begin{minted}{Rust}
