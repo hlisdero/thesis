@@ -67,5 +67,32 @@ It can be found among others in \cite{kavi2002modeling,moshtaghi2001,meyer2020,z
 
 \subsection{A practical example}
 
+Consider the \acrshort{PN} model shown in Fig. \ref{fig:mutex-example}
+corresponding to the program in Listing \ref{lst:double-lock-deadlock}.
+The \acrshort{MIR} is depicted in \ref{lst:double-lock-deadlock-mir}.
+This test program is one of the examples included in the repository.
+
+Observe that there are two locking transitions
+mapping the two calls to \Rustinline{lock} in the source code.
+The indexing system mirrors the order of their appearance in the program,
+which justifies the labels \Rustinline{std_sync_Mutex_T_lock_0_CALL}
+and \Rustinline{std_sync_Mutex_T_lock_1_CALL}.
+Both have an incoming arc from the mutex place \Rustinline{MUTEX_0}.
+
+As explained before, \Rustinline{Drop} terminators may unlock a mutex.
+No matter if they fail or not (the error case includes the suffix \Rustinline{_UNWIND}),
+an outgoing arc flows back to the mutex place to replenish the token.
+
+One should take note that there are more incoming arcs to the mutex place than outgoing arcs,
+which highlights the importance of following the mutex guards throughout the \acrshort{MIR}
+using the strategy explained in Sec. \ref{sec:intercepting-assignments}.
+
+\begin{figure}[!htbp]
+  \centering
+  \includesvg[width=0.95\linewidth]{mutex-example.svg}
+  \caption{The Petri net model for the program in Listing \ref{lst:double-lock-deadlock}.}
+  \label{fig:mutex-example}
+\end{figure}
+
 \subsection{Algorithms for mutex translation}
 \label{sec:mutex-algorithms}
