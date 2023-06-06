@@ -203,4 +203,7 @@ to translate the threads discovered so far in order.
 
 As anticipated before, the algorithm exhibits resemblances
 to the overall procedure for function calls outlined in Sec. \ref{sec:function-calls}.
-This is a desirable property in the implementation.
+Lastly, the implementation is capable of handling programs
+where threads spawn their own threads in a nested manner.
+The threads are simply added to the queue and as the loop advances,
+the nested threads are translated too.
