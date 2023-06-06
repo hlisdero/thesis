@@ -154,8 +154,8 @@ as soon as a function encounters a non-recoverable failure.
 Considering that the translator cannot tell if this abnormal situation could lead
 to a deadlock later in the translation process, it is imperative to translate
 this alternative execution path whenever possible.
-Only in counted exceptions, all related to the synchronization primitives and discussed in Sec.
-\ref{sec:sync-primitives}, this cleanup block is ignored explicitly.
+Only in counted exceptions, all related to the synchronization primitives
+and discussed in the respective sections, this cleanup block is ignored explicitly.
 The complete model for an abridged function call with a cleanup block
 can be seen in Fig. \ref{fig:function-with-cleanup}.
 
@@ -174,7 +174,7 @@ Surprisingly, they include a considerable number of functions.
 
 \begin{itemize}
     \item Functions part of the standard library (the std-crate\footnote{\url{https://doc.rust-lang.org/std/}}),
-          save for some special cases detailed in Sec. \ref{sec:sync-primitives}.
+          save for the \Rustinline{std::sync::Condvar::wait} function detailed in Sec. \ref{sec:condvar-algorithms}.
     \item Functions part of the core library (the core-crate\footnote{\url{https://doc.rust-lang.org/core/}}).
     \item Functions in the alloc-crate: the core allocation and collections library\footnote{\url{https://doc.rust-lang.org/alloc/}}.
     \item Functions without a \acrshort{MIR} representation
