@@ -91,7 +91,7 @@ A single end place for both cases suffices here.
 The joining behavior serves as the inverse operation of the spawn.
 The transition corresponding to the \Rustinline{join} call consumes two tokens
 but generates only one token.
-As a result, the waiting condition is modeled in a straightforward manner:
+As a result, the waiting condition is modeled straightforwardly:
 The main thread can continue, i.e, the \Rustinline{join} transition can fire,
 if and only if the thread to be joined has finished execution,
 reaching its respective \Rustinline{THREAD_END} place.
@@ -137,3 +137,69 @@ thus a failure in one thread does not affect other threads.
   \caption{The Petri net model for the program in Listing \ref{lst:multithreading-example}.}
   \label{fig:multithreading-example}
 \end{figure}
+
+\subsection{Algorithms for thread translation}
+
+To close this section, we will briefly describe the algorithms used for translating threads.
+Initially, it is worth mentioning that since the translation is carried out by a single thread
+(the tool does not support multiple threads translating the source code),
+a decision has to be made concerning when to translate spawned threads:
+
+\begin{itemize}
+  \item Immediate translation: Translate the thread as soon as it is encountered.
+        The translator ``switches'' to the spawned thread.
+  \item Delayed translation: Store all the relevant information about the new thread
+        and translate it after the main thread.
+\end{itemize}
+
+The current solution takes the latter approach.
+
+When a call to \Rustinline{std::thread::spawn} is encountered:
+
+\begin{enumerate}
+  \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
+  \item Retrieve the first argument passed to the function:
+        An aggregate value that holds the variables captured by the closure
+        and the function to be executed by the thread.
+  \item Extract the ID of the function to be executed by the thread.
+  \item Extract the values captured by the closure.
+  \item Create a new \Rustinline{Thread}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/thread.rs}}
+        to store the information required for the delayed translation.
+  \item Link the return value of \Rustinline{std::thread::spawn},
+        the new join handle, to the \Rustinline{Thread}.
+  \item Push the thread to a queue of detected threads in the \Rustinline{Translator}.
+\end{enumerate}
+
+When a call to \Rustinline{std::thread::JoinHandle::join} is encountered:
+
+\begin{enumerate}
+  \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
+        Ignore the cleanup place since we must force the Petri net
+        to ``wait'' for the thread to exit.
+        This is equivalent to assuming that the \Rustinline{join} function never fails.
+  \item Retrieve the first argument passed to the function: The join handle.
+        The memory location is linked to the corresponding thread
+        thanks to the assignment interception explained in Sec. \ref{sec:intercepting-assignments}.
+  \item Set the join transition of the underlying \Rustinline{Thread} behind the join handle.
+\end{enumerate}
+
+When the main thread finishes translating, that is,
+when the \Rustinline{main} function has already been processed,
+the \Rustinline{Translator} enters a loop
+to translate the threads discovered so far in order.
+
+\begin{enumerate}
+  \item Create a new start and end place for the thread.
+  \item Connect the spawn transition to the start place.
+  \item If a join transition was found, connect the end place to it.
+  \item Replace the place \Rustinline{PROGRAM_PANIC} with the place \Rustinline{THREAD_<index>_END}
+        to translate terminators like \Rustinline{Unwind} correctly (Sec. \ref{sec:terminators}).
+  \item Push the thread function to the call stack.
+  \item Move the synchronization variables to the memory of the thread function, i.e.,
+        map the aggregate value and its fields to the memory of the thread function.
+  \item Translate the top of the call stack.
+\end{enumerate}
+
+As anticipated before, the algorithm exhibits resemblances
+to the overall procedure for function calls outlined in Sec. \ref{sec:function-calls}.
+This is a desirable property in the implementation.
