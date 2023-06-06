@@ -45,8 +45,8 @@ its lifetime ends, and the corresponding system resources are released.
 Otherwise, threads that were not joined correctly may potentially leak resources.
 
 If the join handle is dropped, the thread may no longer be joined and it implicitly becomes \emph{detached}.
-A detached thread refers to a thread without a valid join handle
-and will continue its execution independently until it completes or the program terminates.
+A detached thread refers to a thread without a valid join handle.
+It will continue its execution independently until it completes or the program terminates.
 They are useful in scenarios where the spawning thread
 does not need to wait for the thread to complete its task.
 For example, in long-running background tasks or
@@ -85,13 +85,13 @@ Threads lack a separate panic place
 as invoking \Rustinline{panic!()} inside a thread
 only terminates that specific thread's execution.
 We are not interested in differentiating between thread end states;
-the main requirement is to determine whether a thread is finished or not.
+the main requirement is to determine whether a thread has finished or not.
 A single end place for both cases suffices here.
 
 The joining behavior serves as the inverse operation of the spawn.
 The transition corresponding to the \Rustinline{join} call consumes two tokens
 but generates only one token.
-As a result, the waiting condition is straightforward:
+As a result, the waiting condition is modeled in a straightforward manner:
 The main thread can continue, i.e, the \Rustinline{join} transition can fire,
 if and only if the thread to be joined has finished execution,
 reaching its respective \Rustinline{THREAD_END} place.
@@ -110,10 +110,12 @@ that interfaces with the main net only at three places:
 Observe Listing \ref{lst:multithreading-example}
 and its corresponding \acrshort{PN} model in Fig. \ref{fig:multithreading-example}.
 This is one of the test programs found in the repository.
-Note the ``fork'' described in the previous subsection.
+Note the ``fork'' at the spawn transition described in the previous subsection.
 The left branch is the thread, while the right branch is the main thread.
 It is clear that the paths split at the \Rustinline{spawn} and merge
 at the \Rustinline{join}.
+Notice also that there is no separate panic place for the thread,
+thus a failure in one thread does not affect other threads.
 
 \begin{listing}[!htb]
   \begin{minted}{Rust}
