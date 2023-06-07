@@ -25,6 +25,71 @@ Finally, the algorithms for the translation of condition variable functions are 
 
 \subsection{Petri net model}
 
+In this particular case, the \acrshort{PN} model must be examined carefully,
+as it involves not only the condition variable itself
+but also the variable that holds the condition
+on which the blocked thread is waiting and the mutex
+that synchronizes access to that condition.
+
+This interaction can be extremely complex in general.
+For instance, the same condition variable could be used
+to signal an arbitrary number of distinct conditions.
+Accordingly, different mutexes may be passed as an argument to the call to \Rustinline{wait}.
+Furthermore, an arbitrary number of threads may wait on a condition variable and
+Rust supports the broadcast operation to awaken all waiting threads at once
+through the method \Rustinline{notify_all}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html\#method.notify_all}}
+(see Sec. \ref{sec:condition-variables}).
+Most importantly, the condition itself could be of any type
+and could take a long sequence of values during the execution,
+depending on which the waiting threads could act in diverse ways for every scenario.
+
+For the above reasons, it is unavoidable to make assumptions
+regarding the usage of condition variables that we aim to support
+to order to reduce the complexity of the task.
+Embracing and dealing with every possibility is beyond the scope of this thesis.
+
+\subsubsection{Assumptions}
+
+\begin{enumerate}
+      \item \emph{Single call}: There is only one call to \Rustinline{wait} per condition variable, i.e.,
+            \Rustinline{condvar.wait()} appears in a single place in the code for a given \Rustinline{condvar}.
+            For example, it can be inside of a loop but it cannot be in two different functions.
+      \item \emph{Single-element queue}: There is at most one waiting thread per condition variable.
+      \item \emph{Boolean condition}: The condition is a boolean flag. It is either set or not set.
+            Waiting on a condition that may take 3 or more values is \emph{not} supported by this model.
+      \item \emph{Mandatory set-condition / No ``false notify''}: If a thread locks the mutex and accesses the shared condition mutably,
+            then it always sets it to a different value.
+            In simpler terms, threads that look at the value, do not change it
+            and immediately after notify the condition variable are not supported.
+      \item \emph{Broadcast exclusion}: The method \Rustinline{std::sync::Condvar::notify_all} is out of scope.
+\end{enumerate}
+
+Support for multiple calls to \Rustinline{wait} and multiple waiting threads could be implemented
+but a considerable implementation effort is required.
+Alternatively, assumptions 1 and 2 can be overcome with the proposed model.
+
+Supporting non-boolean conditions
+and detecting when the value is set and when it is not
+necessitates a thorough reconsideration of the modeling approach
+for representing specific data values in simple Petri nets.
+Consequently, assumptions 3 and 4 are particularly challenging and
+could be the subject of future research into higher-lever models
+See Sec. \ref{sec:future-work-higher-level-models} for some thoughts to this effect.
+
+\subsubsection{Analysis of the proposed model}
+
+Fig. \ref{fig:condition-variable-model} depicts
+the \acrshort{PN} model used in the implementation.
+The same diagram in DOT and SVG format
+can be found in the repository as documentation.
+
+\begin{figure}[!htbp]
+      \centering
+      \includesvg[width=\linewidth]{condition-variable-model.svg}
+      \caption{The Petri net model for condition variables.}
+      \label{fig:condition-variable-model}
+\end{figure}
+
 \subsection{A practical example}
 
 \subsection{Algorithms for condition variable translation}
