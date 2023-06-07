@@ -180,6 +180,64 @@ the model produces the correct output for each scenario.
 
 \subsection{A practical example}
 
+Due to the size constraints of the resulting \acrshort{PN},
+we are compelled to select a small-scale program for demonstration purposes.
+It would be unfeasible to embed within a single page
+the complete \acrshort{PN} of a realistic program with condition variables and multiple threads.
+For more comprehensive examples, readers are encouraged to explore the repository,
+which contains a collection of more intricate programs included as part of the integration tests.
+
+Despite the space limitations, this example in Listing \ref{lst:condition-variable-example}
+comprises the core elements of the model presented before.
+The complete \acrshort{PN} can be seen in Fig. \ref{fig:condition-variable-example}.
+
+Observe the following sequence of transitions:
+
+\begin{enumerate}
+      \item The mutex is locked in \Rustinline{std_sync_Mutex_T_lock_0_CALL}.
+      \item \Rustinline{std_sync_Condvar_notify_one_0_CALL} sets a token in \Rustinline{CONDVAR_0_NOTIFY}.
+      \item The token flow continues to \Rustinline{main_BB5} right before \Rustinline{CONDVAR_0_WAIT_START}.
+\end{enumerate}
+
+It should be emphasized that no deadlock arises
+if the transition \Rustinline{CONDVAR_0_WAIT_START} fires
+\emph{before} \Rustinline{CONDVAR_0_LOST_SIGNAL}.
+In short, a conflict exists between \Rustinline{CONDVAR_0_WAIT_START}
+and \Rustinline{CONDVAR_0_LOST_SIGNAL} for the token in \Rustinline{CONDVAR_0_NOTIFY}.
+Nevertheless, the model checker verifies \emph{all} possible firings
+and it will uncover the missed signal case without difficulties.
+
+Another noteworthy observation is that this program illustrates
+the effect that the cleanup paths would have on missed signal detection.
+If there were a second transition
+at the same level as \Rustinline{CONDVAR_0_WAIT_START} or \Rustinline{std_sync_Condvar_notify_one_0_CALL},
+the token could ``escape'' to the \Rustinline{PROGRAM_PANIC} place and the deadlock would remain undetected.
+
+It is indispensable for the translation to ``force'' the Petri net to stay blocked
+and not open alternative paths that could be used by the model checker
+to come to the conclusion that the \acrshort{PN} never deadlocks.
+
+\begin{listing}[!htbp]
+      \begin{minted}{Rust}
+      fn main() {
+            let mutex = std::sync::Mutex::new(false);
+            let cvar = std::sync::Condvar::new();
+            let mutex_guard = mutex.lock().unwrap();
+            cvar.notify_one();
+            let _result = cvar.wait(mutex_guard);
+      }     
+      \end{minted}
+      \caption{A basic program to showcase condition variable translation.}
+      \label{lst:condition-variable-example}
+\end{listing}
+
+\begin{figure}[!htbp]
+      \centering
+      \includesvg[width=\linewidth]{condition-variable-example.svg}
+      \caption{The Petri net model for the program in Listing \ref{lst:condition-variable-example}.}
+      \label{fig:condition-variable-example}
+\end{figure}
+
 \subsection{Algorithms for condition variable translation}
 \label{sec:condvar-algorithms}
 
