@@ -125,6 +125,10 @@ Note the arcs between \Rustinline{condition_not_set} and \Rustinline{wait_start}
 The token is regenerated every time that \Rustinline{wait_start} fires.
 The same is true for \Rustinline{condition_set} and \Rustinline{wait_skip}.
 These arcs restore the condition places to their previous state.
+Modeling more than 2 values as a \acrshort{PN} would entail a more convoluted net,
+Besides, it would be impossible to know at compile time,
+how many possible values the condition takes to generate the correct number of places.
+This limitation is the justification for Assumptions 3 and 4.
 
 Now focus on the right side of Fig. \ref{fig:condition-variable-model}.
 In the middle of the condition variable, we find the place for the mutex.
@@ -221,7 +225,10 @@ or \Rustinline{std::sync::Condvar::wait_while} is encountered:
       \item Retrieve the \Rustinline{self} reference to the condition variable
             on which the function is called.
       \item Extract the mutex guard passed into the function.
-      \item Connect the start and end place to the
+      \item If the condition variable was already connected to a function call,
+            then the translation fails.
+            This enforces Assumptions 1 and 2 seen at the beginning of the section.
+      \item Otherwise, connect the start and end places to the
             \Rustinline{wait_start} and \Rustinline{notify_received} transitions respectively.
       \item Link the return value, the same mutex guard that was passed as an argument,
             to the \Rustinline{MutexGuard} structure.
