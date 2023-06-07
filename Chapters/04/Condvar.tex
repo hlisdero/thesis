@@ -149,9 +149,90 @@ for the thread to leave the wait: The mutex must be unlocked and \Rustinline{not
 To restore the initial state of the condition variable,
 it regenerates the token in \Rustinline{wait_enabled}.
 
+\subsubsection{Global translation requirements of the Petri net model}
+
+A fundamental challenge that surfaces
+during the implementation of the model in Fig. \ref{fig:condition-variable-model}
+is that connections across the blue frontier in the diagram cannot be established
+in general when processing the call to \Rustinline{wait}.
+We will analyze the problem and explain how the solution copes with it.
+
+The transition where the condition is set, named \Rustinline{set_condition} on the diagram,
+is the next candidate.
+In the current implementation, the transition selected to fulfill this role
+is the call to \Rustinline{std::ops::DerefMut::deref_mut}
+when a mutex or mutex guard is being dereferenced.
+
+Consider Listing \ref{lst:set-condition-example},
+yet another test program from the repository.
+In line 9, the mutex guard is dereferenced to write the value \Rustinline{true} to it,
+setting the condition for the condition variable.
+In the \acrshort{MIR}, this maps to a call to \Rustinline{std::ops::DerefMut::deref_mut}.
+Although it is not the exact place where the value is written
+(which would actually be a statement in \acrshort{BB}),
+it is close enough and it satisfies our needs.
+
+\begin{listing}[!htbp]
+      \begin{minted}{Rust}
+      fn main() {
+            let pair = std::sync::Arc::new((std::sync::Mutex::new(false), std::sync::Condvar::new()));
+            let pair2 = std::sync::Arc::clone(&pair);
+        
+            // Inside of our lock, spawn a new thread, and then wait for it to start.
+            std::thread::spawn(move || {
+                let (lock, cvar) = &*pair2;
+                let mut started = lock.lock().unwrap();
+                *started = true;
+                // We notify the condvar that the value has changed.
+                cvar.notify_one();
+            });
+        
+            // Wait for the thread to start up.
+            let (lock, cvar) = &*pair;
+            let mut started = lock.lock().unwrap();
+            while !*started {
+                started = cvar.wait(started).unwrap();
+            }
+      }              
+      \end{minted}
+      \caption{A basic program to showcase condition variable translation.}
+      \label{lst:set-condition-example}
+\end{listing}
+
+Unfortunately, the connections to the condition variable cannot be established
+when processing the call to \Rustinline{deref_mut} either.
+The reason is that there is no guarantee that the condition variable was already seen.
+It could still be ahead in the translation path.
+In Listing \ref{lst:set-condition-example}, the main thread is translated first,
+so the condition variable is discovered first.
+But if the roles of the threads are swapped, then the translation cannot be performed.
+
+We reach thus an unpleasing conclusion.
+In order to connect the model of the condition variable
+to the places that model the condition and the transitions where it is set,
+we need the whole \acrshort{PN}, i.e., we need \emph{global} information
+to translate the synchronization primitive effectively.
+
+As a result, it is unavoidable to incorporate some sort of postprocessing step
+to the translation.
+The tasks must also be performed in a specific order.
+The mutex must have been discovered first.
+Later it may be linked to a condition variable
+if such a condition variable is found (the source code may as well not use any).
+Hence, it is advisable to introduce a notion of ``priority'' to the postprocessing tasks.
+
+The \Rustinline{Translator} relies on a \Rustinline{std::collections::BinaryHeap} to
+implement a priority queue of
+\Rustinline{PostprocessingTask}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/function.rs\#L92}}.
+The tasks are returned by the methods that translate synchronization primitives if needed.
+After all the threads are translated, the \Rustinline{Translator}
+addresses the postprocessing tasks.
+By completing them according to their priority,
+we guarantee that the information is available in the required order.
+
 \subsubsection{Table of possible inputs and expected outputs}
 
-As a complement to the explanation in the previous subsection,
+As a complement to the explanation in the previous subsections,
 here is a table summarizing the expected output for a given input.
 The reader may compare Fig. \ref{fig:condition-variable-model} to verify that
 the model produces the correct output for each scenario.
@@ -187,7 +268,7 @@ the complete \acrshort{PN} of a realistic program with condition variables and m
 For more comprehensive examples, readers are encouraged to explore the repository,
 which contains a collection of more intricate programs included as part of the integration tests.
 
-Despite the space limitations, this example in Listing \ref{lst:condition-variable-example}
+Despite the space limitations, the example in Listing \ref{lst:condition-variable-example}
 comprises the core elements of the model presented before.
 The complete \acrshort{PN} can be seen in Fig. \ref{fig:condition-variable-example}.
 
