@@ -1,5 +1,28 @@
 \section{Condition variable (\texttt{std::sync::Condvar})}
 
+A condition variable is a synchronization primitive used in concurrent programming
+to enable threads to wait for a certain condition
+to become true before proceeding with their execution.
+Threads block and wait until they are notified by another thread
+that the desired condition has been met.
+Condition variables are typically associated with a mutex,
+which ensures exclusive access to the shared data that the condition depends on.
+When a thread waits on a condition variable, it releases the associated mutex,
+allowing other threads to make progress.
+When the condition becomes true or some event occurs,
+a notifying thread signals the condition variable,
+allowing one or more waiting threads to resume their execution.
+
+The semantics of condition variables, as well as examples in pseudocode,
+were introduced in Sec. \ref{sec:condition-variables}.
+The understanding of the precise behavior of condition variables in all circumstances
+is a prerequisite for this section.
+
+This section provides an elaborate explanation of the \acrshort{PN} model
+used to represent condition variables from the Rust standard library.
+It is followed by a practical example that aims to enhance the clarity of the concepts.
+Finally, the algorithms for the translation of condition variable functions are outlined.
+
 \subsection{Petri net model}
 
 \subsection{A practical example}
@@ -14,48 +37,48 @@ The additions required to the mutex algorithms are included afterward as well.
 When a call to \Rustinline{std::sync::Condvar::new} is encountered:
 
 \begin{enumerate}
-  \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
-  \item Create a new \Rustinline{Condvar}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/condvar.rs}}
-        structure with an index to identify it unequivocally across the Petri net.
-  \item Link the return value of \Rustinline{std::sync::Condvar::new},
-        the new condition variable, to the \Rustinline{Condvar} structure.
+      \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
+      \item Create a new \Rustinline{Condvar}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/condvar.rs}}
+            structure with an index to identify it unequivocally across the Petri net.
+      \item Link the return value of \Rustinline{std::sync::Condvar::new},
+            the new condition variable, to the \Rustinline{Condvar} structure.
 \end{enumerate}
 
 When a call to \Rustinline{std::sync::Condvar::notify_one} is encountered:
 
 \begin{enumerate}
-  \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
-        Ignore the cleanup place because, otherwise, any call may fail,
-        which amounts to the notify operation not being present in the program,
-        leading to a false lost signal.
-        This is equivalent to assuming that the \Rustinline{notify_one} function never fails.
-  \item Retrieve the \Rustinline{self} reference to the condition variable
-        on which the function is called.
-  \item Add an arc from the transition representing the function call
-        to the \Rustinline{notify} place of the underlying condition variable.
+      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
+            Ignore the cleanup place because, otherwise, any call may fail,
+            which amounts to the notify operation not being present in the program,
+            leading to a false lost signal.
+            This is equivalent to assuming that the \Rustinline{notify_one} function never fails.
+      \item Retrieve the \Rustinline{self} reference to the condition variable
+            on which the function is called.
+      \item Add an arc from the transition representing the function call
+            to the \Rustinline{notify} place of the underlying condition variable.
 \end{enumerate}
 
 When a call to \Rustinline{std::sync::Condvar::wait}
 or \Rustinline{std::sync::Condvar::wait_while} is encountered:
 
 \begin{enumerate}
-  \item Ignore the cleanup place because, otherwise, any call may fail,
-        which amounts to the wait operation not being present in the program,
-        leading to an incorrect result.
-        We must force the Petri net
-        to ``wait'' for the notifying signal to be sent.
-        This is equivalent to assuming that the \Rustinline{wait}
-        or \Rustinline{wait_while} function never fails.
-  \item Retrieve the \Rustinline{self} reference to the condition variable
-        on which the function is called.
-  \item Extract the mutex guard passed into the function.
-  \item Connect the start and end place to the
-        \Rustinline{wait_start} and \Rustinline{notify_received} transitions respectively.
-  \item Link the return value, the same mutex guard that was passed as an argument,
-        to the \Rustinline{MutexGuard} structure.
-  \item Notify the translator that the mutex received must be linked to this \Rustinline{Condvar}.
-        For this purpose, use the enum variant \Rustinline{PostprocessingTask::LinkMutexToCondvar}.
-        This task will be processed after translating all the threads.
+      \item Ignore the cleanup place because, otherwise, any call may fail,
+            which amounts to the wait operation not being present in the program,
+            leading to an incorrect result.
+            We must force the Petri net
+            to ``wait'' for the notifying signal to be sent.
+            This is equivalent to assuming that the \Rustinline{wait}
+            or \Rustinline{wait_while} function never fails.
+      \item Retrieve the \Rustinline{self} reference to the condition variable
+            on which the function is called.
+      \item Extract the mutex guard passed into the function.
+      \item Connect the start and end place to the
+            \Rustinline{wait_start} and \Rustinline{notify_received} transitions respectively.
+      \item Link the return value, the same mutex guard that was passed as an argument,
+            to the \Rustinline{MutexGuard} structure.
+      \item Notify the translator that the mutex received must be linked to this \Rustinline{Condvar}.
+            For this purpose, use the enum variant \Rustinline{PostprocessingTask::LinkMutexToCondvar}.
+            This task will be processed after translating all the threads.
 \end{enumerate}
 
 \subsubsection{Modifications to the mutex algorithms}
@@ -66,35 +89,35 @@ perform missed signal detection.
 Add the following to the handler of the \Rustinline{std::sync::Mutex::new} function:
 
 \begin{enumerate}
-  \item Notify the translator that a new mutex has been created.
-        For this purpose, use the enum variant \Rustinline{PostprocessingTask::NewMutex}.
-        This task will be processed after translating all the threads.
+      \item Notify the translator that a new mutex has been created.
+            For this purpose, use the enum variant \Rustinline{PostprocessingTask::NewMutex}.
+            This task will be processed after translating all the threads.
 \end{enumerate}
 
 When a call to \Rustinline{std::result::Result::<T, E>::unwrap} is encountered:
 
 \begin{enumerate}
-  \item Check that the \Rustinline{self} reference is a mutex or a mutex guard.
-  \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
-        Ignore the cleanup place because, otherwise, any call may fail,
-        as if the mutex lock operation
-        were not present in the program, leading to a false lost signal.
-        This is equivalent to assuming that the \Rustinline{unwrap} function never fails
-        when applied to a variable linked to a mutex or a mutex guard.
+      \item Check that the \Rustinline{self} reference is a mutex or a mutex guard.
+      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
+            Ignore the cleanup place because, otherwise, any call may fail,
+            as if the mutex lock operation
+            were not present in the program, leading to a false lost signal.
+            This is equivalent to assuming that the \Rustinline{unwrap} function never fails
+            when applied to a variable linked to a mutex or a mutex guard.
 \end{enumerate}
 
 When a call to \Rustinline{std::ops::Deref::deref}
 or \Rustinline{std::ops::DerefMut::deref_mut} is encountered:
 
 \begin{enumerate}
-  \item Check that the \Rustinline{self} reference is a mutex or a mutex guard.
-  \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
-        Ignore the cleanup place because, otherwise, any call may fail,
-        as if the mutex lock operation
-        were not present in the program, leading to a false lost signal.
-        This is equivalent to assuming that the \Rustinline{deref}
-        and \Rustinline{deref_mut} functions never fail
-        when dereferencing a variable linked to a mutex or a mutex guard.
+      \item Check that the \Rustinline{self} reference is a mutex or a mutex guard.
+      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
+            Ignore the cleanup place because, otherwise, any call may fail,
+            as if the mutex lock operation
+            were not present in the program, leading to a false lost signal.
+            This is equivalent to assuming that the \Rustinline{deref}
+            and \Rustinline{deref_mut} functions never fail
+            when dereferencing a variable linked to a mutex or a mutex guard.
 \end{enumerate}
 
 It should now be clear to the reader that the algorithms for missed signal detection are
