@@ -49,10 +49,10 @@ that can be consumed by a locking transition.
 Two types of transitions may unlock the mutex:
 
 \begin{enumerate}
-  \item A \Rustinline{Drop} terminator (Sec. \ref{sec:terminators})
-        when the dropped place is of type \Rustinline{std::sync::MutexGuard}.
-  \item The transition for a call to \Rustinline{std::mem::Drop},
-        which frees the memory occupied by the value passed in explicitly.
+      \item A \Rustinline{Drop} terminator (Sec. \ref{sec:terminators})
+            when the dropped place is of type \Rustinline{std::sync::MutexGuard}.
+      \item The transition for a call to \Rustinline{std::mem::Drop},
+            which frees the memory occupied by the value passed in explicitly.
 \end{enumerate}
 
 By connecting the mutex place
@@ -88,10 +88,10 @@ which highlights the importance of following the mutex guards throughout the \ac
 using the strategy explained in Sec. \ref{sec:intercepting-assignments}.
 
 \begin{figure}[!htbp]
-  \centering
-  \includesvg[width=0.95\linewidth]{mutex-example.svg}
-  \caption{The Petri net model for the program in Listing \ref{lst:double-lock-deadlock}.}
-  \label{fig:mutex-example}
+      \centering
+      \includesvg[width=0.95\linewidth]{mutex-example.svg}
+      \caption{The Petri net model for the program in Listing \ref{lst:double-lock-deadlock}.}
+      \label{fig:mutex-example}
 \end{figure}
 
 \subsection{Algorithms for mutex translation}
@@ -103,45 +103,45 @@ employed in the translation of mutex functions.
 When a call to \Rustinline{std::sync::Mutex::new} is encountered:
 
 \begin{enumerate}
-  \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
-  \item Create a new \Rustinline{Mutex}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/mutex.rs}}
-        structure with an index to identify it unequivocally across the Petri net.
-  \item Link the return value of \Rustinline{std::sync::Mutex::new},
-        the new mutex, to the \Rustinline{Mutex} structure.
+      \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
+      \item Create a new \Rustinline{Mutex}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/mutex.rs}}
+            structure with an index to identify it unequivocally across the \acrshort{PN}.
+      \item Link the return value of \Rustinline{std::sync::Mutex::new},
+            the new mutex, to the \Rustinline{Mutex} structure.
 \end{enumerate}
 
 When a call to \Rustinline{std::sync::Mutex::lock} is encountered:
 
 \begin{enumerate}
-  \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
-        Ignore the cleanup place since we must force the Petri net
-        to ``wait'' for the mutex place to be marked.
-        This is equivalent to assuming that the \Rustinline{lock} function never fails.
-  \item Retrieve the \Rustinline{self} reference to the mutex on which the function is called.
-  \item Add an arc from the underlying mutex place to the transition representing the function call.
-  \item Create a new \Rustinline{MutexGuard} with a reference to the \Rustinline{Mutex}.
-  \item Link the return value of \Rustinline{std::sync::Mutex::lock},
-        the new mutex guard, to the \Rustinline{MutexGuard} structure.
+      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
+            Ignore the cleanup place since we must force the \acrshort{PN}
+            to ``wait'' for the mutex place to be marked.
+            This is equivalent to assuming that the \Rustinline{lock} function never fails.
+      \item Retrieve the \Rustinline{self} reference to the mutex on which the function is called.
+      \item Add an arc from the underlying mutex place to the transition representing the function call.
+      \item Create a new \Rustinline{MutexGuard} with a reference to the \Rustinline{Mutex}.
+      \item Link the return value of \Rustinline{std::sync::Mutex::lock},
+            the new mutex guard, to the \Rustinline{MutexGuard} structure.
 \end{enumerate}
 
 When a call to \Rustinline{std::mem::drop} is encountered:
 
 \begin{enumerate}
-  \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
-  \item Extract the variable passed into the function.
-  \item If the variable is linked to a mutex guard,
-        add an arc from the transition of the function call to the mutex place.
-  \item If a cleanup place was provided,
-        add an unlock arc from the cleanup transition to the mutex place too.
+      \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
+      \item Extract the variable passed into the function.
+      \item If the variable is linked to a mutex guard,
+            add an arc from the transition of the function call to the mutex place.
+      \item If a cleanup place was provided,
+            add an unlock arc from the cleanup transition to the mutex place too.
 \end{enumerate}
 
 When a terminator of kind \Rustinline{rustc_middle::mir::TerminatorKind::Drop} is encountered:
 
 \begin{enumerate}
-  \item If the variable to be dropped is linked to a mutex guard,
-        add an arc from the transition of the function call to the mutex place.
-  \item If a cleanup place was supplied,
-        add an unlock arc from the drop unwind transition to the mutex place too.
+      \item If the variable to be dropped is linked to a mutex guard,
+            add an arc from the transition of the function call to the mutex place.
+      \item If a cleanup place was supplied,
+            add an unlock arc from the drop unwind transition to the mutex place too.
 \end{enumerate}
 
 In the upcoming section,

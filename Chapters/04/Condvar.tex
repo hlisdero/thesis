@@ -39,7 +39,7 @@ When a call to \Rustinline{std::sync::Condvar::new} is encountered:
 \begin{enumerate}
       \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
       \item Create a new \Rustinline{Condvar}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/condvar.rs}}
-            structure with an index to identify it unequivocally across the Petri net.
+            structure with an index to identify it unequivocally across the \acrshort{PN}.
       \item Link the return value of \Rustinline{std::sync::Condvar::new},
             the new condition variable, to the \Rustinline{Condvar} structure.
 \end{enumerate}
@@ -65,7 +65,7 @@ or \Rustinline{std::sync::Condvar::wait_while} is encountered:
       \item Ignore the cleanup place because, otherwise, any call may fail,
             which amounts to the wait operation not being present in the program,
             leading to an incorrect result.
-            We must force the Petri net
+            We must force the \acrshort{PN}
             to ``wait'' for the notifying signal to be sent.
             This is equivalent to assuming that the \Rustinline{wait}
             or \Rustinline{wait_while} function never fails.

@@ -175,7 +175,7 @@ When a call to \Rustinline{std::thread::JoinHandle::join} is encountered:
 
 \begin{enumerate}
       \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
-            Ignore the cleanup place since we must force the Petri net
+            Ignore the cleanup place since we must force the \acrshort{PN}
             to ``wait'' for the thread to exit.
             This is equivalent to assuming that the \Rustinline{join} function never fails.
       \item Retrieve the first argument passed to the function: The join handle.
