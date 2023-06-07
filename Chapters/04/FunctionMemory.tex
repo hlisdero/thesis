@@ -290,6 +290,15 @@ from the constituents of the aggregated value that are a synchronization variabl
 This implies that the \Rustinline{Memory} solely retains the portion of the aggregated value
 formed by the synchronization variables.
 
+Tracking the assignments of synchronization variables
+at the moment they are returned from functions is another crucial mechanism.
+Fortunately, this can be accomplished by implementing a consistent check on all functions,
+regardless of whether they are modeled using
+the simple model (Fig. \ref{fig:simplest-function})
+or the function with cleanup model (Fig. \ref{fig:function-with-cleanup}).
+As a benefit, this uniform design readily supports \Rustinline{std::arc::Arc}
+without requiring any additional effort.
+
 In every instance, the handling of assignments has no impact on the Petri net.
 No places or transitions are added when intercepting assignments.
 
