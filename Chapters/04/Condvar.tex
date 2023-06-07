@@ -146,6 +146,29 @@ or \Rustinline{std::sync::Condvar::wait_while} is encountered:
             This task will be processed after translating all the threads.
 \end{enumerate}
 
+When all the threads finished translating, that is,
+when the queue of threads to process is empty,
+the \Rustinline{Translator} enters a loop
+to complete the postprocessing tasks by priority order:
+
+\begin{enumerate}
+      \item Create at the beginning of the loop an empty vector of mutex references.
+      \item Pop from the \Rustinline{std::collections::BinaryHeap} the task with the lowest priority.
+            This will be by design a \Rustinline{PostprocessingTask::NewMutex}.
+            Add the mutex reference to the vector.
+      \item After processing all the lower priority tasks,
+            the \Rustinline{Translator} has references to all the mutexes in the code.
+            Continue popping tasks from the priority queue.
+      \item Eventually, a \Rustinline{PostprocessingTask::LinkMutexToCondvar} is extracted.
+            Link each mutex to the condition variable,
+            which creates the places \Rustinline{condition_set}
+            and \Rustinline{condition_not_set} for the condition.
+            It also connects the \Rustinline{deref_mut} transitions
+            to these places to set the condition.
+            Lastly, it connects the condition places to the condition variable transitions
+            to disable the \Rustinline{wait}.
+\end{enumerate}
+
 \subsubsection{Modifications to the mutex algorithms}
 
 As stated before, the mutex algorithms require some additions to successfully
@@ -183,6 +206,12 @@ or \Rustinline{std::ops::DerefMut::deref_mut} is encountered:
             This is equivalent to assuming that the \Rustinline{deref}
             and \Rustinline{deref_mut} functions never fail
             when dereferencing a variable linked to a mutex or a mutex guard.
+      \item If the value is being dereferenced mutably (\Rustinline{deref_mut}),
+            extract the first argument passed to the function: The mutex or mutex guard.
+            Add the \Rustinline{deref_mut} transition to the mutex
+            to set the condition for a condition variable in the postprocessing step.
+      \item Otherwise do nothing.
+            The immutable case does not need to be added to the mutex.
 \end{enumerate}
 
 It should now be clear to the reader that the algorithms for missed signal detection are
