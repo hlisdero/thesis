@@ -1,10 +1,10 @@
 \section{Condition variable (\texttt{std::sync::Condvar})}
 
 A condition variable is a synchronization primitive used in concurrent programming
-to enable threads to wait for a certain condition
-to become true before proceeding with their execution.
-Threads block and wait until they are notified by another thread
+to enable threads to wait for a certain condition before proceeding with their execution.
+Threads wait until they are notified by another thread
 that the desired condition has been met.
+
 Condition variables are typically associated with a mutex,
 which ensures exclusive access to the shared data that the condition depends on.
 When a thread waits on a condition variable, it releases the associated mutex,
@@ -28,14 +28,15 @@ Finally, the algorithms for the translation of condition variable functions are 
 In this particular case, the \acrshort{PN} model must be examined carefully,
 as it involves not only the condition variable itself
 but also the variable that holds the condition
-on which the blocked thread is waiting and the mutex
+on which the blocked thread is waiting \emph{and} the mutex
 that synchronizes access to that condition.
 
 This interaction can be extremely complex in general.
 For instance, the same condition variable could be used
 to signal an arbitrary number of distinct conditions.
-Accordingly, different mutexes may be passed as an argument to the call to \Rustinline{wait}.
-Furthermore, an arbitrary number of threads may wait on a condition variable and
+Accordingly, different mutexes may be passed
+as an argument to the \Rustinline{wait} call.
+Furthermore, an arbitrary number of threads may block on a condition variable and
 Rust supports the broadcast operation to awaken all waiting threads at once
 through the method \Rustinline{notify_all}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html\#method.notify_all}}
 (see Sec. \ref{sec:condition-variables}).
@@ -44,7 +45,7 @@ and could take a long sequence of values during the execution,
 depending on which the waiting threads could act in diverse ways for every scenario.
 
 For the above reasons, it is unavoidable to make assumptions
-regarding the usage of condition variables that we aim to support
+regarding the supported use cases of condition variables
 in order to reduce the complexity of the task.
 Embracing and dealing with every possibility is beyond the scope of this thesis.
 
@@ -52,7 +53,7 @@ Embracing and dealing with every possibility is beyond the scope of this thesis.
 
 \begin{enumerate}
       \item \emph{Single call}: There is only one call to \Rustinline{wait} per condition variable, i.e.,
-            \Rustinline{condvar.wait()} appears in a single place in the code for a given \Rustinline{condvar}.
+            \Rustinline{condvar.wait()} appears in a single place in the source code for a given \Rustinline{condvar}.
             For example, it can be inside of a loop but it cannot be in two different functions.
       \item \emph{Single-element queue}: There is at most one waiting thread per condition variable.
       \item \emph{Boolean condition}: The condition is a boolean flag. It is either set or not set.
@@ -60,27 +61,27 @@ Embracing and dealing with every possibility is beyond the scope of this thesis.
       \item \emph{Mandatory set-condition / No ``false notify''}: If a thread locks the mutex and accesses the shared condition mutably,
             then it always sets it to a different value.
             In simpler terms, threads that look at the value, do not change it
-            and immediately after notify the condition variable are not supported.
+            and immediately notify the condition variable are \emph{not} supported.
       \item \emph{Broadcast exclusion}: The method \Rustinline{std::sync::Condvar::notify_all} is out of scope.
 \end{enumerate}
 
 Support for multiple calls to \Rustinline{wait} and multiple waiting threads could be implemented
 but a considerable implementation effort is required.
-Alternatively, assumptions 1 and 2 can be overcome with the proposed model.
+Therefore, assumptions 1 and 2 can be overcome with the proposed model.
 
 Supporting non-boolean conditions
-and detecting when the value is set and when it is not
+and detecting which value is set
 necessitates a thorough reconsideration of the modeling approach
-for representing specific data values in simple Petri nets.
+for representing concrete data values in simple Petri nets.
 Consequently, assumptions 3 and 4 are particularly challenging and
-could be the subject of future research into higher-lever models
+could be the subject of future research into higher-lever models.
 See Sec. \ref{sec:future-work-higher-level-models} for some thoughts to this effect.
 
 \subsubsection{Analysis of the proposed model}
 
 Fig. \ref{fig:condition-variable-model} depicts
 the \acrshort{PN} model used in the implementation.
-The same diagram in DOT and SVG format
+The same diagram in DOT, PNG, and SVG format
 can be found in the repository as documentation.
 
 \begin{figure}[!htbp]
@@ -90,10 +91,66 @@ can be found in the repository as documentation.
       \label{fig:condition-variable-model}
 \end{figure}
 
+The input places are:
+
+\begin{itemize}
+      \item \Rustinline{input}: The start place of the wait function.
+            The model supports the methods from the standard library \Rustinline{std::sync::Condvar::wait}
+            and its variation \Rustinline{std::sync::Condvar::wait_while}.
+      \item \Rustinline{condition_not_set}: The place is marked when the condition is \Rustinline{false}.
+      \item \Rustinline{condition_set}: The place is marked when the condition is \Rustinline{true}.
+      \item \Rustinline{notify}: The place where the notifying thread places a token to wake up the waiting thread.
+\end{itemize}
+
+The \Rustinline{output} place is the end place
+of the function call to \Rustinline{wait} or \Rustinline{wait_while}.
+The execution of the thread continues from there.
+
+Two possible ways exist to go
+from \Rustinline{input} to \Rustinline{output}, represented by two transitions:
+
+\begin{itemize}
+      \item \Rustinline{wait_start}: This is the ``common case'', the thread blocks and waits for the signal.
+      \item \Rustinline{wait_skip}: This is the alternative path that the token takes when the condition was already set.
+            The thread does not wait, instead, it skips the wait and reaches \Rustinline{output} in a single jump.
+\end{itemize}
+
+It is essential to notice that the greyed-out part
+on the left of Fig. \ref{fig:condition-variable-model}
+controls which transition is enabled and which transition is disabled.
+As soon as a token is set in \Rustinline{condition_set}, \Rustinline{wait_start} is disabled.
+Before that, the opposite is true: \Rustinline{wait_start} may fire but \Rustinline{wait_skip} may not.
+
+Note the arcs between \Rustinline{condition_not_set} and \Rustinline{wait_start}.
+The token is regenerated every time that \Rustinline{wait_start} fires.
+The same is true for \Rustinline{condition_set} and \Rustinline{wait_skip}.
+These arcs restore the condition places to their previous state.
+
+Now focus on the right side of Fig. \ref{fig:condition-variable-model}.
+In the middle of the condition variable, we find the place for the mutex.
+As expected, it is unlocked when the wait starts
+and it is locked when the notify is received.
+
+The place labeled \Rustinline{wait_enabled} plays an important role.
+On the one hand, it consumes the token from \Rustinline{notify}
+if \Rustinline{wait_start} was not fired.
+This is the archetypical missed signal case that we would like to detect.
+On the other hand, the token in \Rustinline{wait_enabled}
+is consumed when \Rustinline{wait_start} fires,
+This prevents the condition variable from ``accepting'' other threads (Assumption 2)
+and preserves the token in \Rustinline{notify}, ensuring that the missed signal cannot occur.
+
+Finally, the \Rustinline{notify_received} transition combines the requisites
+for the thread to leave the wait: The mutex must be unlocked and \Rustinline{notify_one} was called.
+To restore the initial state of the condition variable,
+it regenerates the token in \Rustinline{wait_enabled}.
+
 \subsubsection{Table of possible inputs and expected outputs}
 
 As a complement to the explanation in the previous subsection,
 here is a table summarizing the expected output for a given input.
+The reader may compare Fig. \ref{fig:condition-variable-model} to verify that
+the model produces the correct output for each scenario.
 
 \begin{table}[!htb]
       \centering
