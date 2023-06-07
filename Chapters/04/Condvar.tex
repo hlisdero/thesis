@@ -45,7 +45,7 @@ depending on which the waiting threads could act in diverse ways for every scena
 
 For the above reasons, it is unavoidable to make assumptions
 regarding the usage of condition variables that we aim to support
-to order to reduce the complexity of the task.
+in order to reduce the complexity of the task.
 Embracing and dealing with every possibility is beyond the scope of this thesis.
 
 \subsubsection{Assumptions}
@@ -89,6 +89,33 @@ can be found in the repository as documentation.
       \caption{The Petri net model for condition variables.}
       \label{fig:condition-variable-model}
 \end{figure}
+
+\subsubsection{Table of possible inputs and expected outputs}
+
+As a complement to the explanation in the previous subsection,
+here is a table summarizing the expected output for a given input.
+
+\begin{table}[h!]\
+      \centering
+      \begin{tabular}{ |c|c|c|c|l| }
+            \hline
+            Row \# & \multicolumn{3}{|c|}{Input} & Output                                                                                                            \\
+            \hline
+                   & \Rustinline{condition_set}  & \Rustinline{wait_enabled} & \Rustinline{notify} & \emph{where the initial token at \Rustinline{input} ends}       \\
+            \hline
+            R1     & False                       & False                     & False               & \Rustinline{waiting} (waiting for a \Rustinline{notify})        \\
+            R2     & False                       & False                     & True                & \Rustinline{output} (correct wait end condition)                \\
+            R3     & False                       & True                      & False               & \Rustinline{input} (initial state)                              \\
+            R4     & False                       & True                      & True                & \emph{lost signal (transient state, goes to R1)}                \\
+            R5     & True                        & False                     & False               & \Rustinline{waiting} (condition set, needs \Rustinline{notify}) \\
+            R6     & True                        & False                     & True                & \Rustinline{waiting} (correct wait end condition)               \\
+            R7     & True                        & True                      & False               & \Rustinline{output} (skip the wait)                             \\
+            R8     & True                        & True                      & True                & \Rustinline{output} (skip the wait, with lost signal)           \\
+            \hline
+      \end{tabular}
+      \caption{A summary of the possible states of the Petri net model for condition variables.}
+      \label{table:condition-variable-model-states}
+\end{table}
 
 \subsection{A practical example}
 
