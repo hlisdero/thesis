@@ -229,8 +229,8 @@ On the one hand, the translator functions responsible for processing the methods
 of mutexes, condition variables, and threads create new synchronization variables
 that are linked to the return value of the corresponding method.
 This is where the lifetime of each synchronization variable starts.
-The specifics are expanded upon in Sec. \ref{sec:mutex-algorithms},
-\ref{sec:mutex-guard-algorithms}, and \ref{sec:condvar-algorithms}.
+The specifics are expanded upon
+in Sec. \ref{sec:mutex-algorithms} and \ref{sec:condvar-algorithms}.
 
 On the other hand, the synchronization variable may be assigned in any other \acrshort{BB}.
 For this reason, the translator incorporates a custom implementation of the method
