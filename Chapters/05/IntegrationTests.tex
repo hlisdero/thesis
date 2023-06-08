@@ -1,2 +1,68 @@
 \section{Integration tests}
 \label{sec:integration-tests}
+
+We will now examine the integration tests,
+which serve as the foundation for the translator's testing framework.
+Two types of tests exist currently:
+
+\begin{itemize}
+  \item Translation tests.
+  \item Deadlock detection tests.
+\end{itemize}
+
+\subsection{Translation tests}
+
+In translation tests, a given program is processed
+\emph{without} performing the deadlock analysis.
+As a result, three text files containing the model
+in DOT, \acrshort{PNML}, and \acrshort{LoLA} formats are generated.
+These files are then compared to the expected output,
+which is stored in the repository and serves as documentation as well.
+
+The expected output was verified manually
+using the tools presented in Sec. \ref{sec:visualizing-results}.
+It was committed to the repository
+when the translator was first able to pass the test.
+If a regression in \emph{rustc} occurs,
+then the expected output files are updated accordingly.
+This has happened some times in the past.
+See for instance
+this commit\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/881a3873a3b060e70bc727f670f9426d14327fa2}}
+or this one\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/b032fa3cc13e631950a802dcd3f755c548afde86}}.
+
+\subsection{Deadlock detection tests}
+
+Deadlock detection tests are closer to an end-to-end test of the translator.
+They generate the file in \acrshort{LoLA} format for the test program
+and instruct the translator to perform the deadlock analysis.
+The output is then contrasted to the known behavior of the test program, i.e.,
+it deadlocks or it does not deadlock.
+If \acrshort{LoLA} produces an incorrect result, then the test fails.
+In such a case, the \acrshort{PN} model should be analyzed
+to find the source of the error.
+
+\subsection{Test structure}
+
+The test programs are in the folder \Rustinline{examples/programs}.
+For each test program, there is a folder in \Rustinline{examples/results}
+that contains the three files
+\Rustinline{net.dot}, \Rustinline{net.pnml}, and \Rustinline{net.lola}.
+
+The tests are grouped into categories:
+
+\begin{itemize}
+  \item Basic: For basic programs like ``Hello, World!'' and a simple arithmetic calculator.
+  \item Condvar: For programs concerning condition variables.
+  \item Function call: For programs that test different types
+        of function calls seen in Sec. \ref{sec:function-calls}.
+  \item Mutex: For programs that use mutexes.
+  \item Statement: For programs that test specific constructs such as a \Rustinline{match},
+        an infinite loop, an \Rustinline{Option}, a call to \Rustinline{panic!},
+        or \Rustinline{std::process::abort}.
+  \item Thread: For programs involving multiple threads.
+\end{itemize}
+
+The structure of the folders in \Rustinline{examples/} mimics the file structure
+of the integration tests in \Rustinline{tests/}.
+As usual, the whole test suite can be run with the \Rustinline{cargo test} command.
+
