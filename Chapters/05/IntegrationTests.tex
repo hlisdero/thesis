@@ -6,8 +6,8 @@ which serve as the backbone for the translator's testing framework.
 Two types of tests exist currently:
 
 \begin{itemize}
-    \item Translation tests.
-    \item Deadlock detection tests.
+  \item Translation tests.
+  \item Deadlock detection tests.
 \end{itemize}
 
 The testing process has proven invaluable throughout the development of the translator,
@@ -63,87 +63,87 @@ The repository contains several other examples,
 all of which are used in the integration tests.
 
 \begin{longlisting}
-    \begin{minted}{Rust}
-    PLACE
-        MUTEX_0,
-        PROGRAM_END,
-        PROGRAM_PANIC,
-        PROGRAM_START,
-        main_BB1,
-        main_BB2,
-        main_BB3,
-        main_BB4,
-        main_BB5,
-        main_BB6,
-        main_BB7;
-    
-    MARKING
-        MUTEX_0 : 1,
-        PROGRAM_END : 0,
-        PROGRAM_PANIC : 0,
-        PROGRAM_START : 1,
-        main_BB1 : 0,
-        main_BB2 : 0,
-        main_BB3 : 0,
-        main_BB4 : 0,
-        main_BB5 : 0,
-        main_BB6 : 0,
-        main_BB7 : 0;
-    
-    TRANSITION main_DROP_3
-      CONSUME
-        main_BB3 : 1;
-      PRODUCE
-        MUTEX_0 : 1,
-        main_BB4 : 1;
-    TRANSITION main_DROP_4
-      CONSUME
-        main_BB4 : 1;
-      PRODUCE
-        MUTEX_0 : 1,
-        main_BB5 : 1;
-    TRANSITION main_DROP_6
-      CONSUME
-        main_BB6 : 1;
-      PRODUCE
-        MUTEX_0 : 1,
-        main_BB7 : 1;
-    TRANSITION main_DROP_UNWIND_3
-      CONSUME
-        main_BB3 : 1;
-      PRODUCE
-        MUTEX_0 : 1,
-        main_BB6 : 1;
-    TRANSITION main_RETURN
-      CONSUME
-        main_BB5 : 1;
-      PRODUCE
-        PROGRAM_END : 1;
-    TRANSITION main_UNWIND_7
-      CONSUME
-        main_BB7 : 1;
-      PRODUCE
-        PROGRAM_PANIC : 1;
-    TRANSITION std_sync_Mutex_T_lock_0_CALL
-      CONSUME
-        MUTEX_0 : 1,
-        main_BB1 : 1;
-      PRODUCE
-        main_BB2 : 1;
-    TRANSITION std_sync_Mutex_T_lock_1_CALL
-      CONSUME
-        MUTEX_0 : 1,
-        main_BB2 : 1;
-      PRODUCE
-        main_BB3 : 1;
-    TRANSITION std_sync_Mutex_T_new_0_CALL
-      CONSUME
-        PROGRAM_START : 1;
-      PRODUCE
-        main_BB1 : 1;    
-    \end{minted}
-    \caption{The LoLA output for the program in Listing \ref{lst:double-lock-deadlock}}
-    \label{lst:double-lock-deadlock-lola}
+  \begin{minted}{Rust}
+  PLACE
+      MUTEX_0,
+      PROGRAM_END,
+      PROGRAM_PANIC,
+      PROGRAM_START,
+      main_BB1,
+      main_BB2,
+      main_BB3,
+      main_BB4,
+      main_BB5,
+      main_BB6,
+      main_BB7;
+  
+  MARKING
+      MUTEX_0 : 1,
+      PROGRAM_END : 0,
+      PROGRAM_PANIC : 0,
+      PROGRAM_START : 1,
+      main_BB1 : 0,
+      main_BB2 : 0,
+      main_BB3 : 0,
+      main_BB4 : 0,
+      main_BB5 : 0,
+      main_BB6 : 0,
+      main_BB7 : 0;
+  
+  TRANSITION main_DROP_3
+    CONSUME
+      main_BB3 : 1;
+    PRODUCE
+      MUTEX_0 : 1,
+      main_BB4 : 1;
+  TRANSITION main_DROP_4
+    CONSUME
+      main_BB4 : 1;
+    PRODUCE
+      MUTEX_0 : 1,
+      main_BB5 : 1;
+  TRANSITION main_DROP_6
+    CONSUME
+      main_BB6 : 1;
+    PRODUCE
+      MUTEX_0 : 1,
+      main_BB7 : 1;
+  TRANSITION main_DROP_UNWIND_3
+    CONSUME
+      main_BB3 : 1;
+    PRODUCE
+      MUTEX_0 : 1,
+      main_BB6 : 1;
+  TRANSITION main_RETURN
+    CONSUME
+      main_BB5 : 1;
+    PRODUCE
+      PROGRAM_END : 1;
+  TRANSITION main_UNWIND_7
+    CONSUME
+      main_BB7 : 1;
+    PRODUCE
+      PROGRAM_PANIC : 1;
+  TRANSITION std_sync_Mutex_T_lock_0_CALL
+    CONSUME
+      MUTEX_0 : 1,
+      main_BB1 : 1;
+    PRODUCE
+      main_BB2 : 1;
+  TRANSITION std_sync_Mutex_T_lock_1_CALL
+    CONSUME
+      MUTEX_0 : 1,
+      main_BB2 : 1;
+    PRODUCE
+      main_BB3 : 1;
+  TRANSITION std_sync_Mutex_T_new_0_CALL
+    CONSUME
+      PROGRAM_START : 1;
+    PRODUCE
+      main_BB1 : 1;    
+  \end{minted}
+  \caption{The LoLA output for the program in Listing \ref{lst:double-lock-deadlock}.}
+  \label{lst:double-lock-deadlock-lola}
 \end{longlisting}
 
 \subsection{Test structure}
@@ -156,15 +156,15 @@ that contains the three files
 The tests are grouped into categories:
 
 \begin{itemize}
-    \item Basic: For basic programs like ``Hello, World!'' and a simple arithmetic calculator.
-    \item Condvar: For programs concerning condition variables.
-    \item Function call: For programs that test different types
-          of function calls seen in Sec. \ref{sec:function-calls}.
-    \item Mutex: For programs that use mutexes.
-    \item Statement: For programs that test specific constructs such as a \Rustinline{match},
-          an infinite loop, an \Rustinline{Option}, a call to \Rustinline{panic!},
-          or \Rustinline{std::process::abort}.
-    \item Thread: For programs involving multiple threads.
+  \item Basic: For basic programs like ``Hello, World!'' and a simple arithmetic calculator.
+  \item Condvar: For programs concerning condition variables.
+  \item Function call: For programs that test different types
+        of function calls seen in Sec. \ref{sec:function-calls}.
+  \item Mutex: For programs that use mutexes.
+  \item Statement: For programs that test specific constructs such as a \Rustinline{match},
+        an infinite loop, an \Rustinline{Option}, a call to \Rustinline{panic!},
+        or \Rustinline{std::process::abort}.
+  \item Thread: For programs involving multiple threads.
 \end{itemize}
 
 The structure of the folders in \Rustinline{examples/} mimics the file structure
@@ -190,89 +190,89 @@ in the repository. For the sake of completeness, Listing \ref{lst:assert-output-
 depicts the function used for the translation tests.
 
 \begin{listing}[!htbp]
-    \begin{minted}{Rust}
-    macro_rules! generate_tests_for_example_program {
-        ($program_path:literal, $result_folder_path:literal) => {
-            #[test]
-            fn generates_correct_output_files() {
-                super::utils::assert_output_files($program_path, $result_folder_path);
-            }
-        };
-    }        
-    \end{minted}
-    \caption{The macro that generates the translation tests.}
-    \label{lst:macro-test-generation}
+  \begin{minted}{Rust}
+  macro_rules! generate_tests_for_example_program {
+      ($program_path:literal, $result_folder_path:literal) => {
+          #[test]
+          fn generates_correct_output_files() {
+              super::utils::assert_output_files($program_path, $result_folder_path);
+          }
+      };
+  }        
+  \end{minted}
+  \caption{The macro that generates the translation tests.}
+  \label{lst:macro-test-generation}
 \end{listing}
 
 
 \begin{listing}[!htbp]
-    \begin{minted}{Rust}
-    mod utils;
-    
-    mod calculator {
-        super::utils::generate_tests_for_example_program!(
-            "./examples/programs/basic/calculator.rs",
-            "./examples/results/basic/calculator/"
-        );
-    }
-    
-    mod greet {
-        super::utils::generate_tests_for_example_program!(
-            "./examples/programs/basic/greet.rs",
-            "./examples/results/basic/greet/"
-        );
-    }
-    
-    mod hello_world {
-        super::utils::generate_tests_for_example_program!(
-            "./examples/programs/basic/hello_world.rs",
-            "./examples/results/basic/hello_world/"
-        );
-    }    
-    \end{minted}
-    \caption{The contents of the file \Rustinline{basic.rs} listing all translation tests in the basic category.}
-    \label{lst:macro-test-generation-example}
+  \begin{minted}{Rust}
+  mod utils;
+  
+  mod calculator {
+      super::utils::generate_tests_for_example_program!(
+          "./examples/programs/basic/calculator.rs",
+          "./examples/results/basic/calculator/"
+      );
+  }
+  
+  mod greet {
+      super::utils::generate_tests_for_example_program!(
+          "./examples/programs/basic/greet.rs",
+          "./examples/results/basic/greet/"
+      );
+  }
+  
+  mod hello_world {
+      super::utils::generate_tests_for_example_program!(
+          "./examples/programs/basic/hello_world.rs",
+          "./examples/results/basic/hello_world/"
+      );
+  }    
+  \end{minted}
+  \caption{The contents of the file \Rustinline{basic.rs} listing all translation tests in the basic category.}
+  \label{lst:macro-test-generation-example}
 \end{listing}
 
 \begin{listing}[!htbp]
-    \begin{minted}{Rust}
-    pub fn assert_output_files(source_code_file: &str, output_folder: &str) {
-        let mut cmd = Command::cargo_bin("cargo-check-deadlock").expect("Command not found");
-    
-        // Current workdir is always the project root folder
-        cmd.arg("check-deadlock")
-            .arg(source_code_file)
-            .arg(format!("--output-folder={output_folder}"))
-            .arg("--dot")
-            .arg("--pnml")
-            .arg("--filename=test")
-            .arg("--skip-analysis");
-    
-        cmd.assert().success();
-    
-        for extension in ["lola", "dot", "pnml"] {
-            let output_path = PathBuf::from(format!("{output_folder}test.{extension}"));
-            let expected_output_path = PathBuf::from(format!("{output_folder}net.{extension}"));
-    
-            let file_contents =
-                std::fs::read_to_string(&output_path).expect("Could not read output file to string");
-    
-            let expected_file_contents = std::fs::read_to_string(&expected_output_path)
-                .expect("Could not read file with expected contents to string");
-    
-            if file_contents != expected_file_contents {
-                panic!(
-                    "The contents of {} do not match the contents of {}",
-                    output_path.to_string_lossy(),
-                    expected_output_path.to_string_lossy()
-                );
-            }
-    
-            std::fs::remove_file(output_path).expect("Could not delete output file");
-        }
-    }
-    \end{minted}
-    \caption{The function that verifies the contents of the output files.}
-    \label{lst:assert-output-files}
+  \begin{minted}{Rust}
+  pub fn assert_output_files(source_code_file: &str, output_folder: &str) {
+      let mut cmd = Command::cargo_bin("cargo-check-deadlock").expect("Command not found");
+  
+      // Current workdir is always the project root folder
+      cmd.arg("check-deadlock")
+          .arg(source_code_file)
+          .arg(format!("--output-folder={output_folder}"))
+          .arg("--dot")
+          .arg("--pnml")
+          .arg("--filename=test")
+          .arg("--skip-analysis");
+  
+      cmd.assert().success();
+  
+      for extension in ["lola", "dot", "pnml"] {
+          let output_path = PathBuf::from(format!("{output_folder}test.{extension}"));
+          let expected_output_path = PathBuf::from(format!("{output_folder}net.{extension}"));
+  
+          let file_contents =
+              std::fs::read_to_string(&output_path).expect("Could not read output file to string");
+  
+          let expected_file_contents = std::fs::read_to_string(&expected_output_path)
+              .expect("Could not read file with expected contents to string");
+  
+          if file_contents != expected_file_contents {
+              panic!(
+                  "The contents of {} do not match the contents of {}",
+                  output_path.to_string_lossy(),
+                  expected_output_path.to_string_lossy()
+              );
+          }
+  
+          std::fs::remove_file(output_path).expect("Could not delete output file");
+      }
+  }
+  \end{minted}
+  \caption{The function that verifies the contents of the output files.}
+  \label{lst:assert-output-files}
 \end{listing}
 
