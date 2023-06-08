@@ -224,7 +224,7 @@ and conclude that a diverging function has been called.
 
 \subsection{Explicit calls to panic}
 
-The \Rustinline{panic!()} macro can be seen as a special case of a divergent function
+The \Rustinline{panic!} macro can be seen as a special case of a divergent function
 where the transition representing the function call is connected to
 the place labeled \Rustinline{PROGRAM_PANIC} described in Sec. \ref{sec:basic-places}.
 The translator detects an explicit call to panic,
@@ -250,7 +250,7 @@ This is one of the illustrative examples included in the repository.
             panic!();
         }        
     \end{minted}
-    \caption{A simple Rust program that calls \Rustinline{panic!()}.}
+    \caption{A simple Rust program that calls \Rustinline{panic!}.}
     \label{lst:panic}
 \end{listing}
 

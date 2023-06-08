@@ -23,7 +23,7 @@ and are supported by the tool.
 
 Lastly, the place labeled \Rustinline{PROGRAM_PANIC} models
 the \emph{abnormal} program termination,
-which happens when the program calls the \Rustinline{panic!()} macro.
+which happens when the program calls the \Rustinline{panic!} macro.
 
 \begin{figure}[!htb]
   \centering
@@ -39,7 +39,7 @@ A program may panic when detecting a possible violation of its memory safety gua
 This is in most circumstances a wiser choice than simply ignoring the error and continuing.
 Therefore, such programs should not be flagged in principle as erroneous or defective but
 it is advisable to record the end state for troubleshooting and debugging purposes.
-Second, even if the user's code does not resort to \Rustinline{panic!()}
+Second, even if the user's code does not resort to \Rustinline{panic!}
 as an error-handling mechanism, numerous functions in the Rust standard library
 may panic under extraordinary circumstances, e.g., due to \acrfull{OOM} or hardware errors,
 or when the \acrshort{OS} fails to allocate a new thread, mutex, etc.

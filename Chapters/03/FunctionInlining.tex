@@ -136,7 +136,7 @@ This is shown in Fig. \ref{fig:two-function-calls-incorrect-1}.
 
 It is evident to the reader that
 the program in Listing \ref{lst:two-simple-function-calls}
-never calls the \Rustinline{panic!()} macro and always terminates successfully,
+never calls the \Rustinline{panic!} macro and always terminates successfully,
 given that the variable \Rustinline{second_call}
 is never \Rustinline{true} before line 9.
 
@@ -258,7 +258,7 @@ Sec. \ref{sec:future-work-petri-net-reduction} and \ref{sec:future-work-no-clean
 Lastly, an attentive reader may notice that
 the analysis of the \acrshort{PN} in Fig. \ref{fig:two-function-calls-correct}
 leads to the conclusion that
-the program may call \Rustinline{panic!()} and terminate abruptly,
+the program may call \Rustinline{panic!} and terminate abruptly,
 which does not match the execution of the Rust program.
 This is correct but it is a limitation of low-level Petri nets
 that cannot be solved in the framework of the model and

@@ -82,7 +82,7 @@ It should be emphasized that
 this mimics the basic places for the program detailed in Sec. \ref{sec:basic-places}.
 
 Threads lack a separate panic place
-as invoking \Rustinline{panic!()} inside a thread
+as invoking \Rustinline{panic!} inside a thread
 only terminates that specific thread's execution.
 We are not interested in differentiating between thread end states;
 the main requirement is to determine whether a thread has finished or not.
