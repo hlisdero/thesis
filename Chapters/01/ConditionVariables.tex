@@ -27,7 +27,7 @@ The boolean predicate is the condition
 on which the threads or processes are waiting for.
 When it is set to a particular value (either true or false),
 the thread or process should continue executing.
-The mutex ensures that only one thread or process
+The mutex guarantees that only one thread or process
 may access the condition variable at a time.
 
 Condition variables do not contain an actual value
@@ -43,7 +43,7 @@ for condition variables to improve performance and reduce overhead.
 For example, some implementations allow multiple threads to be awakened at once
 (an operation called \emph{broadcast}),
 while others use a priority queue
-to ensure that the higher-priority threads are awakened first.
+to accomplish that the higher-priority threads are awakened first.
 
 Condition variables are part of the POSIX standard library for threads \cite{nichols1996pthreads}
 and they are now widely used in concurrent programming languages and systems.

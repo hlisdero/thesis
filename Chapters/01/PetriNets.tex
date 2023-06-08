@@ -343,7 +343,7 @@ represents whether the process performs a read or a write operation.
 
 It makes use of weighted edges to remove atomically
 $k - 1$ tokens from P3 before performing a write (transition T2),
-thus ensuring that no readers are present in the right loop of the net.
+thus preventing readers from entering the right loop of the net.
 
 At most $k$ processes may be reading at the same same,
 but when one process is reading, no process is allowed to read, that is P2 will be empty.

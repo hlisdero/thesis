@@ -159,8 +159,8 @@ e.g., the error message itself and its location, is generated.
 While panics can be caught by parent threads and
 in specific cases when the programmer so desires\footnote{\url{https://doc.rust-lang.org/std/panic/fn.catch\_unwind.html}},
 they typically lead to the termination of the current program.
-This structured panic mechanism ensures that
-the compiler is aware of potential unrecoverable errors,
+This structured panic mechanism makes
+the compiler aware of potential unrecoverable errors,
 enabling the generation of appropriate code to handle such cases.
 
 Rust also provides a type \Rustinline{std::option::Option}\footnote{\url{https://doc.rust-lang.org/std/option/}}

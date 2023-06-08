@@ -169,7 +169,7 @@ the 5 types mentioned previously that the translator tracks.
 4 of these 5 variants enclose a \Rustinline{std::rc::Rc}
 reference to the synchronization variable.
 The aggregate case instead contains a vector of \Rustinline{Value}.
-This enables nesting aggregate values inside of each other,
+This renders possible nesting aggregate values inside of each other,
 which is a critical requirement for supporting more complex programs with nested \Rustinline{structs}.
 
 \begin{listing}[!htb]
