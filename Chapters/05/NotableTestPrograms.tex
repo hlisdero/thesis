@@ -1,0 +1,110 @@
+\section{Notable test programs}
+
+To wrap up this chapter, we introduce two noteworthy test programs that
+illustrate the current capabilities of the tool developed in this thesis.
+Our intention is to inspire others to contribute to this project or,
+at the very least, generate interest in the field of model checking.
+
+First, Listing \ref{lst:dating-philosophers} showcases
+a simple version of the famous Dining Philosophers Problem proposed by Dijkstra.
+This version, affectionately nicknamed ``Dating Philosophers'',
+has only two philosophers and two forks on the table.
+A mutex needs to be locked to access each fork.
+When the philosophers try to grab both forks to eat, the program deadlocks,
+which is easy to verify by inspection.
+This deadlock is successfully detected by the tool.
+Moreover, a more complex version with 5 philosophers,
+for which the deadlock is also detected, is included in the
+repository\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/examples/programs/thread/dining\_philosophers.rs}}.
+It was omitted here due to the space constraints.
+
+\begin{listing}[!htbp]
+    \begin{minted}{Rust}
+  use std::sync::{Arc, Mutex};
+  use std::thread;
+    
+  fn main() {
+      let fork0 = Arc::new(Mutex::new(0));
+      let fork1 = Arc::new(Mutex::new(1));
+    
+      let philosopher0 = {
+          let left_fork = fork0.clone();
+          let right_fork = fork1.clone();
+          thread::spawn(move || {
+              let _left = left_fork.lock().unwrap();
+              let _right = right_fork.lock().unwrap();
+          })
+      };
+    
+      let philosopher1 = {
+          let left_fork = fork1.clone();
+          let right_fork = fork0.clone();
+          thread::spawn(move || {
+              let _left = left_fork.lock().unwrap();
+              let _right = right_fork.lock().unwrap();
+          })
+      };
+    
+      // Wait for all threads to finish
+      philosopher0.join().unwrap();
+      philosopher1.join().unwrap();
+  }    
+  \end{minted}
+    \caption{A reduced version of the dining philosophers problem that deadlocks}
+    \label{lst:dating-philosophers}
+\end{listing}
+
+Second, observe the program in Listing \ref{lst:producer-consumer}.
+It models the classical producer-consumer problem.
+It uses a condition variable and a buffer with capacity for a single element.
+The access to the buffer is protected by a mutex.
+The producer generates 10 elements sequentially and
+the consumer processes them as they become available.
+The tool successfully verifies the absence of deadlock in the program.
+
+\begin{listing}[!htbp]
+    \begin{minted}{Rust}
+  use std::sync::{Arc, Condvar, Mutex};
+  use std::thread;
+  
+  fn main() {
+      let buffer = Arc::new((Mutex::new(0), Condvar::new(), Condvar::new()));
+  
+      let producer_buffer = buffer.clone();
+      let consumer_buffer = buffer.clone();
+  
+      let _producer = thread::spawn(move || {
+          for i in 1..10 {
+              let (lock, cvar_producer, cvar_consumer) = &*producer_buffer;
+              let mut buffer = lock.lock().unwrap();
+  
+              while *buffer != 0 {
+                  buffer = cvar_producer.wait(buffer).unwrap();
+              }
+  
+              *buffer = i;
+              println!("Produced: {}", i);
+  
+              cvar_consumer.notify_one();
+          }
+      });
+  
+      let _consumer = thread::spawn(move || loop {
+          let (lock, cvar_producer, cvar_consumer) = &*consumer_buffer;
+          let mut buffer = lock.lock().unwrap();
+  
+          while *buffer == 0 {
+              buffer = cvar_consumer.wait(buffer).unwrap();
+          }
+  
+          let item = *buffer;
+          *buffer = 0;
+          println!("Consumed: {}", item);
+  
+          cvar_producer.notify_one();
+      });
+  }
+  \end{minted}
+    \caption{A solution to the producer-consumer problem}
+    \label{lst:producer-consumer}
+\end{listing}
