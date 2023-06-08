@@ -1,0 +1,34 @@
+The inclusion of a dedicated chapter on testing in the thesis underscores
+the significance of this indispensable aspect of the development process.
+Tests play a fundamental role in ensuring
+the reliability and correctness of the software implementation.
+A comprehensive test suite has been developed
+to cover the extensive functionality and behavior
+of the translator and the \acrshort{PN} library.
+
+The tests encompass multiple levels
+that will be elucidated in the subsequent sections.
+At the lowest level, unit tests are conducted
+to verify the correctness of the data structures
+employed within the translator and the \acrshort{PN} library.
+These tests target individual components,
+thoroughly examining their functionality in isolation.
+
+In addition to unit tests,
+a suite of integration tests has been constructed incrementally
+to evaluate the translator's adherence to expected behavior.
+These tests consist of test programs that simulate simple scenarios where
+the resulting file output is compared against the expected results.
+This testing methodology helps to uncover any regressions in the compiler
+and confirms that the translator functions reliably in the supported use cases.
+
+Furthermore, we incorporated a description of how to generate the \acrshort{MIR} and
+visualize the result of the translation to aid in the debugging process.
+The tooling enables exposing the internal details in an accessible and understandable manner.
+
+Last in this chapter, the usage of the model checker \acrshort{LoLA}
+and its integration within the translator is explained.
+The model checker provides more features than the minimal set
+that was integrated into the translator to answer the deadlock detection problem.
+Hence, it is beneficial to explore
+which features the model checker provides for debugging the \acrshort{PN} translation.
