@@ -1,4 +1,6 @@
-# Thesis: Compile-time Deadlock Detection in Rust using Petri Nets
+# Thesis
+
+## Compile-time Deadlock Detection in Rust using Petri Nets
 
 [Link to the PDF](./Thesis.pdf)
 
