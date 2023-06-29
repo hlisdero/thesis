@@ -727,6 +727,29 @@
   \end{figure}
 \end{frame}
 
+\subsection{Why Petri nets?}
+
+\begin{frame}{Reachability analysis}
+  Petri nets can be analyzed using formal methods to conclude whether the net can reach
+  a deadlock or not. There is a notion of liveness analogous to the one found in computer systems.
+
+  \vfill
+  \pause
+
+  Several model checkers are being developed and
+  there is even a Model Checking Contest that takes place every year.
+  State-of-the-art tools can handle Petri net models
+  with more than \textbf{70 000 transitions} and \textbf{one million places}.
+
+  \vfill
+  \pause
+
+  Translating source code to a Petri net has been done before for other programming languages
+  \cite{kavi2002modeling,moshtaghi2001} and also for Rust \cite{meyer2020, zhang2022deadlocks}.
+  The difficulty lies in supporting more synchronization primitives
+  than simple mutexes and translating code from real-world applications.
+\end{frame}
+
 \section{Translation}
 
 \subsection{MIR}
