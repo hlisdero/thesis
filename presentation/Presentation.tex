@@ -671,6 +671,56 @@
 
 \subsection{Examples}
 
+\begin{frame}{Vending machine}
+  \scriptsize
+  This is a finite-state machine (FSM), a subclass of Petri nets.
+
+  \begin{figure}
+    \centering
+    \includesvg[width=\linewidth]{state-machine-example.svg}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Parallel activities: Fork/Join}
+  \scriptsize
+  This is a marked graph (MG), a subclass of Petri nets.
+  Observe the concurrency between Task 1 and Task 2.
+  This cannot be modeled by a single finite-state machine. 
+
+  \begin{figure}
+    \centering
+    \includesvg[width=0.8\linewidth]{parallel-activities-example.svg}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Communication protocols: Send with ACK}
+  \scriptsize
+  A simple protocol in which Process 1 sends messages to Process 2 and
+  waits for an acknowledgment to be received before continuing.
+  For simplicity, no timeout mechanism was included.
+
+  \begin{figure}
+    \centering
+    \includesvg[width=0.90\linewidth]{communication-protocols-example.svg}
+  \end{figure}
+\end{frame}
+
+\begin{frame}{Synchronization control: Readers and writers}
+  \scriptsize
+  A Petri net system with k processes that either read or write a shared value.
+
+  \begin{itemize}
+    \item If one process writes, then no process may read.
+    \item If a process is reading, then no process may write.
+    \item There can only be zero or one process writing at any given time.
+  \end{itemize}
+
+  \begin{figure}
+    \centering
+    \includesvg[width=0.9\linewidth]{readers-writers-example.svg}
+  \end{figure}
+\end{frame}
+
 \section{Translation}
 
 \subsection{MIR}
