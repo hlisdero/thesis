@@ -618,6 +618,59 @@
 
 \section{Petri nets}
 
+\subsection{What is a Petri net?}
+
+\begin{frame}{Informal definition}
+  A Petri net is a mathematical modeling tool
+  used to describe and analyze the behavior of concurrent systems.
+  It provides a graphical representation of the system's state and its transitions,
+  allowing for visual and formal analysis of complex processes.
+  
+  \begin{figure}[!htb]
+    \centering
+    \includegraphics[width=0.8\linewidth]{petri-net-formal-example.png}
+  \end{figure}
+
+  \scriptsize
+  \begin{itemize}
+    \item Places: Represent states in the system (\emph{circles})
+    \item Transitions: Represent usually events or actions that occur in the system (\emph{rectangles})
+    \item Tokens: Marks inside of places that are created and consumed by transitions (\emph{points inside of places})
+  \end{itemize}
+  
+  \vfill
+\end{frame}
+
+\begin{frame}{Mathematical definition}
+  A Petri net is a 5-tuple, $ PN = (P, T, F, W, M_{0}) $ where:
+
+  \begin{quote}
+        $ P = \{ p_1, p_2, \dots, p_m \} $ is a finite set of places,\\
+        $ T = \{ t_1, t_2, \dots, t_n \} $ is a finite set of transitions,\\
+        $ F \subseteq (P \times T) \cup (T \times P) $ is a set of arcs (flow relation),\\
+        $ W: F \rightarrow \{1, 2, 3, ... \} $ is a weight function for the arcs,\\
+        $ M_{0}: P \rightarrow \{0, 1, 2, 3, .... \} $ is the initial marking,\\
+        $ P \cap T = \varnothing $ and $ P \cup T \neq \varnothing $
+  \end{quote}
+
+  The graph is by definition \emph{bipartite}.
+  There can only be edges:
+  \begin{itemize}
+    \item from places to transitions or
+    \item from transitions to places
+  \end{itemize}
+
+\end{frame}
+
+\begin{frame}{Transition firing rule}
+  \begin{figure}[!htb]
+    \centering
+    \includesvg[width=0.9\linewidth]{petri-net-transition-example.svg}
+    \caption{Example of transition firing: Transition 1 fires first, then transition 2 fires.}
+    \label{fig:petri-net-transition-example}
+\end{figure}
+\end{frame}
+
 \subsection{Examples}
 
 \section{Translation}
