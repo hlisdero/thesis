@@ -31,3 +31,22 @@
 
 % DEFINE HOW CAPTIONS SHOULD BE ADDED % 
 \setbeamertemplate{caption}{\insertcaption}
+
+% CODE LISTINGS WITH SINTAX HIGHLIGHTING %
+% See example: https://www.overleaf.com/learn/latex/Code_Highlighting_with_minted
+% Restart the counter on every chapter
+\usepackage[chapter,newfloat]{minted}
+\setminted{
+  linenos, % Show line numbers
+  breaklines, % Wrap lines if necessary
+  autogobble, % Remove whitespace in front of the code
+  frame=lines, % Use lines to create a frame
+  framesep=2mm, % Separation of the frame from the actual code
+  fontsize=\scriptsize % Use a tiny font size
+}
+
+% FANCY VERBATIM ENVIRONMENT THAT SUPPORTS COLOR %
+% https://tex.stackexchange.com/questions/370334/use-color-in-verbatim-environment
+% Used to format Rust error messages
+\usepackage{fancyvrb}
+\usepackage{xcolor}
