@@ -922,8 +922,6 @@
   We have to use a very simple example program to keep the net small.
   In this case, the thread is trying to notify itself, which leads to a lost signal.
 
-  \vfill
-
   \begin{listing}
     \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
       fn main() {
@@ -936,8 +934,6 @@
     \end{minted}
   \end{listing}
 
-  \vfill
-  
   \begin{itemize}
     \item The model for the condition variable should appear in the Petri net.
     \item The notify place should be set.
