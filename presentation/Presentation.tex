@@ -98,17 +98,21 @@
 
 \subsection{How does it look like?}
 
-\begin{frame}[fragile]{Immutability by default}
+\begin{frame}[fragile]{Immutability by default}\
+  \scriptsize
+  In other languages, immutability is the exception or an afterthought (e.g. \texttt{const}-ness in C/C++).
+
   \begin{listing}
     \begin{minted}{Rust}
       fn main() {
-        let x = 1;
+        let x = 1; // Immutable by default
         x = x + 1;
       }
     \end{minted}
   \end{listing}
 
   \vfill
+  The Rust compiler points out exactly where the error is and provides help on how to fix it.
 
   \begin{listing}
     \scriptsize
@@ -129,7 +133,7 @@
 
 \begin{frame}[fragile]{Move semantics by default}
   Each value has only one owner.
-  If a variable is passed to another function or scope, the owner of the value changes.
+  If a variable is passed to another function or assigned to a different variable, the owner of the value changes.
 
   \vfill
 
@@ -146,6 +150,11 @@
       }
     \end{minted}
   \end{listing}
+
+  \vfill
+
+  Values have copy semantics only if they are marked as \texttt{Copy}.
+  This is the case for numbers by default. Compare this with the default in C++ vs the best practices.
 \end{frame}
 
 \begin{frame}[fragile]{Algebraic Data Types, aka enums with fields}
