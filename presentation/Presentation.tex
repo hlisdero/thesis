@@ -844,11 +844,79 @@
   \end{figure}
 \end{frame}
 
-\subsection{Modelling threads}
+\subsection{Modeling threads}
 
-\subsection{Modelling mutexes}
+\begin{frame}[fragile]{Example program}
+  Let's consider a trivial program that spawns a thread that does nothing
+  and immediately joins it.
 
-\subsection{Modelling condition variables}
+  \vfill
+
+  \begin{listing}
+    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
+      fn main() {
+        let thread_join_handle = std::thread::spawn(move || {
+            // some work here
+        });
+        // some work here
+        let _res = thread_join_handle.join();
+      }   
+    \end{minted}
+  \end{listing}
+
+  \vfill
+  
+  \begin{itemize}
+    \item \Rustinline{std::thread::spawn} should create an additional token
+          that models the program counter of the second thread.
+    \item The joining thread should wait until the spawned thread finishes.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Petri net model for a thread}
+  \begin{figure}
+    \centering
+    \includesvg[height=0.85\textheight]{multithreading-example.svg}
+  \end{figure}
+\end{frame}
+
+
+
+\subsection{Modeling condition variables}
+
+\begin{frame}[fragile]{Example program}
+  We have to use a very simple example program to keep the net small.
+  In this case, the thread is trying to notify itself, which leads to a lost signal.
+
+  \vfill
+
+  \begin{listing}
+    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
+      fn main() {
+            let mutex = std::sync::Mutex::new(false);
+            let cvar = std::sync::Condvar::new();
+            let mutex_guard = mutex.lock().unwrap();
+            cvar.notify_one();
+            let _result = cvar.wait(mutex_guard);
+      }     
+    \end{minted}
+  \end{listing}
+
+  \vfill
+  
+  \begin{itemize}
+    \item The model for the condition variable should appear in the Petri net.
+    \item The notify place should be set.
+    \item But the signal gets consumed because \Rustinline{std::sync::Condvar::wait} was not called.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Petri net model for the example program}
+  \begin{figure}
+    \centering
+    \includesvg[height=0.85\textheight]{condition-variable-example.svg}
+  \end{figure}
+\end{frame}
 
 \section{Bibliography}
 
