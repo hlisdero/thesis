@@ -66,7 +66,7 @@
     \item [2009] Mozilla officially started sponsoring the project
     \item [2015] First stable version 1.0
     \item [2016] Mozilla releases Servo, a browser engine built with Rust
-    \item [2019] \texttt{async/await} support stabilized
+    \item [2019] \Rustinline{async}/\Rustinline{await} support stabilized
     \item [2021] The Rust Foundation is founded by AWS, Huawei, Google, Microsoft, and Mozilla
     \item [2021] The Android Open Source Project encourages the use of Rust for the SO components below the ART
     \item [2022] The Linux kernel adds support for Rust alongside C
@@ -153,7 +153,7 @@
 
   \vfill
 
-  Values have copy semantics only if they are marked as \texttt{Copy}.
+  Values have copy semantics only if they are marked as \Rustinline{Copy}.
   This is the case for numbers by default. Compare this with the default in C++ vs the best practices.
 \end{frame}
 
@@ -228,8 +228,8 @@
 \end{frame}
 
 \begin{frame}[fragile]{A more advanced match statement}
-  A match statement works \emph{with} the type system,
-  while a mere if can do anything and it is not bound to the type system.
+  A \Rustinline{match} statement works \emph{with} the type system,
+  while a mere \Rustinline{if} can do anything and it is not bound to the type system.
   Match statements are always \emph{exhaustive}: They must handle all possibilities.
 
   \begin{listing}
