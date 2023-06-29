@@ -41,7 +41,60 @@
 
 \section{Introduction}
 
-\subsection{Rust}
+\section{Rust}
+
+\subsection{What is Rust?}
+
+\begin{frame}{What is Rust?}
+  Rust is a multi-paradigm, general-purpose programming language that
+  aims to provide developers with a safe and efficient way to write low-level code.
+
+  \pause
+  \vfill
+
+  \begin{itemize}
+    \item Memory-safe
+    \item Compiled to machine code, no runtime needed
+    \item High-level simplicity
+    \item Low-level performance (on the same level as C or C++)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Brief timeline of Rust}
+  \begin{description}
+    \item [2007] Started as a side project by Graydon Hoare, a programmer at Mozilla
+    \item [2009] Mozilla officially started sponsoring the project
+    \item [2015] First stable version 1.0
+    \item [2016] Mozilla releases Servo, a browser engine built with Rust
+    \item [2019] \texttt{async/await} support stabilized
+    \item [2021] The Rust Foundation is founded by AWS, Huawei, Google, Microsoft, and Mozilla
+    \item [2021] The Android Open Source Project encourages the use of Rust for the SO components below the ART
+    \item [2022] The Linux kernel adds support for Rust alongside C
+    \item [2023] 8 years in a row the most loved programming language in the Stack Overflow Developer Survey
+  \end{description}
+\end{frame}
+
+\begin{frame}{Memory safety}
+  It achieves memory safety without using a garbage collector or reference counting.
+  Instead, it uses the concept of \textbf{ownership} and \textbf{borrowing}.
+
+  \vfill
+  \pause
+
+  It prevents a wide variety of error classes at compile-time:
+
+  \begin{itemize}
+    \item Double free
+    \item Use after free
+    \item Dangling pointers
+    \item Data races
+    \item Passing non-thread-safe variables
+  \end{itemize}
+
+  \vfill
+
+  If a violation of the compiler rules is found, the program will simply not compile.
+\end{frame}
 
 \subsection{Why Rust?}
 
