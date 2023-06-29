@@ -148,6 +148,42 @@
   \end{listing}
 \end{frame}
 
+\begin{frame}[fragile]{Algebraic Data Types, aka enums with fields}
+  \begin{listing}
+    \begin{minted}[fontsize=\tiny, frame=none]{Rust}
+      enum Shape {
+        Circle { radius: f64 },
+        Rectangle { width: f64, height: f64 },
+        Triangle { base: f64, height: f64 },
+      }
+    
+      fn main() {
+          let shapes = vec![
+              Shape::Circle { radius: 5.0 },
+              Shape::Rectangle { width: 10.0, height: 8.0 },
+              Shape::Triangle { base: 7.0, height: 4.0 },
+          ];
+      
+          for shape in shapes {
+              match shape {
+                  Shape::Circle { radius } => {
+                      let circle = Circle { radius };
+                      // Do something with the circle...
+                  },
+                  Shape::Rectangle { width, height } => {
+                      let rectangle = Rectangle { width, height };
+                      // Do something with the rectangle...
+                  },
+                  Shape::Triangle { base, height } => {
+                      let triangle = Triangle { base, height };
+                      // Do something with the triangle...
+                  },
+              }
+          }
+      }
+    \end{minted}
+  \end{listing}
+\end{frame}
 
 \subsection{Why Rust?}
 
