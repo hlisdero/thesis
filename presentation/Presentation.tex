@@ -758,6 +758,44 @@
 
 \section{Translation}
 
+\begin{frame}{Compilation stages in \emph{rustc}}
+  \scriptsize
+
+  \begin{itemize}
+    \item Lexing: The source text is turned into a stream of atomic source code units known as tokens.
+    \pause
+    \item Parsing: The stream of tokens is converted into an \textbf{Abstract Syntax Tree}.
+    \pause
+    \item High-level Intermediate Representation (HIR):
+    \begin{itemize}
+      \scriptsize
+      \item Desugar loops: \Rustinline[fontsize=\scriptsize]{while} and \Rustinline[fontsize=\scriptsize]{for} to simple \Rustinline[fontsize=\scriptsize]{loop}.
+      \item Type inference: The automatic detection of a type of an expression.
+      \item Trait solving: Ensuring that each implementation block (\Rustinline[fontsize=\scriptsize]{impl}) points to a valid trait.
+      \item Type checking.
+    \end{itemize}
+    \pause
+    \item Mid-level Intermediate Representation (MIR): 
+    \begin{itemize}
+      \scriptsize
+      \item Checking of exhaustiveness of pattern matching.
+      \item Desugar method calls to function calls\\
+            (\Rustinline[fontsize=\scriptsize]{x.method(y)} becomes \Rustinline[fontsize=\scriptsize]{Type::method(&x, y)}).
+      \item Add implicit dereferencing operations.
+      \item Borrow checking.
+    \end{itemize}
+    \pause
+    \item Code generation:
+    \begin{itemize}
+      \scriptsize
+      \item Rust uses LLVM for the backend.
+      \item It leverages many optimizations of the LLVM intermediate representation.
+      \item LLVM takes over from this point on.
+      \item At the end object files are linked to create an executable.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
 \subsection{MIR}
 
 \subsection{Modelling threads}
