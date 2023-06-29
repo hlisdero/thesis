@@ -918,6 +918,13 @@
 
 \subsection{Modeling condition variables}
 
+\begin{frame}{How to model a condition variable}
+  \begin{figure}
+    \centering
+    \includesvg[height=0.85\textheight]{condition-variable-model.svg}
+  \end{figure}
+\end{frame}
+
 \begin{frame}[fragile]{Example program}
   We have to use a very simple example program to keep the net small.
   In this case, the thread is trying to notify itself, which leads to a lost signal.
