@@ -240,10 +240,10 @@
         match number {
             0 => println!("The number is zero"),
             1 | 2 | 3 => println!("The number is a small prime"),
-            n @ 4..=9 => println!("The number is between 4 and 9: {}", n),
-            n if is_even(n) => println!("The number is even: {}", n),
-            n if is_odd(n) => println!("The number is odd: {}", n),
-            _ => println!("The number doesn't match any specific case"),
+            n @ 4..=9 => println!("The number is between 4 and 9: {n}"),
+            n if is_even(n) => println!("The number is even: {n}"),
+            n if is_odd(n) => println!("The number is odd: {n}"),
+            _ => panic!("The number doesn't match any specific case!"),
         }
       }
     \end{minted}
