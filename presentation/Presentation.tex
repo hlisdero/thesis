@@ -185,6 +185,311 @@
   \end{listing}
 \end{frame}
 
+\begin{frame}[fragile]{Error handling with Result}
+  \begin{listing}
+    \begin{minted}[fontsize=\tiny, frame=none]{Rust}
+      use std::fs::File;
+      use std::io::Read;
+      // This definition is part of the standard library
+      // It does not need to be imported
+      enum Result<T, E> {
+        Ok(T),
+        Err(E),
+      }  
+      
+      fn read_file_contents(path: &str) -> Result<String, std::io::Error> {
+          let mut file = File::open(path)?;
+          let mut contents = String::new();
+          file.read_to_string(&mut contents)?;
+          Ok(contents)
+      }
+      
+      fn main() {
+          let file_path = "example.txt";
+          let result = read_file_contents(file_path);
+      
+          match result {
+              Ok(contents) => {
+                  println!("File contents:\n{}", contents);
+              }
+              Err(error) => {
+                  eprintln!("Error reading file: {}", error);
+              }
+          }
+      }      
+    \end{minted}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{The enum Option: No need for null pointers}
+  \begin{listing}
+    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
+      // This definition is part of the standard library
+      // It does not need to be imported
+      pub enum Option<T> {
+        None,
+        Some(T),
+      }
+
+      fn main() {
+        let mut list = vec![1, 2, 3, 4, 5];
+    
+        while let Some(element) = list.pop() {
+            println!("Popped element: {}", element);
+        }
+        // List::pop() returned `None`
+        println!("List is empty!");
+      }
+    \end{minted}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{No OOP: Just structs with methods}
+  \begin{listing}
+    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
+      struct Rectangle {
+          width: u32,
+          height: u32,
+      }
+      
+      impl Rectangle {
+          fn new(width: u32, height: u32) -> Rectangle {
+              Rectangle { width, height }
+          }
+      
+          fn area(&self) -> u32 {
+              self.width * self.height
+          }
+      
+          fn is_square(&self) -> bool {
+              self.width == self.height
+          }
+      
+          fn double_size(&mut self) {
+              self.width *= 2;
+              self.height *= 2;
+          }
+      }
+    \end{minted}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{Define traits to share an interface}
+  \begin{listing}
+    \begin{minted}[fontsize=\tiny, frame=none]{Rust}
+      trait Container {
+        fn get_value(&self);
+      }
+      
+      struct Storage {
+          value: i32,
+      }
+      
+      impl Container for Storage {
+          fn get_value(&self) {
+              println!("Value: {}", self.value);
+          }
+      }
+      
+      impl PartialEq for Storage {
+          fn eq(&self, other: &Self) -> bool {
+              self.value == other.value
+          }
+      }
+      
+      impl std::fmt::Display for Storage {
+          fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+              write!(f, "Value: {}", self.value)
+          }
+      }
+    \end{minted}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{Nearly everything is an expression as in Lisp}
+  \begin{listing}
+    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
+      fn main() {
+        let numbers = vec![1, 2, 3, 4, 5];
+    
+        let sum_of_squares: i32 = numbers
+            .iter()
+            .fold(0, |acc, x| acc + x * x);
+    
+        let result = if sum_of_squares > 50 {
+            "Sum of squares is greater than 50"
+        } else {
+            "Sum of squares is not greater than 50"
+        };
+    
+        println!("Result: {}", result);
+      }
+    \end{minted}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{Generics}
+  \begin{listing}
+    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
+      struct Pair<T, U> {
+        first: T,
+        second: U,
+      }
+    
+      impl<T, U> Pair<T, U> {
+          fn new(first: T, second: U) -> Self {
+              Pair { first, second }
+          }
+      
+          fn get_first(&self) -> &T {
+              &self.first
+          }
+      
+          fn get_second(&self) -> &U {
+              &self.second
+          }
+      }
+    \end{minted}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{Lifetimes}
+  \begin{listing}
+    \begin{minted}[fontsize=\tiny, frame=none]{Rust}
+      struct StringHolder<'a> {
+        value: &'a str,
+      }
+      
+      impl<'a> StringHolder<'a> {
+          fn new(value: &'a str) -> Self {
+              StringHolder { value }
+          }
+      
+          fn get_value(&self) -> &'a str {
+              self.value
+          }
+      }
+      
+      fn main() {
+          let input_string = String::from("Hello, lifetimes!");
+      
+          let holder;
+          {
+              let local_string = String::from("Local string");
+              holder = StringHolder::new(local_string.as_str());
+              println!("Holder value: {}", holder.get_value());
+          }
+      
+          println!("Input string: {}", input_string);
+          println!("Holder value: {}", holder.get_value());
+      }
+    \end{minted}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{Lifetimes: Error message}
+  \begin{listing}
+    \raggedleft
+    \tiny
+    \begin{Verbatim}[commandchars=\\\{\}]
+      \textbf{\textcolor{red}{error[E0597]}: `local_string` does not live long enough}
+      --> src/main.rs:21:36
+       |
+    20 |         let local_string = String::from("Local string");
+       |             \textcolor{blue}{------------ binding `local_string` declared here}
+    21 |         holder = StringHolder::new(local_string.as_str());
+       |                                    \textcolor{red}{^^^^^^^^^^^^^^^^^^^^^ borrowed value does not}
+       |                                                                 \textcolor{red}{live long enough}
+    22 |         println!("Holder value: {}", holder.get_value());
+    23 |     \}
+       |     \textcolor{blue}{- `local_string` dropped here while still borrowed}
+    ...
+    26 |     println!("Holder value: {}", holder.get_value());
+       |                                \textcolor{blue}{------------------ borrow later used here}
+    
+    \textbf{For more information about this error, try `rustc --explain E0597`.}
+    \end{Verbatim}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{Only one active mutable reference at any given time}
+  \begin{listing}
+    \begin{minted}[fontsize=\tiny, frame=none]{Rust}
+      struct Item {
+        value: i32,
+      }
+      
+      fn main() {
+          let mut item = Item { value: 42 };
+      
+          let reference1 = &mut item; // First mutable reference
+          let reference2 = &mut item; // Second mutable reference - COMPILATION ERROR
+      
+          reference1.value += 1;
+          reference2.value += 1;
+      
+          println!("Reference 1: {}", reference1.value);
+          println!("Reference 2: {}", reference2.value);
+      }
+    \end{minted}
+  \end{listing}
+
+  \begin{listing}
+    \tiny
+    \begin{Verbatim}[commandchars=\\\{\}]
+      \textbf{\textcolor{red}{error[E0499]}: cannot borrow `item` as mutable more than once at a time}
+      --> src/main.rs:9:22
+       |
+    8  |     let reference1 = &mut item; // First mutable reference
+       |                      \textcolor{blue}{--------- first mutable borrow occurs here}
+    9  |     let reference2 = &mut item; // Second mutable reference - COMPILATION ERROR
+       |                      \textcolor{red}{^^^^^^^^^ second mutable borrow occurs here}
+    10 |
+    11 |     reference1.value += 1;
+       |     \textcolor{blue}{--------------------- first borrow later used here}
+    
+    \textbf{For more information about this error, try `rustc --explain E0499`.}
+    \end{Verbatim}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{A mutable reference is allowed only if no immutable references are present}
+  \begin{listing}
+    \begin{minted}[fontsize=\tiny, frame=none]{Rust}
+      fn main() {
+        let mut item = 42;
+    
+        let reference1 = &item; // First mutable reference
+        let reference2 = &mut item; // Second mutable reference - COMPILATION ERROR
+    
+        if *reference1 == 1 {
+            println!("Item is set to one");
+        }
+        *reference2 += 1;
+    
+        println!("Reference 1: {}", reference1);
+        println!("Reference 2: {}", reference2);
+      }
+    \end{minted}
+  \end{listing}
+
+  \begin{listing}
+    \tiny
+    \begin{Verbatim}[commandchars=\\\{\}]
+      \textbf{\textcolor{red}{error[E0502]}: cannot borrow `item` as mutable because it is also borrowed as immutable}
+      --> src/main.rs:5:22
+       |
+     4 |     let reference1 = &item; // First mutable reference
+       |                      \textcolor{blue}{----- immutable borrow occurs here}
+     5 |     let reference2 = &mut item; // Second mutable reference - COMPILATION ERROR
+       |                      \textcolor{red}{^^^^^^^^^ mutable borrow occurs here}
+     6 |
+     7 |     if *reference1 == 1 \{
+       |        \textcolor{blue}{----------- immutable borrow later used here}
+    \end{Verbatim}
+  \end{listing}
+\end{frame}
+
 \subsection{Why Rust?}
 
 \section{Petri nets}
