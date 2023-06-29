@@ -1,0 +1,33 @@
+\ProvidesPackage{Presentation}
+% Style file for the thesis %
+% Based on the guide: https://en.wikibooks.org/wiki/LaTeX/Modular_Documents#The_file_mystyle.sty 
+
+% SET THE LANGUAGE TO ENGLISH %
+\usepackage[english]{babel}
+
+% USE TIMES NEW ROMAN AS THE DEFAULT FONT %
+\usepackage{times}
+
+% THEME CONFIGURATION %
+\usetheme{Luebeck}
+\usecolortheme{seahorse}
+\useoutertheme{infolines}
+
+% GRAPHICS CONFIGURATION %
+\usepackage{graphicx}
+\graphicspath{{images/}}
+
+% HYPERLINK CONFIGURATION %
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  filecolor=blue,
+  citecolor=blue,
+  urlcolor=blue,
+}
+
+\usefonttheme[onlymath]{serif}
+
+% DEFINE HOW CAPTIONS SHOULD BE ADDED % 
+\setbeamertemplate{caption}{\insertcaption}

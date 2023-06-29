@@ -1,0 +1,56 @@
+\documentclass{beamer}
+\usepackage{Presentation}
+
+\title[Compile-time Deadlock Detection in Rust]{Compile-time Deadlock Detection in Rust using Petri Nets}
+\author{Horacio Lisdero Scaffino}
+\institute[FIUBA]{Facultad de Ingeniería\\Universidad de Buenos Aires}
+\date{June 30, 2023}
+% TWEAK THE FONT FIZE
+\setbeamerfont{date}{size=\scriptsize}
+% ADD LOGO
+\logo{\includegraphics[height=0.6cm]{FIUBA-Logo.png}}
+
+\AtBeginSection[]
+{
+  \begin{frame}{Agenda}
+  \footnotesize
+    \tableofcontents[currentsection]
+  \end{frame}
+}
+
+\AtBeginSubsection[]
+{
+  \begin{frame}{Agenda}
+  \footnotesize
+    \tableofcontents[currentsection, currentsubsection]
+  \end{frame}
+}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}
+  \frametitle{Agenda}
+  \tableofcontents
+\end{frame}
+
+\section{Introduction}
+
+\subsection{Rust}
+
+\subsection{Why Rust?}
+
+\section{Translation}
+
+\subsection{MIR}
+
+\subsection{Modelling threads}
+
+\subsection{Modelling mutexes}
+
+\subsection{Modelling condition variables}
+
+\end{document}
