@@ -880,7 +880,41 @@
   \end{figure}
 \end{frame}
 
+\subsection{Modeling mutexes}
 
+\begin{frame}[fragile]{Example program}
+  Consider a simple program that locks a mutex twice.
+  The second lock operation will deadlock
+  because the lock handle returned by the first call to \Rustinline{std::sync::Mutex::lock}
+  is not dropped until it falls out of scope.
+
+  \vfill
+
+  \begin{listing}
+    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
+      fn main() {
+        let data = std::sync::Mutex::new(0);
+        let _d1 = data.lock();
+        let _d2 = data.lock(); // cannot lock, since d1 is still active
+      }
+    \end{minted}
+  \end{listing}
+
+  \vfill
+  
+  \begin{itemize}
+    \item There should be a single place that models the mutex.
+    \item Locking the mutex is taking the token from the mutex place.
+    \item Unlocking the mutex is setting the token back in the mutex place.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Petri net model for a mutex}
+  \begin{figure}
+    \centering
+    \includesvg[height=0.85\textheight]{mutex-example.svg}
+  \end{figure}
+\end{frame}
 
 \subsection{Modeling condition variables}
 
@@ -893,11 +927,11 @@
   \begin{listing}
     \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
       fn main() {
-            let mutex = std::sync::Mutex::new(false);
-            let cvar = std::sync::Condvar::new();
-            let mutex_guard = mutex.lock().unwrap();
-            cvar.notify_one();
-            let _result = cvar.wait(mutex_guard);
+        let mutex = std::sync::Mutex::new(false);
+        let cvar = std::sync::Condvar::new();
+        let mutex_guard = mutex.lock().unwrap();
+        cvar.notify_one();
+        let _result = cvar.wait(mutex_guard);
       }     
     \end{minted}
   \end{listing}
