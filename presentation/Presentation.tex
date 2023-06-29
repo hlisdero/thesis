@@ -801,6 +801,49 @@
 
 \subsection{MIR}
 
+\begin{frame}[fragile]{Hello World in MIR}
+  \tiny
+  BB means ``basic block''. Each one is formed by statements and one terminator statement.
+  The terminator statement is the only place where the control flow can jump to another basic block.
+
+  \begin{listing}
+    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
+      fn main() -> () {
+          let mut _0: ();                     
+          let _1: ();                         
+          let mut _2: std::fmt::Arguments<'_>;
+          let mut _3: &[&str];                
+          let mut _4: &[&str; 1];             
+      
+          bb0: {
+              _4 = const _;                    
+              _3 = _4 as &[&str] (Pointer(Unsize));
+              _2 = Arguments::<'_>::new_const(move _3) -> bb1;
+          }
+      
+          bb1: {
+              _1 = _print(move _2) -> bb2;
+          }
+      
+          bb2: {
+              return;
+          }
+      }      
+    \end{minted}
+  \end{listing}
+\end{frame}
+
+\begin{frame}{MIR as a graph that shows the flow of execution}
+  \scriptsize
+  The MIR is a form of control flow graph (CFG) used in compilers.
+  In this form, the translation to a Petri net becomes evident.
+
+  \begin{figure}[!htb]
+    \centering
+    \includesvg[width=0.50\linewidth]{mir-cfg-example.svg}
+  \end{figure}
+\end{frame}
+
 \subsection{Modelling threads}
 
 \subsection{Modelling mutexes}
