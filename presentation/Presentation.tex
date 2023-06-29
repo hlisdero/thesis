@@ -560,6 +560,62 @@
 
 \subsection{Why Rust?}
 
+\begin{frame}{Memory safety is critical for reliability and security}
+  Empirical investigations have concluded that around 70\% of the vulnerabilities found in
+  large C/C++ codebases are due to memory handling errors. This high figure can be observed in
+  projects such as:
+
+  \begin{itemize}
+    \item Android Open Source Project \cite{memory-bugs-android},
+    \item the Bluetooth and media components of Android \cite{memory-bugs-android-media-bluetooth},
+    \item the Chromium Projects behind the Chrome web browser \cite{memory-bugs-chrome},
+    \item the CSS component of Firefox \cite{memory-bugs-firefox},
+    \item iOS and macOS \cite{memory-bugs-ios-macos},
+    \item Microsoft products \cite{miller-security-microsoft2019, memory-bugs-microsoft},
+    \item Ubuntu \cite{memory-bugs-ubuntu}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Rust adoption is increasing fast}
+  \scriptsize
+  \begin{itemize}
+    \item The Android Open Source Project encourages
+          the use of Rust for the SO components
+          below the ART \cite{stoep2021}.
+    \item The Linux kernel introduces in version 6.1 official tooling
+          support for programming components in Rust \cite{corbet2022,desimone2022}.
+    \item At Mozilla, the Oxidation project was created in 2015
+          to increase the usage of Rust in Firefox and related projects.
+          As of March 2023, the lines of code in Rust represent more than
+          10\% of the total in Firefox Nightly \cite{mozilla-oxidation}.
+    \item At Meta, the use of Rust as a development language server-side
+          is approved and encouraged since July 2022 \cite{garcia2022}.
+    \item At Cloudflare, a new HTTP proxy in Rust was built from scratch
+          to overcome the architectural limitations of NGINX,
+          reducing CPU usage by 70\% and memory usage by 67\% \cite{wu2022}.
+    \item At Discord, reimplementing a crucial service
+          in Rust provided great benefits in performance
+          and solved a performance penalty due to the garbage collection in Go \cite{howarth2020}.
+    \item At npm Inc., the company behind the npm registry, Rust allowed scaling CPU-bound services
+          to more than 1.3 billion downloads per day \cite{rust-npm-case-study}.
+    \item A study of Rust-based code found it runs so efficiently
+          that it uses half as much electricity as a similar program written in Java,
+          a language commonly used at AWS \cite{pereira2017energy}.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{The tooling is great and works out of the box}
+  \begin{itemize}
+    \item \href{https://doc.rust-lang.org/stable/cargo/}{cargo}, the official package manager: Build, test, lint, and update packages. \pause
+    \item \href{https://doc.rust-lang.org/book/ch11-00-testing.html}{Test harness} for unit tests, integration tests, and tests in documentation comments (doctests). No third-party libraries needed. \pause
+    \item An official public registry for Rust packages (called ``crates''): \url{https://crates.io/}. \pause
+    \item Automatic generation of a static website from the doc comments of the project. It is published automatically to \url{https://docs.rs/}. \pause
+    \item An official linter included with the default installation that catches even more errors and spots non-idiomatic code: \href{https://github.com/rust-lang/rust-clippy}{clippy}. \pause
+    \item Integration with git, GitHub, VSCode, IntelliJ is great and easy to use. \pause
+    \item A new stable compiler release every 6 weeks \cite{albini2019}.
+  \end{itemize}
+\end{frame}
+
 \section{Petri nets}
 
 \subsection{Examples}
