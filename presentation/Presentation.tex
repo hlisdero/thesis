@@ -769,6 +769,7 @@
     \item High-level Intermediate Representation (HIR):
     \begin{itemize}
       \scriptsize
+      \setbeamertemplate{itemize items}[circle]
       \item Desugar loops: \Rustinline[fontsize=\scriptsize]{while} and \Rustinline[fontsize=\scriptsize]{for} to simple \Rustinline[fontsize=\scriptsize]{loop}.
       \item Type inference: The automatic detection of a type of an expression.
       \item Trait solving: Ensuring that each implementation block (\Rustinline[fontsize=\scriptsize]{impl}) points to a valid trait.
@@ -778,9 +779,10 @@
     \item Mid-level Intermediate Representation (MIR): 
     \begin{itemize}
       \scriptsize
+      \setbeamertemplate{itemize items}[circle]
       \item Checking of exhaustiveness of pattern matching.
       \item Desugar method calls to function calls\\
-            (\Rustinline[fontsize=\scriptsize]{x.method(y)} becomes \Rustinline[fontsize=\scriptsize]{Type::method(&x, y)}).
+                    (\Rustinline[fontsize=\scriptsize]{x.method(y)} becomes \Rustinline[fontsize=\scriptsize]{Type::method(&x, y)}).
       \item Add implicit dereferencing operations.
       \item Borrow checking.
     \end{itemize}
@@ -788,6 +790,7 @@
     \item Code generation:
     \begin{itemize}
       \scriptsize
+      \setbeamertemplate{itemize items}[circle]
       \item Rust uses LLVM for the backend.
       \item It leverages many optimizations of the LLVM intermediate representation.
       \item LLVM takes over from this point on.
