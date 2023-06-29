@@ -96,6 +96,59 @@
   If a violation of the compiler rules is found, the program will simply not compile.
 \end{frame}
 
+\subsection{How does it look like?}
+
+\begin{frame}[fragile]{Immutability by default}
+  \begin{listing}
+    \begin{minted}{Rust}
+      fn main() {
+        let x = 1;
+        x = x + 1;
+      }
+    \end{minted}
+  \end{listing}
+
+  \vfill
+
+  \begin{listing}
+    \scriptsize
+    \begin{Verbatim}[commandchars=\\\{\}]
+      \textbf{\textcolor{red}{error[E0384]}: cannot assign twice to immutable variable `x`}
+      --> src/main.rs:3:5
+      |
+    2 |     let x = 1;
+      |         \textcolor{blue}{-}
+      |         \textcolor{blue}{|}
+      |         \textcolor{blue}{first assignment to `x`}
+      |         \textcolor{blue}{help: consider making this binding mutable: `mut x`}
+    3 |     x = x + 1;
+      |     \textcolor{red}{^^^^^^^^^ cannot assign twice to immutable variable}
+    \end{Verbatim}
+  \end{listing}
+\end{frame}
+
+\begin{frame}[fragile]{Move semantics by default}
+  Each value has only one owner.
+  If a variable is passed to another function or scope, the owner of the value changes.
+
+  \vfill
+
+  \begin{listing}
+    \begin{minted}{Rust}
+      fn main() {
+        let name = String::from("Alice");
+        print_name(name);
+        println!("The name is: {}", name); // Compilation error
+      }
+    
+      fn print_name(name: String) {
+          println!("Name: {}", name);
+      }
+    \end{minted}
+  \end{listing}
+\end{frame}
+
+
 \subsection{Why Rust?}
 
 \section{Petri nets}
