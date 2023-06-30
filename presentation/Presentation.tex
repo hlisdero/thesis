@@ -167,6 +167,40 @@
   This is the case for numbers by default. Compare this with the default in C++ vs the best practices.
 \end{frame}
 
+\begin{frame}[fragile]{Move semantics by default: Error message}
+  \begin{listing}
+    \raggedleft
+    \tiny
+    \begin{Verbatim}[commandchars=\\\{\}]
+      \textbf{\textcolor{red}{error[E0382]}: borrow of moved value: `name`}
+      --> src/main.rs:4:33
+       |
+     2 |     let name = String::from("Alice");
+       |         \textcolor{blue}{---- move occurs because `name` has type `String`,
+       |                                which does not implement the `Copy` trait}
+     3 |     print_name(name);
+       |                \textcolor{blue}{---- value moved here}
+     4 |     println!("The name is: {}", name); // Compilation error
+       |                               \textcolor{red}{^^^^ value borrowed here after move}
+       |
+     \textcolor{green}{note}: consider changing this parameter type in function `print_name` to borrow
+     instead if owning the value isn't necessary
+      --> src/main.rs:7:21
+       |
+     7 | fn print_name(name: String) \{
+       |    \textcolor{blue}{----------}       \textcolor{green}{^^^^^^ this parameter takes ownership of the value}
+       |    \textcolor{blue}{|}
+       |    \textcolor{blue}{in this function}
+       = \textbf{note}: this error originates in the macro `$crate::format_args_nl`
+         which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+     help: consider cloning the value if the performance cost is acceptable
+       |
+     3 |     print_name(name.clone());
+       |                    \textcolor{green}{++++++++}     
+    \end{Verbatim}
+  \end{listing}
+\end{frame}
+
 \begin{frame}[fragile]{Algebraic Data Types, aka enums with fields}
   \begin{listing}
     \begin{minted}[fontsize=\tiny, frame=none]{Rust}
@@ -617,7 +651,7 @@
 \begin{frame}{The tooling is great and works out of the box}
   \begin{itemize}
     \item \href{https://doc.rust-lang.org/stable/cargo/}{cargo},
-          the official package manager: Format, build, test, lint, and update packages.
+          the official package manager: Format, build, test, lint, update, and publish packages.
     \pause
     \item \href{https://doc.rust-lang.org/book/ch11-00-testing.html}{Test harness}
           for unit tests, integration tests, and tests in documentation comments (doctests).
@@ -801,10 +835,10 @@
     \begin{itemize}
       \scriptsize
       \setbeamertemplate{itemize items}[circle]
-      \item Rust uses LLVM for the backend.
+      \item Rust relies on LLVM as a backend.
       \item It leverages many optimizations of the LLVM intermediate representation.
       \item LLVM takes over from this point on.
-      \item At the end object files are linked to create an executable.
+      \item At the end, object files are linked to create an executable.
     \end{itemize}
   \end{itemize}
 \end{frame}
