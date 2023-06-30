@@ -238,6 +238,32 @@
   \end{listing}
 \end{frame}
 
+\begin{frame}[fragile]{A more advanced match statement}
+  A \Rustinline{match} statement works \emph{with} the type system,
+  while a mere \Rustinline{if} can do anything and it is not bound to the type system.
+  Match statements are always \emph{exhaustive}: They must handle all possibilities.
+
+  \begin{listing}
+    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
+      fn main() {
+        let number = 42;
+    
+        match number {
+            0 => println!("The number is zero"),
+            1 | 2 | 3 => println!("The number is a small prime"),
+            n @ 4..=9 => println!("The number is between 4 and 9: {n}"),
+            n if is_even(n) => println!("The number is even: {n}"),
+            n if is_odd(n) => println!("The number is odd: {n}"),
+            _ => panic!("The number doesn't match any specific case!"),
+        }
+      }
+    \end{minted}
+  \end{listing}
+
+  Python 3.10 introduced a similar feature (\href{https://peps.python.org/pep-0636/}{PEP 636}).
+  Java 17 has a limited version of this (\href{https://openjdk.org/jeps/406}{JEP 406}).
+\end{frame}
+
 \begin{frame}[fragile]{Modeling data in Rust}
   \begin{itemize}
     \item Leverage the type system in your favor
@@ -269,32 +295,6 @@
   By directly modeling the business domain with Rust's expressive type system,
   the compiler is able to verify the business logic and
   we catch more errors at compile-time.
-\end{frame}
-
-\begin{frame}[fragile]{A more advanced match statement}
-  A \Rustinline{match} statement works \emph{with} the type system,
-  while a mere \Rustinline{if} can do anything and it is not bound to the type system.
-  Match statements are always \emph{exhaustive}: They must handle all possibilities.
-
-  \begin{listing}
-    \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
-      fn main() {
-        let number = 42;
-    
-        match number {
-            0 => println!("The number is zero"),
-            1 | 2 | 3 => println!("The number is a small prime"),
-            n @ 4..=9 => println!("The number is between 4 and 9: {n}"),
-            n if is_even(n) => println!("The number is even: {n}"),
-            n if is_odd(n) => println!("The number is odd: {n}"),
-            _ => panic!("The number doesn't match any specific case!"),
-        }
-      }
-    \end{minted}
-  \end{listing}
-
-  Python 3.10 introduced a similar feature (\href{https://peps.python.org/pep-0636/}{PEP 636}).
-  Java 17 has a limited version of this (\href{https://openjdk.org/jeps/406}{JEP 406}).
 \end{frame}
 
 \begin{frame}[fragile]{Error handling with Result}
