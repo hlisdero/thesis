@@ -2,7 +2,9 @@
 
 ## Compile-time Deadlock Detection in Rust using Petri Nets
 
-[Link to the PDF](./thesis_en/Thesis.pdf)
+[Link to the PDF in English](./thesis_en/Thesis.pdf)
+
+[Link to the PDF in Spanish](./thesis_es/Tesis.pdf)
 
 [Repository of the tool implemented](https://github.com/hlisdero/cargo-check-deadlock/)
 
