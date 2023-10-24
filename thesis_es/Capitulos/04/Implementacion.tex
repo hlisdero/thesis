@@ -1,0 +1,32 @@
+This chapter is dedicated to exploring
+the implementation details of the deadlock detection tool.
+Its purpose is to provide a high-level view of the code and the data structures.
+The most important implementation decisions made throughout the development process
+are examined as well.
+
+In the subsequent sections,
+we will describe the central components of the deadlock detection tool,
+including the internal representation of the call stack, the function memory model,
+and the translation of every constituent of a \acrshort{MIR} function.
+
+Later on, a significant portion of the discussion is devoted to explaining
+the support of multithreading and the modeling of synchronization primitives as Petri nets.
+Its implementation required careful design considerations
+to ensure correctness and efficiency.
+
+The tool currently supports the following structures
+from the Rust standard library to synchronize access to shared resources
+and provide communication among threads:
+
+\begin{itemize}
+  \item mutexes (\Rustinline{std::sync::Mutex}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Mutex.html}}),
+  \item condition variables (\Rustinline{std::sync::Condvar}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html}}),
+  \item atomic reference counters (\Rustinline{std::sync::Arc}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Arc.html}}).
+\end{itemize}
+
+While the main details are covered, this chapter is not intended
+to serve as a substitute for the code documentation.
+The code documentation in the form of comments, unit tests, and integration tests
+provides comprehensive information on the low-level specifics and usage of the tool.
+As stated before, the repository is publicly available on
+GitHub\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock}}\footnote{\url{https://github.com/hlisdero/netcrab}}.

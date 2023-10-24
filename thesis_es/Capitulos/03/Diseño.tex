@@ -1,0 +1,14 @@
+Now that the relevant background topics have been covered,
+we can proceed to delve into the specifics of the design of the translation process.
+The design is marked by three crucial architectural choices
+that will be elaborated on in this chapter:
+
+\begin{enumerate}
+    \item The decision to utilize the Rust compiler as a backend for the translation.
+    \item Basing the translation on the \acrfull{MIR}.
+    \item Inlining function calls in the Petri net.
+\end{enumerate}
+
+Throughout this chapter,
+we will conduct an in-depth analysis
+of the Rust compiler's internal mechanisms and its relevant compilation stages.

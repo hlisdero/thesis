@@ -1,0 +1,45 @@
+\section{Petri nets libraries in Rust}
+
+As part of the development of the translation of the source code to a Petri net,
+it is necessary to use a Petri net library for the Rust programming language.
+A quick search of the packages available on
+\emph{crates.io}\footnote{\url{https://crates.io/}}, GitHub, and GitLab
+revealed that there is, unfortunately, no well-maintained library.
+
+Some Petri net simulators were found such as:
+
+\begin{itemize}
+    \item pns\footnote{\url{https://gitlab.com/porky11/pns}}:
+          Programmed in C. It does not offer the option
+          to export the resulting network to a standard format.
+    \item PetriSim\footnote{\url{https://staff.um.edu.mt/jskl1/petrisim/index.html}}:
+          An old DOS/PC simulator programmed in Bordland Pascal.
+    \item WOLFGANG\footnote{\url{https://github.com/iig-uni-freiburg/WOLFGANG}}:
+          A Petri net editor in Java, maintained by the Department of Computer Science
+          at the University of Freiburg, Germany.
+\end{itemize}
+
+Regrettably, none of them meet the requirements of the task.
+
+Since a Petri net is a graph, the possibility
+of using a graph library and modifying it to suit the objectives of this work was considered.
+Two graph libraries were found in Rust:
+
+\begin{itemize}
+    \item petgraph\footnote{\url{https://docs.rs/petgraph/latest/petgraph/}}:
+          The most widely used library for graphs in \textit{crates.io}.
+          It offers an option to export to the DOT format.
+    \item gamma\footnote{\url{https://github.com/metamolecular/gamma}}:
+          Unstable and unchanged since 2021. It does not offer the ability to export the graph.
+\end{itemize}
+
+None of the possibilities satisfies the requirement
+to export the resulting network to the \acrshort{PNML} format.
+In addition, if a graph library is used,
+the operations of a Petri net should be implemented as a \emph{wrapper} around a graph,
+which reduces the possibility of optimizations for our use case
+and hinders the long-term extensibility of the project.
+
+In conclusion, it is imperative
+to implement a Petri net library in Rust from scratch as a separate project.
+This contributes one more tool to the community that could be reused in the future.

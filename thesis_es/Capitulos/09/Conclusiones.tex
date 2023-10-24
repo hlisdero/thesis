@@ -1,0 +1,53 @@
+This thesis has explored the translation of Rust programs into Petri net models
+for the purpose of deadlock and missed signal detection.
+Throughout the study, various aspects of the translation process have been examined,
+including the handling of function calls, threads, mutexes, and condition variables.
+The translator we developed has demonstrated its capability
+to accurately capture the concurrency and
+synchronization behavior of rather simple Rust programs.
+
+The translation approach presented in this thesis has shown promising results,
+successfully modeling and detecting deadlocks in a range of test programs,
+comprising even two classical problems of concurrent programming.
+By harnessing the expressive power of Petri nets,
+the translator provides a visual representation of program behavior,
+facilitating the identification of potential synchronization issues.
+Most importantly, the translation produces a model that can be analyzed
+by a myriad of model checking tools,
+leveraging the existing academic work to bring solutions to industry problems.
+The incorporation of a succinct model for condition variables
+enhances the modeling capabilities and enables the detection of missed signals,
+which are a more intricate class of deadlock in concurrent systems.
+
+Moving forward, there are several avenues for future research and improvement.
+One potential direction is the exploration of more complex programs and real-world applications
+to evaluate the scalability and effectiveness of the translation approach.
+Additionally, further refinement and optimization of the translation algorithms
+could enhance the efficiency of the analysis,
+specially higher-level models that would allow modeling the memory more effectively.
+
+Overall, this thesis has made a significant contribution by developing a translator
+that bridges the gap between Rust programs and Petri nets.
+The insights gained from this research have shed light on the challenges
+and opportunities in modeling and analyzing concurrent systems at compile-time.
+Ideally, a programming language whose compiler detects concurrency problems
+would be a godsend for many applications.
+Building on the strengths of Petri nets, this possibility could be advanced
+further in the Rust programming language.
+
+On a different note, the contribution of this thesis extends
+beyond the immediate benefits of the proposed translator and its capabilities.
+By providing a solid, well-documented base for the translation of Rust programs into Petri nets,
+this work aims to make a meaningful contribution to the Rust community as a whole.
+It serves as a stepping stone for future endeavors,
+offering a reliable foundation upon which other tools and research projects can be built.
+It opens up new possibilities for exploring the analysis and verification
+of concurrent Rust programs using Petri nets.
+This, in turn, has the potential to drive further advancements in the field,
+stimulating innovation and promoting a deeper understanding of concurrent programming in Rust.
+With its comprehensive documentation and clear implementation,
+the translator not only facilitates immediate use but also serves as a valuable resource
+for those interested in studying or extending the translation techniques employed.
+Ultimately, this work aspires to ignite curiosity and
+inspire further contributions to the Rust ecosystem,
+fostering collaboration and growth in the community.

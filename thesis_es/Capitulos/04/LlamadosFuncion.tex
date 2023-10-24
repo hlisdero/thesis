@@ -1,0 +1,262 @@
+\section{Function calls}
+\label{sec:function-calls}
+
+\subsection{The call stack}
+
+A Rust program is composed, as in other programming languages, of functions.
+The program begins (except for the caveats seen in Sec. \ref{sec:basic-places})
+with a call to the \Rustinline{main} function, which then may call other functions.
+It should be emphasized that function calls may be placed at any point within the code.
+A function can be called from another function or even from within itself, resulting in recursive calls.
+
+Function calls are stored in memory in a data structure called the \emph{call stack}.
+When a function is called in Rust, it gets pushed onto the call stack, creating a new stack frame.
+A stack frame contains important information such as the function's local variables, arguments,
+and the return address indicating where the program should resume once the function finishes its execution.
+
+The call stack operates based on the principle of \acrfull{LIFO}.
+As functions are called, each new stack frame is placed on top of the previous one.
+This allows the program to execute the most recently called function first.
+Once a function completes its execution, it is popped off the stack,
+and the program continues from the point where it left off in the previous function.
+
+Hence, the call stack plays an essential role in managing function calls and returns,
+since it keeps track of the flow of function calls and maintains the necessary information
+for the program to return to the correct execution point after a function completes its task.
+
+For the same reasons, mirroring the call stack in the translator
+is the most suitable approach for tracking function calls to be translated
+because it aligns with the logical flow of program execution.
+As functions are translated, they are pushed and popped
+from the call stack of the \Rustinline{Translator},
+reflecting the order in which they are called at runtime.
+This enables us to handle nested function invocations and
+follow the control flow from one function to the other during the translation process.
+
+\subsection{MIR functions}
+
+In the implementation, the \Rustinline{Translator} has a stack
+that supports the usual operations \Rustinline{push}, \Rustinline{pop}, and \Rustinline{peek}.
+This stack stores structures of type \Rustinline{MirFunction}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function.rs}}.
+Later, we will see that not all functions are translated as \acrshort{MIR} functions
+since not all functions have a representation in \acrshort{MIR}
+and, in other cases, it is convenient to handle them differently.
+Nevertheless, \acrshort{MIR} functions are the ``common case'' in the translation process,
+the default case for the majority of user-defined functions.
+
+The available interface provided by \emph{rustc}
+allows for querying the \acrshort{MIR} body of only one function at a time,
+which can be done using the \Rustinline{optimized_mir}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.optimized\_mir}}
+method.
+This implies that it is not possible to get the \acrshort{MIR} of the whole program initially
+and the translator must obtain the \acrshort{MIR} from each function as it reaches them in the code.
+But how to identify each function?
+It is known from experience that functions in distinct modules may have the same name,
+making the name unsuitable as an identifier.
+Luckily, this problem is already solved in the compiler.
+The functions are uniquely identified by the compiler type \Rustinline{rustc_hir::def_id::DefId}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_hir/def_id/struct.DefId.html}}.
+This ID is valid for the crate currently being compiled and it is already present in the \acrshort{HIR}.
+The high-level algorithm can be described as follows.
+
+When the translation starts:
+
+\begin{enumerate}
+    \item Query the id of the entry point of the program (the \Rustinline{main} function).
+    \item Create a \Rustinline{MirFunction} with the necessary information.
+    \item Push it to the stack.
+    \item If necessary, modify the \acrshort{MIR} function contents using \Rustinline{peek}.
+    \item Translate the top of the call stack.
+    \item When \Rustinline{main} finishes, remove it (\Rustinline{pop}) from the call stack.
+\end{enumerate}
+
+When a terminator of type ``call'' (see Sec. \ref{sec:mir-components}) is encountered:
+
+\begin{enumerate}
+    \item Query the id of the called function.
+    \item Create a \Rustinline{MirFunction} with the necessary information.
+    \item Push it to the stack.
+    \item If necessary, modify the \acrshort{MIR} function contents using \Rustinline{peek}.
+    \item Translate the top of the call stack.
+    \item When the function finishes, remove it (\Rustinline{pop}) from the call stack.
+\end{enumerate}
+
+As seen, the approach is consistent for every \acrshort{MIR} function
+and thus is easier to implement.
+
+The use of a call stack in the translation process enables context switching
+between \acrshort{MIR} functions and facilitates the ability to return to the specific basic block
+from which a function was called.
+This allows for the translation of the program to be performed function by function,
+in a linear fashion, ensuring that the structure and order of the original program are maintained.
+
+However, employing the call stack approach does come with certain limitations.
+First, if the same function is called multiple times within the program,
+it will be translated multiple times as well.
+This is related to the inlining strategy elaborated in Sec. \ref{sec:function-inlining}.
+Although this can potentially be mitigated through the use of some sort of cache,
+it is out of the scope of this thesis.
+This optimization will be discussed in Sec. \ref{sec:future-work-function-cache}.
+
+The more severe implication of using the call stack approach
+is the inability to handle recursive functions.
+When encountering a recursive function within the translation process,
+the process becomes trapped in an endless loop
+where the stack grows indefinitely as new stack frames are pushed to it,
+leading to a stack overflow and a subsequent crash of the translation process.
+This problem is addressed in Sec. \ref{sec:future-work-recursion} too.
+For now, it is necessary to accept the limitation that recursive functions
+cannot be translated using this framework.
+
+\subsection{Foreign functions and functions in the standard library}
+
+In Rust, the compiler includes by default
+the standard library in all compiled binaries, effectively linking it statically.
+To override this behavior, the crate-level attribute \Rustinline{#![no_std]}
+is used to indicate that the crate will link to the core-crate instead of the std-crate.
+See \cite{embedded-book} for more details.
+
+This means that the standard library's functionality becomes an integral part of the resulting executable.
+Function calls to the standard library appear in various contexts in Rust code,
+such as when accessing command line arguments, invoking iterators,
+utilizing traits like \Rustinline{std::clone::Clone}, \Rustinline{std::deref::Deref::deref},
+or employing standard library types like \Rustinline{std::result::Result} or \Rustinline{std::option::Option}.
+Given the prevalence of these function calls throughout Rust programs,
+it becomes essential to handle them separately in the translation process.
+It is evident that these standard library functions, due to their purpose, cannot lead to a deadlock.
+Therefore, it is more practical to treat them as black boxes within the translation process,
+bypassing the need to translate their \acrshort{MIR}.
+This approach is indispensable in order to avoid generating
+an excessively large and convoluted Petri net that would hinder readability and comprehension.
+
+The focus of the translation effort lies primarily on the user code, specifically
+the functions that developers write to implement their desired functionalities.
+By directing attention to the user code and excluding the translation of standard library functions,
+the resulting Petri net remains more manageable,
+facilitating the analysis and verification of potential deadlocks within the user's codebase.
+The calls to the standard library constitute, in other words,
+the ``frontier'' or ``boundary'' of the translation,
+the point at which we stop translating the \acrshort{MIR} accurately
+and rely instead on a simplified model.
+
+\subsubsection{Petri net model for a function with cleanup block}
+
+The model presented in Fig. \ref{fig:simplest-function} is the first approximation.
+There is, however, an implementation detail that requires careful attention.
+Numerous functions in the standard library contain not only an end place
+(``target block'', in the \emph{rustc} parlance) but also a cleanup place (``cleanup block'').
+This second execution path is taken when the function explicitly panics
+or more generally fails to achieve its goal for whatever reason.
+In this case, the control flow continues to a different basic block,
+where variables are freed and eventually the program ends with a panic error code.
+Stated differently, the unwind of the stack begins
+as soon as a function encounters a non-recoverable failure.
+
+Considering that the translator cannot tell if this abnormal situation could lead
+to a deadlock later in the translation process, it is imperative to translate
+this alternative execution path whenever possible.
+Only in counted exceptions, all related to the synchronization primitives
+and discussed in the respective sections, this cleanup block is ignored explicitly.
+The complete model for an abridged function call with a cleanup block
+can be seen in Fig. \ref{fig:function-with-cleanup}.
+
+\begin{figure}[!htb]
+    \centering
+    \includesvg[width=\linewidth]{function-with-cleanup.svg}
+    \caption{The Petri net model for a function with a cleanup block.}
+    \label{fig:function-with-cleanup}
+\end{figure}
+
+\subsubsection{Functions translated with the abridged Petri net model}
+
+Having discussed the exclusion of standard library functions from the translation process,
+we now shift our focus towards the functions that indeed require translation using the model we presented earlier.
+Surprisingly, they include a considerable number of functions.
+
+\begin{itemize}
+    \item Functions part of the standard library (the std-crate\footnote{\url{https://doc.rust-lang.org/std/}}),
+          save for the \Rustinline{std::sync::Condvar::wait} function detailed in Sec. \ref{sec:condvar-algorithms}.
+    \item Functions part of the core library (the core-crate\footnote{\url{https://doc.rust-lang.org/core/}}).
+    \item Functions in the alloc-crate: the core allocation and collections library\footnote{\url{https://doc.rust-lang.org/alloc/}}.
+    \item Functions without a \acrshort{MIR} representation
+          This can be checked with the \Rustinline{is_mir_available}
+          method\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.is\_mir\_available}}.
+    \item Functions which are a foreign item i.e., linked via \Rustinline{extern { ... }}.
+          This can be checked with the \Rustinline{is_foreign_item}
+          method\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/ty/context/struct.TyCtxt.html\#method.is\_foreign\_item}}.
+\end{itemize}
+
+In the future, calls to functions in dependencies, i.e., in other crates, should also be handled in this fashion.
+In conclusion, the default case for functions that are \emph{not} user-defined
+is to treat them as a foreign function and use an abridged Petri net model to translate them.
+
+\subsection{Diverging functions}
+
+Diverging functions are a special case that is relatively easy to support.
+It is simply a function that never returns to the caller.
+Examples of this are a wrapper around an infinite \Rustinline{while} loop,
+a function that exits the process,
+or a function that starts an \acrshort{OS}.
+It suffices to connect the start place of the function to
+a sink transition (Definition \ref{definition:sink-transition})
+as seen in Fig. \ref{fig:diverging-function}.
+
+\begin{figure}[!htb]
+    \centering
+    \includesvg[width=0.5\linewidth]{diverging-function.svg}
+    \caption{The Petri net model for a diverging function (a function that does not return).}
+    \label{fig:diverging-function}
+\end{figure}
+
+Note that this special case does not constitute a deadlock and must \emph{not} be treated as such.
+An infinite loop, i.e., a ``busy wait'', is in its inherent nature distinct from the infinite wait that
+characterizes a deadlock as seen in Sec. \ref{sec:coffman-conditions}.
+In other words, detecting infinite loops is closer to the problem of detecting livelocks,
+which are out of the scope of this thesis.
+Besides, the translator cannot tell ahead of time
+if the diverging call is benign like a call to \Rustinline{std::process::exit}
+or a call to some kind of function carefully designed to block the program.
+
+In the current \acrshort{PN} model, the token is consumed and the net is left
+in an end state without tokens in the places
+\Rustinline{PROGRAM_END} or \Rustinline{PROGRAM_PANIC} shown in Fig. \ref{fig:program-places}.
+Consequently, the model checker is able to distinguish this end state from the other cases
+and conclude that a diverging function has been called.
+
+\subsection{Explicit calls to panic}
+
+The \Rustinline{panic!} macro can be seen as a special case of a divergent function
+where the transition representing the function call is connected to
+the place labeled \Rustinline{PROGRAM_PANIC} described in Sec. \ref{sec:basic-places}.
+The translator detects an explicit call to panic,
+which is one of the following functions:
+
+\begin{itemize}
+    \item \Rustinline{core::panicking::assert_failed}
+    \item \Rustinline{core::panicking::panic}
+    \item \Rustinline{core::panicking::panic_fmt}
+    \item \Rustinline{std::rt::begin_panic}
+    \item \Rustinline{std::rt::begin_panic_fmt}
+\end{itemize}
+
+The documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/panic-implementation.html}}
+elaborates on why panic is defined in the core-crate and the std-crate and how it is implemented.
+
+See Listing \ref{lst:panic} for a simple program that panics. The corresponding Petri net model is depicted in Fig. \ref{fig:panic}.
+This is one of the illustrative examples included in the repository.
+
+\begin{listing}[!htb]
+    \begin{minted}{Rust}
+        fn main() {
+            panic!();
+        }        
+    \end{minted}
+    \caption{A simple Rust program that calls \Rustinline{panic!}.}
+    \label{lst:panic}
+\end{listing}
+
+\begin{figure}[!htb]
+    \centering
+    \includesvg[width=0.5\linewidth]{panic.svg}
+    \caption{The Petri net model for Listing \ref{lst:panic}.}
+    \label{fig:panic}
+\end{figure}

@@ -1,0 +1,44 @@
+\section{In search of a backend}
+
+To put it succinctly, two approaches for translating Rust code to Petri nets exist.
+The first option is to create a translator from scratch,
+while the second option is to build upon an existing tool.
+
+The first option may seem attractive at first,
+considering that it gives the developer
+the freedom to shape the tool according to his/her desires.
+Features can be added as required and
+data structures can be tailored to the specific purpose.
+Nonetheless, this flexibility comes at a high price.
+In order to support a reasonable subset of the Rust programming language,
+substantial amounts of effort need to be invested into the task.
+Complex language constructs, such as macros, generics, or the rich type system itself,
+must be comprehended in their most intricate details to be translated effectively.
+The result is, essentially, a new compiler for Rust code.
+Noting that the Rust compiler was developed over many years and
+with the support of a large community of contributors,
+it becomes clear that this path is nothing more than work duplication.
+It is indeed a Herculean labor that would require the full-time dedication of a whole team
+to maintain and keep up-to-date with the newest changes in the Rust language and the compiler.
+
+On the other hand, there is the possibility
+of integrating with the existing Rust compiler,
+which is available under an open-source license
+and its documentation is extensive and regularly updated.
+This frees the implementation partly from having to deal with the changes to the language,
+giving more time to focus on the features that add value to the users.
+Hence the compiler plays the role of a backend on which the static analysis relies.
+Of course, this requires learning the compiler internals
+but this is not the first time that a tool sets off to do this.
+For instance, the official Rust linter,
+\emph{clippy}\footnote{\url{https://github.com/rust-lang/rust-clippy}},
+analyzes the Rust code for incorrect, inefficient, or non-idiomatic constructs.
+It is an extremely valuable tool for developers that goes beyond the standard checks
+performed during compilation.
+
+Supporting all the language features from the beginning
+and collaborating with the community is key to the success of the proposed solution.
+Therefore, it is advisable to integrate with the existing ecosystem
+and reuse as much work as possible.
+Due to the above reasons, this project is based on \emph{rustc}.
+We will now study the relevant parts of the Rust compiler in more detail.

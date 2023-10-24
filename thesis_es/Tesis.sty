@@ -1,0 +1,102 @@
+\ProvidesPackage{Tesis}
+% Style file for the thesis %
+% Based on the guide: https://en.wikibooks.org/wiki/LaTeX/Modular_Documents#The_file_mystyle.sty 
+
+% FIX A BUG WHEN USING THE MINTED PACKAGE.
+% See: https://github.com/gpoore/minted/issues/307
+\usepackage[T1]{fontenc}
+
+% SET THE LANGUAGE TO SPANISH %
+\usepackage[spanish]{babel}
+
+% INCLUDE THE BASIC PACKAGES FOR TYPESETTING EQUATIONS %
+\usepackage{amssymb,amsmath,amsthm,amsfonts}
+\usepackage{calc}
+
+% MARGINS CONFIGURATION %
+\usepackage{vmargin}
+\setmarginsrb{2 cm}{2 cm}{2 cm}{2 cm}{1 cm}{1.5 cm}{1 cm}{1.5 cm}
+
+% SPACE BETWEEN PARAGRAPHS
+\usepackage{parskip}
+
+% TITLE PAGE SETUP % 
+\usepackage{titlesec}
+
+% FANCY HEADERS %
+\usepackage{fancyhdr}
+
+% GRAPHICS CONFIGURATION %
+\usepackage{graphicx}
+\graphicspath{{../images/}}
+
+% ADD SUPPORT FOR SVG FILES %
+\usepackage[notransparent]{svg}
+\svgsetup{inkscape=newer,inkscapelatex=false}
+\svgpath{{../svg/}}
+
+% AN IMPROVED \xurl COMMAND FOR TYPESETTING URLS %
+% See: https://tex.stackexchange.com/questions/372321/handling-an-url-underfull-hbox-problem
+\usepackage{xurl}
+
+% HYPERLINK CONFIGURATION %
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\hypersetup{
+      colorlinks=true,
+      linkcolor=black,
+      filecolor=blue,
+      citecolor=blue,
+      urlcolor=blue,
+}
+
+% ACRONYM SUPPORT %
+% nomain: Do not use a main glossary
+% nopostdot: Do not add a dot at the end of each entry
+% nonumberlist: Do not add numbers at the end of each entry
+% nogroupskip: Do not add a skip between each letter group
+% See example: https://en.wikibooks.org/wiki/LaTeX/Glossary
+\usepackage[acronym,nomain,nopostdot,nonumberlist,nogroupskip]{glossaries}
+\setglossarystyle{list}
+\makeglossaries
+
+% CODE LISTINGS WITH SINTAX HIGHLIGHTING %
+% See example: https://www.overleaf.com/learn/latex/Code_Highlighting_with_minted
+% Restart the counter on every chapter
+\usepackage[chapter,newfloat]{minted}
+\setminted{
+      linenos, % Show line numbers
+      breaklines, % Wrap lines if necessary
+      autogobble, % Remove whitespace in front of the code
+      frame=lines, % Use lines to create a frame
+      framesep=2mm, % Separation of the frame from the actual code
+      baselinestretch=1.2, % Line spacing of the code set to 1.2
+      fontsize=\footnotesize % Use a font size equal to the font size of a footnote
+}
+% Define a new environment for long listings as suggested in the documentation
+\usepackage{caption}
+\newenvironment{longlisting}{\captionsetup{type=listing}}{}
+% Define a new environment for inline Rust code
+\newmintinline{Rust}{
+      fontsize=\small
+}
+
+% BETTER ENUMERATE ENVIRONMENTS: SUPPORT USING ROMAN NUMERALS % 
+\usepackage{enumitem}
+
+% MULTICOLUMNS: TABLE WHERE A ROW OCCUPIES MULTIPLE COLUMNS
+% See example: https://www.overleaf.com/learn/latex/Tables
+\usepackage{multicol}
+
+% COLOR BOXES FOR DEFINITIONS %
+\usepackage[most]{tcolorbox}
+% Define a new environment for definitions
+% See example format: https://github.com/T-F-S/tcolorbox/blob/master/doc/latex/tcolorbox/tcolorbox-example.tex
+\newtcbtheorem[auto counter]{definition}
+{Definition}{fonttitle=\bfseries\upshape, fontupper=\slshape,
+      arc=0mm, colback=blue!5!white,colframe=blue!75!black}{definition}
+
+% CORRECT DISPLAY OF THE EURO SIGN %
+\usepackage{eurosym}
+
+% DEFINE SOME COMMON SYMBOLS (THE INCLUDE IS LOCATION-SENSITIVE) %
+\usepackage{gensymb}

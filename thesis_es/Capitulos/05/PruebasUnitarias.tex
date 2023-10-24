@@ -1,0 +1,51 @@
+\section{Unit tests}
+
+The unit tests form the base of the test suite.
+The \acrshort{PN} library and the data structures
+used in the translator rely on them extensively.
+By testing the underlying data structures meticulously,
+potential issues can be identified and resolved early in the development cycle
+before continuing work on the higher-level components of the translator.
+
+\subsection{Petri net library}
+
+The \acrshort{PN} library \Rustinline{netcrab} uses unit tests to verify that
+adding places, transitions, and arcs to a net behaves as expected.
+The translator performs these operations often so it is important to verify them.
+The iterators on which the export formats are built are tested as well.
+
+On the other hand, each one of the three export formats
+(DOT, \acrshort{PNML} and \acrshort{LoLA}) comes with unit tests
+to check that the output is generated correctly for the following simple cases:
+
+\begin{itemize}
+  \item Empty net.
+  \item A \acrshort{PN} with 5 places and 0 transitions.
+  \item A \acrshort{PN} with 0 places and 5 transitions.
+  \item A \acrshort{PN} with 5 places marked with different numbers of tokens.
+  \item A \acrshort{PN} with a chain topology.
+  \item A \acrshort{PN} with 1 place and 1 transition connected in a loop.
+\end{itemize}
+
+These tests helped to troubleshoot bugs related to the \acrshort{LoLA}
+format.
+For concrete examples,
+see this commit\footnote{\url{https://github.com/hlisdero/netcrab/commit/5745e0da5d27bd709ef479f45a6d2e75974d3745}}
+or this other commit\footnote{\url{https://github.com/hlisdero/netcrab/commit/dbce3f8999ece32e6731527c303a7b59858991f9}}.
+
+\subsection{Stack}
+
+The simple
+\Rustinline{Stack}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/data_structures/stack.rs}}
+data structure is employed to implement the call stack in the \Rustinline{Translator},
+as seen in Sec. \ref{sec:function-calls}.
+Unit tests demonstrate the supported methods and check some simple use cases.
+
+\subsection{Hash map counter}
+
+Analogous to the stack,
+the \Rustinline{HashMapCounter}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/data_structures/hash_map_counter.rs}}
+contains some unit tests to verify that the methods work as intended.
+This data structure forms the basis for the function counter in the \Rustinline{Translator}
+that keeps track of how many times each function was called
+to generate a unique incremental index for the transition labels.

@@ -1,0 +1,459 @@
+\section{Condition variable (\texttt{std::sync::Condvar})}
+
+A condition variable is a synchronization primitive used in concurrent programming
+to enable threads to wait for a certain condition before proceeding with their execution.
+Threads wait until they are notified by another thread
+that the desired condition has been met.
+
+Condition variables are typically associated with a mutex,
+which ensures exclusive access to the shared data that the condition depends on.
+When a thread waits on a condition variable, it releases the associated mutex,
+allowing other threads to make progress.
+When the condition becomes true or some event occurs,
+a notifying thread signals the condition variable,
+allowing one or more waiting threads to resume their execution.
+
+The semantics of condition variables, as well as examples in pseudocode,
+were introduced in Sec. \ref{sec:condition-variables}.
+The understanding of the precise behavior of condition variables in all circumstances
+is a prerequisite for this section.
+
+This section provides an elaborate explanation of the \acrshort{PN} model
+used to represent condition variables from the Rust standard library.
+It is followed by a practical example that aims to enhance the clarity of the concepts.
+Finally, the algorithms for the translation of condition variable functions are outlined.
+
+\subsection{Petri net model}
+
+In this particular case, the \acrshort{PN} model must be examined carefully,
+as it involves not only the condition variable itself
+but also the variable that holds the condition
+on which the blocked thread is waiting \emph{and} the mutex
+that synchronizes access to that condition.
+
+This interaction can be extremely complex in general.
+For instance, the same condition variable could be used
+to signal an arbitrary number of distinct conditions.
+Accordingly, different mutexes may be passed
+as an argument to the \Rustinline{wait} call.
+Furthermore, an arbitrary number of threads may block on a condition variable and
+Rust supports the broadcast operation to awaken all waiting threads at once
+through the method \Rustinline{notify_all}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html\#method.notify_all}}
+(see Sec. \ref{sec:condition-variables}).
+Most importantly, the condition itself could be of any type
+and could take a long sequence of values during the execution,
+depending on which the waiting threads could act in diverse ways for every scenario.
+
+For the above reasons, it is unavoidable to make assumptions
+regarding the supported use cases of condition variables
+in order to reduce the complexity of the task.
+Embracing and dealing with every possibility is beyond the scope of this thesis.
+
+\subsubsection{Assumptions}
+
+\begin{enumerate}
+      \item \emph{Single call}: There is only one call to \Rustinline{wait} per condition variable, i.e.,
+            \Rustinline{condvar.wait()} appears in a single place in the source code for a given \Rustinline{condvar}.
+            For example, it can be inside of a loop but it cannot be in two different functions.
+      \item \emph{Single-element queue}: There is at most one waiting thread per condition variable.
+      \item \emph{Boolean condition}: The condition is a boolean flag. It is either set or not set.
+            Waiting on a condition that may take 3 or more values is \emph{not} supported by this model.
+      \item \emph{Mandatory set-condition / No ``false notify''}: If a thread locks the mutex and accesses the shared condition mutably,
+            then it always sets it to a different value.
+            In simpler terms, threads that look at the value, do not change it
+            and immediately notify the condition variable are \emph{not} supported.
+      \item \emph{Broadcast exclusion}: The method \Rustinline{std::sync::Condvar::notify_all} is out of scope.
+\end{enumerate}
+
+Support for multiple calls to \Rustinline{wait} and multiple waiting threads could be implemented
+but a considerable implementation effort is required.
+Therefore, assumptions 1 and 2 can be overcome with the proposed model.
+
+Supporting non-boolean conditions
+and detecting which value is set
+necessitates a thorough reconsideration of the modeling approach
+for representing concrete data values in simple Petri nets.
+Consequently, assumptions 3 and 4 are particularly challenging and
+could be the subject of future research into higher-lever models.
+See Sec. \ref{sec:future-work-higher-level-models} for some thoughts to this effect.
+
+\subsubsection{Analysis of the proposed model}
+
+Fig. \ref{fig:condition-variable-model} depicts
+the \acrshort{PN} model used in the implementation.
+The same diagram in DOT, PNG, and SVG format
+can be found in the repository as documentation.
+
+\begin{figure}[!htbp]
+      \centering
+      \includesvg[width=\linewidth]{condition-variable-model.svg}
+      \caption{The Petri net model for condition variables.}
+      \label{fig:condition-variable-model}
+\end{figure}
+
+The input places are:
+
+\begin{itemize}
+      \item \Rustinline{input}: The start place of the wait function.
+            The model supports the methods from the standard library \Rustinline{std::sync::Condvar::wait}
+            and its variation \Rustinline{std::sync::Condvar::wait_while}.
+      \item \Rustinline{condition_not_set}: The place is marked when the condition is \Rustinline{false}.
+      \item \Rustinline{condition_set}: The place is marked when the condition is \Rustinline{true}.
+      \item \Rustinline{notify}: The place where the notifying thread places a token to wake up the waiting thread.
+\end{itemize}
+
+The \Rustinline{output} place is the end place
+of the function call to \Rustinline{wait} or \Rustinline{wait_while}.
+The execution of the thread continues from there.
+
+Two possible ways exist to go
+from \Rustinline{input} to \Rustinline{output}, represented by two transitions:
+
+\begin{itemize}
+      \item \Rustinline{wait_start}: This is the ``common case'', the thread blocks and waits for the signal.
+      \item \Rustinline{wait_skip}: This is the alternative path that the token takes when the condition was already set.
+            The thread does not wait, instead, it skips the wait and reaches \Rustinline{output} in a single jump.
+\end{itemize}
+
+It is essential to notice that the greyed-out part
+on the left of Fig. \ref{fig:condition-variable-model}
+controls which transition is enabled and which transition is disabled.
+As soon as a token is set in \Rustinline{condition_set}, \Rustinline{wait_start} is disabled.
+Before that, the opposite is true: \Rustinline{wait_start} may fire but \Rustinline{wait_skip} may not.
+
+Note the arcs between \Rustinline{condition_not_set} and \Rustinline{wait_start}.
+The token is regenerated every time that \Rustinline{wait_start} fires.
+The same is true for \Rustinline{condition_set} and \Rustinline{wait_skip}.
+These arcs restore the condition places to their previous state.
+Modeling more than 2 values as a \acrshort{PN} would entail a more convoluted net,
+Besides, it would be impossible to know at compile time,
+how many possible values the condition takes to generate the correct number of places.
+This limitation is the justification for Assumptions 3 and 4.
+
+Now focus on the right side of Fig. \ref{fig:condition-variable-model}.
+In the middle of the condition variable, we find the place for the mutex.
+As expected, it is unlocked when the wait starts
+and it is locked when the notify is received.
+
+The place labeled \Rustinline{wait_enabled} plays an important role.
+On the one hand, it consumes the token from \Rustinline{notify}
+if \Rustinline{wait_start} was not fired.
+This is the archetypical missed signal case that we would like to detect.
+On the other hand, the token in \Rustinline{wait_enabled}
+is consumed when \Rustinline{wait_start} fires,
+This prevents the condition variable from ``accepting'' other threads (Assumption 2)
+and preserves the token in \Rustinline{notify}, ensuring that the missed signal cannot occur.
+
+Finally, the \Rustinline{notify_received} transition combines the requisites
+for the thread to leave the wait: The mutex must be unlocked and \Rustinline{notify_one} was called.
+To restore the initial state of the condition variable,
+it regenerates the token in \Rustinline{wait_enabled}.
+
+\subsubsection{Global translation requirements of the Petri net model}
+
+A fundamental challenge that surfaces
+during the implementation of the model in Fig. \ref{fig:condition-variable-model}
+is that connections across the blue frontier in the diagram cannot be established
+in general when processing the call to \Rustinline{wait}.
+We will analyze the problem and explain how the solution copes with it.
+
+The transition where the condition is set, named \Rustinline{set_condition} on the diagram,
+is the next candidate.
+In the current implementation, the transition selected to fulfill this role
+is the call to \Rustinline{std::ops::DerefMut::deref_mut}
+when a mutex or mutex guard is being dereferenced.
+
+Consider Listing \ref{lst:set-condition-example},
+yet another test program from the repository.
+In line 9, the mutex guard is dereferenced to write the value \Rustinline{true} to it,
+setting the condition for the condition variable.
+In the \acrshort{MIR}, this maps to a call to \Rustinline{std::ops::DerefMut::deref_mut}.
+Although it is not the exact place where the value is written
+(which would actually be a statement in \acrshort{BB}),
+it is close enough and it satisfies our needs.
+
+\begin{listing}[!htbp]
+      \begin{minted}{Rust}
+      fn main() {
+            let pair = std::sync::Arc::new((std::sync::Mutex::new(false), std::sync::Condvar::new()));
+            let pair2 = std::sync::Arc::clone(&pair);
+        
+            // Inside of our lock, spawn a new thread, and then wait for it to start.
+            std::thread::spawn(move || {
+                let (lock, cvar) = &*pair2;
+                let mut started = lock.lock().unwrap();
+                *started = true;
+                // We notify the condvar that the value has changed.
+                cvar.notify_one();
+            });
+        
+            // Wait for the thread to start up.
+            let (lock, cvar) = &*pair;
+            let mut started = lock.lock().unwrap();
+            while !*started {
+                started = cvar.wait(started).unwrap();
+            }
+      }              
+      \end{minted}
+      \caption{A program that requires global Petri net information to be translated.}
+      \label{lst:set-condition-example}
+\end{listing}
+
+Unfortunately, the connections to the condition variable cannot be established
+when processing the call to \Rustinline{deref_mut} either.
+The reason is that there is no guarantee that the condition variable was already seen.
+It could still be ahead in the translation path.
+In Listing \ref{lst:set-condition-example}, the main thread is translated first,
+so the condition variable is discovered first.
+But if the roles of the threads are swapped, then the translation cannot be performed.
+
+We reach thus an unpleasing conclusion.
+In order to connect the model of the condition variable
+to the places that model the condition and the transitions where it is set,
+we need the whole \acrshort{PN}, i.e., we need \emph{global} information
+to translate the synchronization primitive effectively.
+
+As a result, it is unavoidable to incorporate some sort of postprocessing step
+to the translation.
+The tasks must also be performed in a specific order.
+The mutex must have been discovered first.
+Later it may be linked to a condition variable
+if such a condition variable is found (the source code may as well not use any).
+Hence, it is advisable to introduce a notion of ``priority'' to the postprocessing tasks.
+
+The \Rustinline{Translator} relies on a \Rustinline{std::collections::BinaryHeap} to
+implement a priority queue of
+\Rustinline{PostprocessingTask}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/function.rs\#L92}}.
+The tasks are returned by the methods that translate synchronization primitives if needed.
+After all the threads are translated, the \Rustinline{Translator}
+addresses the postprocessing tasks.
+By completing them according to their priority,
+we guarantee that the information is available in the required order.
+
+\subsubsection{Table of possible inputs and expected outputs}
+
+As a complement to the explanation in the previous subsections,
+here is a table summarizing the expected output for a given input.
+The reader may compare Fig. \ref{fig:condition-variable-model} to verify that
+the model produces the correct output for each scenario.
+
+\begin{table}[!htb]
+      \centering
+      \begin{tabular}{ |c|c|c|c|l| }
+            \hline
+            Row \# & \multicolumn{3}{|c|}{Input} & Output                                                                                                            \\
+            \hline
+                   & \Rustinline{condition_set}  & \Rustinline{wait_enabled} & \Rustinline{notify} & \emph{where the initial token at \Rustinline{input} ends}       \\
+            \hline
+            R1     & False                       & False                     & False               & \Rustinline{waiting} (waiting for a \Rustinline{notify})        \\
+            R2     & False                       & False                     & True                & \Rustinline{output} (correct wait end condition)                \\
+            R3     & False                       & True                      & False               & \Rustinline{input} (initial state)                              \\
+            R4     & False                       & True                      & True                & \emph{lost signal (transient state, goes to R1)}                \\
+            R5     & True                        & False                     & False               & \Rustinline{waiting} (condition set, needs \Rustinline{notify}) \\
+            R6     & True                        & False                     & True                & \Rustinline{waiting} (correct wait end condition)               \\
+            R7     & True                        & True                      & False               & \Rustinline{output} (skip the wait)                             \\
+            R8     & True                        & True                      & True                & \Rustinline{output} (skip the wait, with lost signal)           \\
+            \hline
+      \end{tabular}
+      \caption{A summary of the possible states of the Petri net model for condition variables.}
+      \label{table:condition-variable-model-states}
+\end{table}
+
+\subsection{A practical example}
+
+Due to the size constraints of the resulting \acrshort{PN},
+we are compelled to select a small-scale program for demonstration purposes.
+It would be unfeasible to embed within a single page
+the complete \acrshort{PN} of a realistic program with condition variables and multiple threads.
+For more comprehensive examples, readers are encouraged to explore the repository,
+which contains a collection of more intricate programs included as part of the integration tests.
+
+Despite the space limitations, the example in Listing \ref{lst:condition-variable-example}
+comprises the core elements of the model presented before.
+The complete \acrshort{PN} can be seen in Fig. \ref{fig:condition-variable-example}.
+
+Observe the following sequence of transitions:
+
+\begin{enumerate}
+      \item The mutex is locked in \Rustinline{std_sync_Mutex_T_lock_0_CALL}.
+      \item \Rustinline{std_sync_Condvar_notify_one_0_CALL} sets a token in \Rustinline{CONDVAR_0_NOTIFY}.
+      \item The token flow continues to \Rustinline{main_BB5} right before \Rustinline{CONDVAR_0_WAIT_START}.
+\end{enumerate}
+
+It should be emphasized that no deadlock arises
+if the transition \Rustinline{CONDVAR_0_WAIT_START} fires
+\emph{before} \Rustinline{CONDVAR_0_LOST_SIGNAL}.
+In short, a conflict exists between \Rustinline{CONDVAR_0_WAIT_START}
+and \Rustinline{CONDVAR_0_LOST_SIGNAL} for the token in \Rustinline{CONDVAR_0_NOTIFY}.
+Nevertheless, the model checker verifies \emph{all} possible firings
+and it will uncover the missed signal case without difficulties.
+
+Another noteworthy observation is that this program illustrates
+the effect that the cleanup paths would have on missed signal detection.
+If there were a second transition
+at the same level as \Rustinline{CONDVAR_0_WAIT_START} or \Rustinline{std_sync_Condvar_notify_one_0_CALL},
+the token could ``escape'' to the \Rustinline{PROGRAM_PANIC} place and the deadlock would remain undetected.
+
+It is indispensable for the translation to ``force'' the Petri net to stay blocked
+and not open alternative paths that could be used by the model checker
+to come to the conclusion that the \acrshort{PN} never deadlocks.
+
+\begin{listing}[!htbp]
+      \begin{minted}{Rust}
+      fn main() {
+            let mutex = std::sync::Mutex::new(false);
+            let cvar = std::sync::Condvar::new();
+            let mutex_guard = mutex.lock().unwrap();
+            cvar.notify_one();
+            let _result = cvar.wait(mutex_guard);
+      }     
+      \end{minted}
+      \caption{A basic program to showcase condition variable translation.}
+      \label{lst:condition-variable-example}
+\end{listing}
+
+\begin{figure}[!htbp]
+      \centering
+      \includesvg[width=\linewidth]{condition-variable-example.svg}
+      \caption{The Petri net model for the program in Listing \ref{lst:condition-variable-example}.}
+      \label{fig:condition-variable-example}
+\end{figure}
+
+\subsection{Algorithms for condition variable translation}
+\label{sec:condvar-algorithms}
+
+To wrap up this section, we will present a concise summary
+of the algorithms utilized in the translation of condition variables.
+The additions required to the mutex algorithms are included afterward as well.
+
+When a call to \Rustinline{std::sync::Condvar::new} is encountered:
+
+\begin{enumerate}
+      \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
+      \item Create a new \Rustinline{Condvar}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/condvar.rs}}
+            structure with an index to identify it unequivocally across the \acrshort{PN}.
+      \item Link the return value of \Rustinline{std::sync::Condvar::new},
+            the new condition variable, to the \Rustinline{Condvar} structure.
+\end{enumerate}
+
+When a call to \Rustinline{std::sync::Condvar::notify_one} is encountered:
+
+\begin{enumerate}
+      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
+            Ignore the cleanup place because, otherwise, any call may fail,
+            which amounts to the notify operation not being present in the program,
+            leading to a false lost signal.
+            This is equivalent to assuming that the \Rustinline{notify_one} function never fails.
+      \item Retrieve the \Rustinline{self} reference to the condition variable
+            on which the function is called.
+      \item Add an arc from the transition representing the function call
+            to the \Rustinline{notify} place of the underlying condition variable.
+\end{enumerate}
+
+When a call to \Rustinline{std::sync::Condvar::wait}
+or \Rustinline{std::sync::Condvar::wait_while} is encountered:
+
+\begin{enumerate}
+      \item Ignore the cleanup place because, otherwise, any call may fail,
+            which amounts to the wait operation not being present in the program,
+            leading to an incorrect result.
+            We must force the \acrshort{PN}
+            to ``wait'' for the notifying signal to be sent.
+            This is equivalent to assuming that the \Rustinline{wait}
+            or \Rustinline{wait_while} function never fails.
+      \item Retrieve the \Rustinline{self} reference to the condition variable
+            on which the function is called.
+      \item Extract the mutex guard passed into the function.
+      \item If the condition variable was already connected to a function call,
+            then the translation fails.
+            This enforces Assumptions 1 and 2 seen at the beginning of the section.
+      \item Otherwise, connect the start and end places to the
+            \Rustinline{wait_start} and \Rustinline{notify_received} transitions respectively.
+      \item Link the return value, the same mutex guard that was passed as an argument,
+            to the \Rustinline{MutexGuard} structure.
+      \item Notify the translator that the mutex received must be linked to this \Rustinline{Condvar}.
+            For this purpose, use the enum variant \Rustinline{PostprocessingTask::LinkMutexToCondvar}.
+            This task will be processed after translating all the threads.
+\end{enumerate}
+
+When all the threads finished translating, that is,
+when the queue of threads to process is empty,
+the \Rustinline{Translator} enters a loop
+to complete the postprocessing tasks by priority order:
+
+\begin{enumerate}
+      \item Create at the beginning of the loop an empty vector of mutex references.
+      \item Pop from the \Rustinline{std::collections::BinaryHeap} the task with the lowest priority.
+            This will be by design a \Rustinline{PostprocessingTask::NewMutex}.
+            Add the mutex reference to the vector.
+      \item After processing all the lower priority tasks,
+            the \Rustinline{Translator} has references to all the mutexes in the code.
+            Continue popping tasks from the priority queue.
+      \item Eventually, a \Rustinline{PostprocessingTask::LinkMutexToCondvar} is extracted.
+            Link each mutex to the condition variable,
+            which creates the places \Rustinline{condition_set}
+            and \Rustinline{condition_not_set} for the condition.
+            It also connects the \Rustinline{deref_mut} transitions
+            to these places to set the condition.
+            Lastly, it connects the condition places to the condition variable transitions
+            to disable the \Rustinline{wait}.
+\end{enumerate}
+
+\subsubsection{Modifications to the mutex algorithms}
+
+As stated before, the mutex algorithms require some additions to successfully
+perform missed signal detection.
+
+Add the following to the handler of the \Rustinline{std::sync::Mutex::new} function:
+
+\begin{enumerate}
+      \item Notify the translator that a new mutex has been created.
+            For this purpose, use the enum variant \Rustinline{PostprocessingTask::NewMutex}.
+            This task will be processed after translating all the threads.
+\end{enumerate}
+
+When a call to \Rustinline{std::result::Result::<T, E>::unwrap} is encountered:
+
+\begin{enumerate}
+      \item Check that the \Rustinline{self} reference is a mutex or a mutex guard.
+      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
+            Ignore the cleanup place because, otherwise, any call may fail,
+            as if the mutex lock operation
+            were not present in the program, leading to a false lost signal.
+            This is equivalent to assuming that the \Rustinline{unwrap} function never fails
+            when applied to a variable linked to a mutex or a mutex guard.
+\end{enumerate}
+
+When a call to \Rustinline{std::ops::Deref::deref}
+or \Rustinline{std::ops::DerefMut::deref_mut} is encountered:
+
+\begin{enumerate}
+      \item Check that the \Rustinline{self} reference is a mutex or a mutex guard.
+      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
+            Ignore the cleanup place because, otherwise, any call may fail,
+            as if the mutex lock operation
+            were not present in the program, leading to a false lost signal.
+            This is equivalent to assuming that the \Rustinline{deref}
+            and \Rustinline{deref_mut} functions never fail
+            when dereferencing a variable linked to a mutex or a mutex guard.
+      \item If the value is being dereferenced mutably (\Rustinline{deref_mut}),
+            extract the first argument passed to the function: The mutex or mutex guard.
+            Add the \Rustinline{deref_mut} transition to the mutex
+            to set the condition for a condition variable in the postprocessing step.
+      \item Otherwise do nothing.
+            The immutable case does not need to be added to the mutex.
+\end{enumerate}
+
+It should now be clear to the reader that the algorithms for missed signal detection are
+fundamentally of higher complexity and ought to handle more border cases than
+those for detecting simple deadlocks caused by incorrect usage of mutexes or
+calling \Rustinline{join} on threads that never terminate.
+
+It is worth mentioning that some border cases arise
+due to the inclusion of the cleanup logic
+from the \acrshort{MIR} in the \acrshort{PN} model.
+If the implementation instead skipped this,
+under the hypothesis that Rust standard library functions may never panic,
+then the algorithms would become simpler.
+Sec. \ref{sec:future-work-no-cleanup} is concerned with
+the question of not modeling the cleanup paths.

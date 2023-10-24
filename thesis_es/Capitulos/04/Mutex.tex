@@ -1,0 +1,153 @@
+\section{Mutex (\texttt{std::sync::Mutex})}
+
+A mutex, short for mutual exclusion, is a synchronization mechanism
+used to control access to a shared resource in a concurrent program.
+It allows multiple threads to access the shared resource in a mutually exclusive manner,
+ensuring that only one thread can access the resource at a time.
+
+In this section, the \acrshort{PN} model for a mutex in Rust is explained,
+then a practical example is presented to ease comprehension and finally
+the algorithms used for the translation of mutex functions are outlined.
+
+\subsection{Petri net model}
+
+In Rust, a mutex is created by wrapping the shared data in a \Rustinline{Mutex<T>} type,
+where \Rustinline{T} is the type of the shared resource.
+The \Rustinline{std::sync::Mutex} type exposes a method named \Rustinline{lock}
+to acquire the lock on the shared resource.
+If the mutex is currently unlocked,
+the thread successfully acquires the lock and can proceed with accessing the resource.
+If the mutex is already locked by another thread,
+the thread attempting to acquire the lock will be blocked until the lock becomes available.
+The \Rustinline{lock} method returns a mutex guard (\Rustinline{std::sync::MutexGuard})
+that grants exclusive access to the resource until it is dropped.
+
+Contrary to the \Rustinline{unlock} semantics present in C or C++,
+the mutex included by the Rust standard library is unlocked implicitly,
+i.e., without calling a function.
+The mutex implements \acrfull{RAII} and releases the lock automatically
+when it goes out of scope, preventing deadlocks.
+Alternatively, dropping a local variable of type \Rustinline{std::sync::MutexGuard}
+is equivalent to unlocking the corresponding mutex.
+
+A mutex can be modeled in \acrshort{PN} as a single place
+that represents the state of the mutex,
+indicating whether it is locked or unlocked.
+The place is labeled to reflect its purpose as a mutex.
+Besides, the place is marked with a token initially
+to signify that the mutex starts in the unlocked state.
+
+Transitions that lock the mutex consume the token from the mutex place.
+If the token is absent, the transition may not fire.
+The mutex must be in the unlocked state to enable the locking transition,
+which is the desired behavior.
+
+Transitions that unlock the mutex produce a token at the mutex place.
+The transition can fire as long as the program reached that point in the execution.
+After the transition fires, the mutex place holds again a token
+that can be consumed by a locking transition.
+Two types of transitions may unlock the mutex:
+
+\begin{enumerate}
+      \item A \Rustinline{Drop} terminator (Sec. \ref{sec:terminators})
+            when the dropped place is of type \Rustinline{std::sync::MutexGuard}.
+      \item The transition for a call to \Rustinline{std::mem::Drop},
+            which frees the memory occupied by the value passed in explicitly.
+\end{enumerate}
+
+By connecting the mutex place
+to the locking and unlocking transitions using input and output arcs,
+we establish the relationship between the mutex state and the actions that manipulate it.
+This modeling approach allows for the representation of the mutex's behavior in a \acrshort{PN}
+and facilitates the analysis of its interactions with other parts of the system.
+
+The \acrshort{PN} model presented here is well-known in the literature
+and has been applied successfully in other tools.
+It can be found among others in \cite{kavi2002modeling,moshtaghi2001,meyer2020,zhang2022deadlocks}.
+
+\subsection{A practical example}
+
+Consider the \acrshort{PN} model shown in Fig. \ref{fig:mutex-example}
+corresponding to the program in Listing \ref{lst:double-lock-deadlock}.
+The \acrshort{MIR} is depicted in \ref{lst:double-lock-deadlock-mir}.
+This test program is one of the examples included in the repository.
+
+Observe that there are two locking transitions
+mapping the two calls to \Rustinline{lock} in the source code.
+The indexing system mirrors the order of their appearance in the program,
+which justifies the labels \Rustinline{std_sync_Mutex_T_lock_0_CALL}
+and \Rustinline{std_sync_Mutex_T_lock_1_CALL}.
+Both have an incoming arc from the mutex place \Rustinline{MUTEX_0}.
+
+As explained before, \Rustinline{Drop} terminators may unlock a mutex.
+No matter if they fail or not (the error case includes the suffix \Rustinline{_UNWIND}),
+an outgoing arc flows back to the mutex place to replenish the token.
+
+One should take note that there are more incoming arcs to the mutex place than outgoing arcs,
+which highlights the importance of following the mutex guards throughout the \acrshort{MIR}
+using the strategy explained in Sec. \ref{sec:intercepting-assignments}.
+
+\begin{figure}[!htbp]
+      \centering
+      \includesvg[width=0.95\linewidth]{mutex-example.svg}
+      \caption{The Petri net model for the program in Listing \ref{lst:double-lock-deadlock}.}
+      \label{fig:mutex-example}
+\end{figure}
+
+\subsection{Algorithms for mutex translation}
+\label{sec:mutex-algorithms}
+
+Concluding this section, we will provide a brief overview of the algorithms
+employed in the translation of mutex functions.
+
+When a call to \Rustinline{std::sync::Mutex::new} is encountered:
+
+\begin{enumerate}
+      \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
+      \item Create a new \Rustinline{Mutex}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/mutex.rs}}
+            structure with an index to identify it unequivocally across the \acrshort{PN}.
+      \item Link the return value of \Rustinline{std::sync::Mutex::new},
+            the new mutex, to the \Rustinline{Mutex} structure.
+\end{enumerate}
+
+When a call to \Rustinline{std::sync::Mutex::lock} is encountered:
+
+\begin{enumerate}
+      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
+            Ignore the cleanup place since we must force the \acrshort{PN}
+            to ``wait'' for the mutex place to be marked.
+            This is equivalent to assuming that the \Rustinline{lock} function never fails.
+      \item Retrieve the \Rustinline{self} reference to the mutex on which the function is called.
+      \item Add an arc from the underlying mutex place to the transition representing the function call.
+      \item Create a new \Rustinline{MutexGuard} with a reference to the \Rustinline{Mutex}.
+      \item Link the return value of \Rustinline{std::sync::Mutex::lock},
+            the new mutex guard, to the \Rustinline{MutexGuard} structure.
+\end{enumerate}
+
+When a call to \Rustinline{std::mem::drop} is encountered:
+
+\begin{enumerate}
+      \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
+      \item Extract the variable passed into the function.
+      \item If the variable is linked to a mutex guard,
+            add an arc from the transition of the function call to the mutex place.
+      \item If a cleanup place was provided,
+            add an unlock arc from the cleanup transition to the mutex place too.
+\end{enumerate}
+
+When a terminator of kind \Rustinline{rustc_middle::mir::TerminatorKind::Drop} is encountered:
+
+\begin{enumerate}
+      \item If the variable to be dropped is linked to a mutex guard,
+            add an arc from the transition of the function call to the mutex place.
+      \item If a cleanup place was supplied,
+            add an unlock arc from the drop unwind transition to the mutex place too.
+\end{enumerate}
+
+In the upcoming section,
+we will delve into the necessary adjustments of these algorithms to
+establish a unified model for condition variables,
+which is essential for detecting missed signals.
+Given that these modifications are better comprehended
+within the framework of condition variables,
+we will elucidate them in that specific context.

@@ -1,0 +1,211 @@
+\section{MIR function}
+
+In the following section,
+we will delve into the translation process of a \acrshort{MIR} function.
+This section aims to provide a comprehensive understanding
+of the translation techniques applied to specific \acrshort{MIR} elements,
+namely \acrfull{BB}, statements, and terminators.
+These components were introduced previously in Sec. \ref{sec:mir-components}.
+
+The implementation in the repository is accordingly named
+\Rustinline{MirFunction}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function.rs}}.
+This type stores the start place and the end place of the function.
+These must be supplied to the \acrshort{MIR} function because
+they also represent where the function call took place and where it should return to.
+The end place is in simpler terms the return place in the Petri net.
+See Fig. \ref{fig:simplest-function} for an illustration.
+
+The start place of the function overlaps with the place
+that models the first basic block in the function.
+This matches more closely the \acrshort{MIR} as the code only lives inside of basic blocks,
+so the function call begins at the first basic block (BB0).
+
+The \Rustinline{MirFunction} also stores the ID that identifies it.
+This is necessary for performing function calls from this function.
+Moreover, the function requires a name that is different for every function call,
+so it receives a name with an index appended, making it unique across the whole Petri net.
+
+We will now explain how each component is expressed in the language of Petri nets.
+Through a detailed exploration of the translation techniques employed for
+basic blocks, statements, and terminators, we will develop a formal model that
+accurately captures the behavior of a \acrshort{MIR} function for deadlock detection.
+
+\subsection{Basic blocks}
+
+One aspect of the translation process involves transforming basic blocks into Petri nets,
+which serve as a fundamental building block for modeling the control flow within the \acrshort{MIR} function.
+As seen in Fig. \ref{fig:mir-cfg-example}, a basic block in \acrshort{MIR} acts as a container
+that houses a sequence of zero or more statements, as well as a mandatory terminator statement.
+
+As nodes in a graph, the main property of basic blocks is
+their ability to direct the flow of control within a program.
+Each basic block may have one or more basic blocks pointing to it,
+indicating the potential paths from which the control flow can reach it.
+Similarly, a basic block can point to one or more other basic blocks,
+signifying the possible paths the control flow may take after executing the current basic block.
+It is worth mentioning that isolated basic blocks with no connections
+do not make sense since they would never be executed, i.e., they are dead code.
+
+This branching behavior allows for dynamic control flow within the program,
+as multiple basic blocks can continue the control flow to the same target basic block
+(for instance to a block that performs cleanup tasks).
+Conversely, a basic block can branch and
+determine the next basic block based on specific conditions or program logic, e.g.,
+in an \Rustinline{if}, \Rustinline{while}, \Rustinline{match} or other control structures.
+This versatility in control flow provides the foundation for modeling complex program behavior.
+
+The Petri net model used in the implementation relies on a single place to model each \acrshort{BB}.
+We can abstract away the inner workings of the \acrshort{BB} and work with a single place.
+The rationale behind it is that the connections to other \acrshort{BB} depend solely on the terminators
+and statements are not modeled at all as we will see shortly.
+Additionally, the implementation\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function/basic_block.rs}}
+keeps track of the function name to which the \acrshort{BB} belongs and
+the \acrshort{BB} number to generate unique labels.
+
+\subsection{Statements}
+
+\acrshort{MIR} statements are intentionally \emph{not} incorporated into the Petri net model.
+Considering the reasons for this and the benefits may not be immediately apparent,
+we will provide a detailed explanation for this implementation decision.
+
+The approach that was previously implemented did include the modeling of statements.
+It was based on the approach seen in \cite{meyer2020}.
+However, it was observed that this led to the creation of a long chain of places and transitions
+that did not significantly contribute to the detection of deadlocks or missed signals.
+Furthermore, it unnecessarily inflated the size of the Petri net representation,
+making it more difficult to debug and understand.
+Consequently, this approach was later revised and removed in a later
+commit\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/b27403b6a5b2bb020a5d7ab2a9b1cacefb48be82}}.
+
+In all the programs we had tested so far, the statements did not perform any action
+that may justify their addition to the Petri net.
+On the contrary, the nets that include the statements were larger and more difficult to read.
+In order to facilitate the use and adoption of the tool,
+it is crucial to optimize the Petri net for the purpose of the tool.
+The decision was therefore to eliminate all the code related to the modeling of the statements
+and fix the tests accordingly to match the new output.
+
+The alternative was to disable the statements with a compile flag
+but that would complicate testing and
+since there is no use case for modeling the \acrshort{MIR} statements anyway, this option was discarded.
+
+For illustrative purposes, we can refer to Fig. \ref{fig:statement-model-comparison},
+which showcases a comparison between the old model and the new model.
+The differences between these two representations are evident,
+highlighting the removal of statements from the model and
+the subsequent simplification achieved in the resulting Petri net.
+
+\begin{figure}[!htb]
+  \centering
+  \includesvg[width=0.5\linewidth]{statement-model-comparison.svg}
+  \caption{A side-by-side comparison of two possibilities to model the MIR statements.}
+  \label{fig:statement-model-comparison}
+\end{figure}
+
+\subsection{Terminators}
+\label{sec:terminators}
+
+As seen in Sec. \ref{sec:mir-components}, terminator statements come in different shapes.
+The documentation for the enum \Rustinline{TerminatorKind}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/enum.TerminatorKind.html}}
+lists as of this writing 14 different variants.
+The implementation is required to support most of them,
+since they appear sooner or later in the test programs included in the repository
+and their translation directly influences the connections between the basic blocks.
+The remaining terminators that are not implemented are not present
+when querying the \Rustinline{optimized_mir}, i.e., they are used only in previous compiler passes.
+
+The implementation of the MIR
+Visitor\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_visitor.rs}}
+includes the \Rustinline{visit_terminator} method as seen before.
+This is where the edges connecting one \acrshort{BB} to another are created.
+In the next paragraphs, the high-level details of each handler are discussed.
+Some implementation details are omitted as they do not affect the Petri net.
+
+\subsubsection{Goto}
+
+This is an elementary terminator kind.
+The end place of the currently active \acrshort{BB} is connected
+to the start place of the target \acrshort{BB}
+through a new transition with an appropriate label.
+
+\subsubsection{SwitchInt}
+
+This terminator kind comes with a collection of target basic blocks.
+For each target \acrshort{BB},
+we connect the end place of the currently active \acrshort{BB}
+to the start place of the target \acrshort{BB}
+through a new transition with an appropriate label.
+This creates a \emph{conflict} as defined in Sec. \ref{sec:transition-firing}.
+
+The label must also contain some kind of unique identifier of the block from where the
+jump starts.
+This is a precondition to correctly translate multiple basic blocks with a \Rustinline{SwitchInt}
+that jumps to the same block.
+
+\subsubsection{Resume or Terminate}
+
+These are terminators that model respectively an unwinding of the stack
+and the immediate abort of the program.
+Both are treated in the same way:
+Connecting the end place of the currently active \acrshort{BB}
+to the \Rustinline{PROGRAM_PANIC} place seen in Fig. \ref{fig:program-places}.
+
+\subsubsection{Return}
+
+This is the terminator that causes the \acrshort{MIR} function to return.
+This is where the end place of the function is used.
+The end place of the currently active \acrshort{BB} is connected to it.
+
+\subsubsection{Unreachable}
+
+This is a border case that appears
+in some \Rustinline{match}, \Rustinline{while} loops, or other control structures.
+The documentation states: \emph{Indicates a terminator that can never be reached}.
+To handle this case, the decision was to connect
+the end place of the currently active \acrshort{BB}
+to the \Rustinline{PROGRAM_END} place seen in Fig. \ref{fig:program-places}.
+See the comments in the repository for more details.
+
+\subsubsection{Drop}
+
+The \Rustinline{std::ops::Drop} trait is used to specify code that should be executed
+when the type goes out of scope \cite[Chap. 15.3]{rust-book}.
+It is equivalent to the concept of destructors found in other programming languages.
+
+The drop terminator behaves like a function call with a cleanup transition.
+Therefore, we apply the model shown in Fig. \ref{fig:function-with-cleanup}
+with modified transition labels.
+
+An important check happens here too, namely checking if a mutex guard is being dropped.
+If that is the case, then the corresponding mutex should be unlocked
+as part of the transition firing.
+Precise details are explained in Sec. \ref{sec:mutex-algorithms}.
+
+\subsubsection{Call}
+
+This is the terminator kind for executing function calls.
+The presence of a cleanup block and the particular
+\Rustinline{UnwindAction}\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/syntax/enum.UnwindAction.html}}
+as well as the function name and type is analyzed to handle it
+according to the strategy elaborated in Sec. \ref{sec:function-calls}.
+
+Note that \Rustinline{UnwindAction} is a refactor of \emph{rustc}
+that was introduced on April 7th, 2023.
+It is a good example of a regression that required significant changes to accommodate.
+The interested reader is referred to the corresponding
+commit\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/8cf95cd54b29c210801cae2941abcbbb85051b92}}.
+
+\subsubsection{Assert}
+
+This terminator kind is related to the
+\Rustinline{assert!()}\footnote{\url{https://doc.rust-lang.org/std/macro.assert.html}}
+macro and the default overflow checks that \emph{rustc} incorporates when
+performing arithmetic operations.
+
+The implementation does not model the condition for the assert.
+It simply connects the end place of the currently active \acrshort{BB}
+to the start place of the target \acrshort{BB}
+through a new transition with an appropriate label.
+
+In some cases, a cleanup block is present too.
+For this, a second transition is needed, analogously to the \Rustinline{Drop} case.

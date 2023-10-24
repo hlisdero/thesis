@@ -1,0 +1,48 @@
+\section{Correctness of concurrent programs}
+
+In the area of concurrent computing, one of the main challenges is
+to prove the correctness of a concurrent program.
+Unlike a sequential program where for each input the same output
+is always obtained, in a concurrent program the output may depend
+on how instructions from different processes or
+threads were interleaved during execution.
+
+The correctness of a concurrent program is then defined
+in terms of the properties of the computation performed
+and not only in terms of the obtained result.
+In the literature \cite{ben-ari2006,coulouris2012,tanenbaum2017},
+two types of correctness properties are defined:
+
+\begin{itemize}
+    \item \textbf{Safety properties}: The property must \emph{always} be true.
+    \item \textbf{Liveness properties}: The property must \emph{eventually} become true.
+\end{itemize}
+
+Two desirable safety properties in a concurrent program are:
+
+\begin{itemize}
+    \item \textbf{Mutual exclusion}: Two processes must not access shared resources at the same time.
+    \item \textbf{Absence of deadlock}: A running system must be able to continue performing its task,
+          that is, progressing and producing useful work.
+\end{itemize}
+
+Synchronization primitives such as mutexes,
+semaphores (as proposed by \cite{Dijkstra2002}),
+monitors (as proposed by \cite{hansen1972structured,hansen1973operating}),
+and condition variables (as proposed by \cite{hoare1974monitors}) are usually used
+to implement coordinated access of threads or processes to shared resources.
+However, the correct use of these primitives is difficult to achieve in practice
+and can introduce errors that are difficult to detect and correct.
+Currently, most general-purpose languages, whether compiled or interpreted,
+do not allow these errors to be detected in all cases.
+
+Given the increasing importance of concurrent programming due to the proliferation
+of multithreaded and multithreaded hardware systems,
+minimizing the occurrence of errors associated with thread or process synchronization
+holds significant importance for the industry.
+Deadlock-free operation is an unavoidable requirement for many projects, such as
+operating systems \cite{ArpaciDusseau2018}, autonomous vehicles \cite{Perronnet2019}
+and aircraft \cite{carreno2005safety,monzon2009deadlock}.
+
+In the next section, we will have a closer look at the conditions that cause a deadlock
+and the strategies used to cope with them.

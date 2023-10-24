@@ -1,0 +1,125 @@
+\section[Interception strategy]
+ {Interception strategy:\\Selecting a suitable starting point for the translation}
+\label{sec:interception-strategy}
+
+In this section, a rationale for selecting the \acrfull{MIR}
+as the starting point for the translation to a Petri net is elucidated.
+This architectural design choice is justified for several reasons.
+
+\subsection{Benefits}
+
+First, the \acrshort{MIR} is
+the lowest machine-independent \acrshort{IR} used in \emph{rustc}.
+It captures the semantics of Rust code
+after it has undergone a series of optimization passes
+without relying on the details of any particular machine.
+By intercepting the translation at this stage,
+the static analysis tool leverages the benefits of these optimizations,
+such as constant folding, dead code elimination, and inlining,
+which results in a more efficient and overall smaller Petri net representation.
+
+Second, intercepting the compilation after the previous stages are completed
+offers an advantage in terms of efficiency and code reuse.
+By this stage, the Rust compiler has already performed crucial steps
+such as borrow checking, type checking,
+monomorphization of generic code, and macro expansion, among others.
+These steps are resource-intensive
+and involve complex analysis of the Rust code to ensure correctness and safety.
+Re-implementing these steps in our tool from scratch
+would be redundant and time-consuming.
+It would require duplicating the efforts of the Rust compiler
+and may introduce potential inconsistencies or errors.
+By building on top of the existing \acrshort{MIR},
+we take advantage of the work already done by \emph{rustc}.
+This not only saves effort but also aligns our static analysis tool
+with the same level of correctness and safety as the Rust compiler.
+
+Third, it simplifies the maintenance task of staying up-to-date
+with the ongoing additions to the Rust language and its compiler.
+Rust is a fast-evolving language and its compiler is
+constantly updated with new features, bug fixes, and performance optimizations.
+Repurposing the \acrshort{MIR} means our tool can benefit from these updates
+without having to independently implement and maintain those changes.
+This provides overall a more robust and reliable static analysis solution.
+
+Furthermore, as it will be explained in the next section, the \acrshort{MIR}
+is based on the concept of a \acrfull{CFG}, i.e., a type of graph found in compilers.
+That means that \acrshort{MIR} and Petri nets are both graph representations,
+which makes the \acrshort{MIR} particularly amenable to translation.
+Both \acrshort{MIR} and Petri nets can be seen as graphical models
+that capture the relationships and interactions between different entities.
+The \acrshort{MIR} graph represents the underlying execution flow within a Rust program,
+while a Petri net captures the state transitions and event occurrences in a system.
+Therefore, it becomes easier to convert the \acrshort{MIR} to a Petri net,
+as the graph structure and relationships are already present.
+This allows for a more straightforward and efficient translation process
+without having to create a graph structure from thin air,
+resulting in better integration between the \acrshort{MIR}
+and the Petri net model for deadlock detection.
+
+Finally, working with the \acrshort{MIR} synergizes
+with incremental compilation and modular analysis.
+In fact, one of the reasons why \acrshort{MIR} was introduced
+in the first place was incremental compilation \cite{matsakis2016mir}.
+Even though it is not mandatory in the initial implementation,
+the tool could profit from incremental compilation
+and perform analysis on a per-crate/per-module basis,
+allowing for faster and more efficient analysis of large Rust codebases.
+
+\subsection{Limitations}
+
+There are however some limitations to the approach of basing the translation
+on the \acrfull{MIR}.
+
+The most important one is that the \acrshort{MIR} is subject to change.
+No stability guarantees are made in terms of
+how the Rust code will be translated to \acrshort{MIR}
+or which its constituent elements \acrshort{MIR} are.
+These are internal details that the compiler developers reserve for themselves.
+In short, \acrshort{MIR} as an interface is not stable.
+As work on the compiler continues,
+the \acrshort{MIR} undergoes modifications
+to incorporate new language features, optimizations, or bug fixes,
+which may require frequent updates and adjustments to the translation process,
+increasing the maintenance cost.
+
+In the course of this project, this situation happened numerous times.
+As an example, in the period between mid-February 2023 and mid-April 2023,
+the code was modified 7 times to accommodate these changes.
+They were always a few lines of code in size and detected by tests.
+We will discuss how tests play a significant role
+in coping with these changes in Sec. \ref{sec:integration-tests}.
+
+On the same note, \cite{meyer2020} also relied on the \acrshort{MIR}
+but did not incorporate tests to deal with the newer nightly versions.
+As a result, the toolchain was pinned to an exact nightly
+version\footnote{\url{https://github.com/Skasselbard/Granite/blob/master/rust-toolchain}}
+to prevent the implementation from breaking before the publication of the thesis.
+
+Another drawback worth mentioning is that, in some instances,
+generic code could take the form of a function whose behavior can be modeled
+by the same Petri net in all cases.
+Under these circumstances, the \acrshort{MIR} could be ``condensed'' further
+before translating it to a Petri net.
+Similarly, some parts of the \acrshort{MIR} may be superfluous
+to the deadlock detection analysis and its translation may enlarge the output,
+which slows down the reachability analysis done by the model checker.
+This can be countered with careful optimizations,
+which will be proposed in Sec. \ref{sec:future-work-petri-net-reduction}
+and \ref{sec:future-work-no-cleanup}.
+
+\subsection{Synthesis}
+
+In conclusion, despite the drawbacks mentioned earlier,
+intercepting the translation at the \acrshort{MIR} level offers significant advantages,
+including maximizing the utilization of the existing compiler code,
+reducing the implementation effort, and a more natural mapping to Petri nets.
+These benefits outweigh the cons and make the \acrshort{MIR}
+a compelling starting point for the translation
+in the context of building a static analysis tool
+for detecting deadlocks and missed signals in Rust code.
+
+Both \cite{meyer2020} and \cite{zhang2022deadlocks} base their translations
+on the \acrshort{MIR} as well and to the best knowledge of this author, there is
+no analogous tool that performed a translation to Petri nets
+starting from a higher-level \acrshort{IR}.

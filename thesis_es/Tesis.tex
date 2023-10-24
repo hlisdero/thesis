@@ -1,0 +1,77 @@
+\documentclass[12pt, oneside]{book}
+\usepackage{Tesis}
+
+\input{../FrontMatter/Acronyms.tex}
+
+\begin{document}
+
+\input{../FrontMatter/TitlePage_es.tex}
+\input{../FrontMatter/Contents_es.tex}
+\input{../FrontMatter/Abstract.tex}
+
+\chapter{Introducción}
+\input{Capitulos/01/Introduccion.tex}
+\input{Capitulos/01/RedesPetri.tex}
+\input{Capitulos/01/Rust.tex}
+\input{Capitulos/01/CorrectitudConcurrente.tex}
+\input{Capitulos/01/Deadlocks.tex}
+\input{Capitulos/01/ConditionVariables.tex}
+\input{Capitulos/01/ArquitecturaCompiladores.tex}
+\input{Capitulos/01/VerificacionModelos.tex}
+
+\chapter{Estado del arte}
+\input{Capitulos/02/EstadoArte.tex}
+\input{Capitulos/02/VerificacionFormal.tex}
+\input{Capitulos/02/DeteccionDeadlocks.tex}
+\input{Capitulos/02/BibliotecasRedesPetri.tex}
+\input{Capitulos/02/VerificadoresModelos.tex}
+\input{Capitulos/02/FormatosIntercambio.tex}
+
+\chapter{Diseño de la solución propuesta}
+\input{Capitulos/03/Diseño.tex}
+\input{Capitulos/03/Backend.tex}
+\input{Capitulos/03/CompiladorRust.tex}
+\input{Capitulos/03/EstrategiaInterceptacion.tex}
+\input{Capitulos/03/MIR.tex}
+\input{Capitulos/03/InliningFunciones.tex}
+
+\chapter{Implementación de la traducción}
+\input{Capitulos/04/Implementacion.tex}
+\input{Capitulos/04/ConsideracionesIniciales.tex}
+\input{Capitulos/04/LlamadosFuncion.tex}
+\input{Capitulos/04/VisitanteMIR.tex}
+\input{Capitulos/04/FuncionMIR.tex}
+\input{Capitulos/04/MemoriaFunciones.tex}
+\input{Capitulos/04/Multihilo.tex}
+\input{Capitulos/04/Mutex.tex}
+\input{Capitulos/04/Condvar.tex}
+
+\chapter{Probando la implementación}
+\input{Capitulos/05/Pruebas.tex}
+\input{Capitulos/05/PruebasUnitarias.tex}
+\input{Capitulos/05/PruebasIntegracion.tex}
+\input{Capitulos/05/Visualizacion.tex}
+\input{Capitulos/05/LoLA.tex}
+\input{Capitulos/05/ProgramasPruebasNotables.tex}
+
+\chapter{Trabajos futuros}
+\input{Capitulos/07/TrabajosFuturos.tex}
+
+\chapter{Trabajos relacionados}
+\input{Capitulos/08/TrabajosRelacionados.tex}
+
+\chapter{Conclusiones}
+\input{Capitulos/09/Conclusiones.tex}
+
+\clearpage
+\bibliographystyle{apalike}
+\bibliography{
+      ../Bibliography/Articles.bib,
+      ../Bibliography/Blogs.bib,
+      ../Bibliography/Books.bib,
+      ../Bibliography/Conferences.bib,
+      ../Bibliography/Proceedings.bib
+}
+\addcontentsline{toc}{chapter}{Bibliografía}
+
+\end{document}
