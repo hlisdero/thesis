@@ -2,7 +2,7 @@
 
 ## Compile-time Deadlock Detection in Rust using Petri Nets
 
-[Link to the PDF](./Thesis.pdf)
+[Link to the PDF](./thesis_en/Thesis.pdf)
 
 [Repository of the tool implemented](https://github.com/hlisdero/cargo-check-deadlock/)
 
@@ -10,13 +10,19 @@
 
 ## Folder structure
 
+- `.vscode`: Configuration for building the project with the LaTeX Workshop extension.
 - `Bibliography/`: For BibTeX entries, organized by type of material.
-- `Chapters/`: One folder for each chapter.
 - `dot/`: Diagrams in DOT format.
-- `FrontMatter/`: Title page, abstract, acronym definitions, table of contents, list of figures, and list of listings.
+- `FrontMatter/`: Title page, abstract, acronym definitions, table of contents, list of figures, and list of listings. These are reused for the different versions.
 - `images/`: All images in PNG format, not in SVG.
-- `proposal/`: Original thesis project proposal in Spanish. It is also a LaTeX sub-project.
+- `presentation_de`: A presentation of the Rust programming language and the thesis in German.
+- `proposal_es/`: Original thesis project proposal in Spanish. It is an independent LaTeX sub-project.
 - `svg/`: SVG diagrams.
+- `thesis_en/`: English version of the thesis
+  - `Chapters/`: One folder for each chapter.
+- `thesis_es/`: Spanish version of the thesis. It was translated from the original English version.
+  - `Capitulos/`: One folder for each chapter.
+  - `raw/`: The original PDF text as translated by AI.
 
 ## Tools used
 
