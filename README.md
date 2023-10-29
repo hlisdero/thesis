@@ -17,7 +17,7 @@
 - `dot/`: Diagrams in DOT format.
 - `FrontMatter/`: Title page, abstract, acronym definitions, table of contents, list of figures, and list of listings. These are reused for the different versions.
 - `images/`: All images in PNG format, not in SVG.
-- `presentation_de`: A presentation of the Rust programming language and the thesis in German.
+- `presentation_en`: A presentation of the Rust programming language and the thesis in English.
 - `proposal_es/`: Original thesis project proposal in Spanish. It is an independent LaTeX sub-project.
 - `svg/`: SVG diagrams.
 - `thesis_en/`: English version of the thesis
