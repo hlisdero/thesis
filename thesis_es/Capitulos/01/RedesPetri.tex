@@ -1,6 +1,6 @@
-\section{Petri nets}
+\section{Redes de Petri}
 
-\subsection{Overview}
+\subsection{Visión general}
 
 \acrfull{PN} are a graphical and mathematical modeling tool
 used to describe and analyze the behavior of concurrent systems.
@@ -75,7 +75,7 @@ by modeling the input program as a Petri net and then analyzing the structure of
 It will be shown that this approach is formally sound and
 practicably amenable to source code written in the Rust programming language.
 
-\subsection{Formal mathematical model}
+\subsection{Modelo matemático formal}
 
 A Petri net is a particular kind of bipartite, weighted, directed graph,
 equipped with an initial state called the \emph{initial marking}, $M_{0}$.
@@ -155,7 +155,7 @@ Moreover, if every arc weight is equal to one, we call the Petri net \emph{ordin
       \end{equation*}
 \end{definition}
 
-\subsection{Transition firing}
+\subsection{Disparo de transiciones}
 \label{sec:transition-firing}
 
 The transition firing rule is the core concept in Petri nets.
@@ -202,7 +202,7 @@ It is noteworthy that a source transition is unconditionally enabled
 and produces tokens without consuming any, while the firing of a sink transition
 consumes tokens without producing any.
 
-\subsection{Online simulators}
+\subsection{Simuladores en línea}
 
 To familiarize oneself with the dynamics of Petri nets,
 it is useful to simulate some examples online
@@ -221,7 +221,7 @@ We have gathered some tools for this purpose to ease the burden on the reader.
             The user can draw the net, add the tokens, and then manually fire transitions.
 \end{itemize}
 
-\subsection{Modeling examples}
+\subsection{Ejemplos de modelado}
 
 In this subsection, several simple examples are presented to introduce
 some basic concepts of Petri nets that are useful in modeling.
@@ -232,7 +232,7 @@ semaphores as proposed by Edsger W. Dijkstra, the producer/consumer problem,
 and the dining philosophers problem, the reader is referred to
 \cite[Chap. 3]{peterson1981} and \cite{reisig2013}.
 
-\subsubsection{Finite-state machines}
+\subsubsection{Máquinas de estado finito}
 
 \acrfull{FSM} can be represented by a subclass of Petri nets.
 
@@ -271,7 +271,7 @@ a \emph{conflict}, \emph{decision}, or \emph{choice}, depending on the applicati
 This is seen in the initial place of Fig. \ref{fig:state-machine-example},
 where the user must select which coin to insert first.
 
-\subsubsection{Parallel activities}
+\subsubsection{Actividades en paralelo}
 
 Contrary to finite-state machines, Petri nets can also model parallel or concurrent activities.
 In Fig. \ref{fig:parallel-activities-example} an example of this is shown,
@@ -306,7 +306,7 @@ This subclass of Petri nets allows the representation of concurrency but not dec
       and exactly one outgoing arc is known as a marked graph.
 \end{definition}
 
-\subsubsection{Communication protocols}
+\subsubsection{Protocolos de comunicación}
 
 Communications protocols can also be represented in Petri nets.
 Fig. \ref{fig:communication-protocols-example} illustrates a simple protocol
@@ -327,7 +327,7 @@ A timeout for the send operation could be incorporated into the model
 by adding a transition $t_{timeout}$ with edges from ``Wait for ACK'' to ``Ready to send''.
 This maps the decision between receiving the acknowledgment and the timeout.
 
-\subsubsection{Synchronization control}
+\subsubsection{Control de sincronización}
 
 In a multithreaded system, resources and information are shared among several threads.
 This sharing must be controlled or synchronized
@@ -359,12 +359,12 @@ It should be pointed out that this system is not free from starvation,
 since there is no guarantee that a write operation will eventually take place.
 The system is on the other hand free from deadlocks.
 
-\subsection{Important properties}
+\subsection{Propiedades importantes}
 
 In this subsection, we will look at fundamental concepts for the analysis of Petri nets
 that will facilitate the understanding of the nets we will be dealing with in the rest of the work.
 
-\subsubsection{Reachability}
+\subsubsection{Alcanzabilidad}
 \label{sec:reachability}
 
 Reachability is one of the most important questions
@@ -410,7 +410,7 @@ an active area of research in theoretical computer science.
 For this and other key problems, the most important theoretical results
 obtained up to 1998 are detailed in \cite{esparza1994decidability}.
 
-\subsubsection{Boundedness and safeness}
+\subsubsection{Acotamiento y seguridad}
 
 During the execution of a Petri net, tokens may accumulate in some places.
 Applications need to ensure that the number of tokens in a given place does not
@@ -483,7 +483,7 @@ After two firings it finishes executing and nothing more can happen.
 The net in Fig. \ref{fig:petri-net-formal-example} is also not live, because
 T1 will only execute once and only T2 can be enabled from that point on.
 
-\subsection{Reachability Analysis}
+\subsection{Análisis de alcanzabilidad}
 
 Having introduced the reachability set $R(N, M_0)$ in Sec. \ref{sec:reachability},
 we can now present a major analysis technique for Petri nets: the \emph{reachability tree}.
