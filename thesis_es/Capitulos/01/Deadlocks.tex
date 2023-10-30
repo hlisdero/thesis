@@ -1,4 +1,4 @@
-\section{Bloqueo mutuo \textit{Deadlocks}}
+\section{Bloqueo mutuo (\textit{deadlocks})}
 
 Deadlocks are a common problem that arises in concurrent systems,
 which are systems where multiple threads or processes are
@@ -52,7 +52,7 @@ The cycle therein indicates a deadlock, as will be explained in the next section
       \caption{Example of a state graph with a cycle indicating a deadlock.}
       \label{fig:state-graph-example}
 \end{figure}
-\subsection{Necessary conditions}
+\subsection{Condiciones necesarias}
 \label{sec:coffman-conditions}
 
 According to the classic paper on the topic \cite{coffman1971deadlocks},
@@ -90,7 +90,7 @@ Nonetheless, the Coffman conditions are a useful framework for understanding and
 analyzing the causes of deadlocks in concurrent systems
 and they can help guide the development of strategies for preventing and resolving deadlocks.
 
-\subsection{Strategies}
+\subsection{Estrategias}
 \label{sec:deadlock-strategies}
 
 Several strategies for handling deadlocks exist,
@@ -101,7 +101,7 @@ Designers and developers must carefully consider the trade-offs between differen
 and choose the approach that is best suited to their needs.
 Interested readers are referred to \cite{coffman1971deadlocks,singhal1989deadlock}.
 
-\subsubsection{Prevention}
+\subsubsection{Prevención}
 
 One way to deal with deadlocks is to prevent them from occurring in the first place.
 The idea is for deadlocks to be excluded a priori.
@@ -159,7 +159,7 @@ a forest (an acyclical graph), thus no deadlocks are possible.
 
 In practical applications, a combination of the previous strategies may prove useful
 when none of them is entirely applicable.
-\subsubsection{Avoidance}
+\subsubsection{Evasión (\textit{avoidance})}
 
 Avoidance is another strategy for dealing with deadlocks,
 which involves dynamically detecting and
@@ -180,7 +180,7 @@ and their required locks are known a priori.
 Consequently, deadlock avoidance is not a commonly used solution
 applicable to a broad range of situations.
 
-\subsubsection{Detection and Recovery}
+\subsubsection{Detección y recuperación}
 
 Another strategy to handle deadlocks is to detect them
 \emph{after} they take place and recover from them.
@@ -221,7 +221,7 @@ in distributed database systems is \cite{knapp1987deadlock}.
 The subject of concurrency control and recovery from deadlocks in \acrshort{DBMS} is
 extensively discussed in \cite{bernstein1987concurrency}.
 
-\subsubsection{Acceptance or ignoring deadlocks altogether}
+\subsubsection{Aceptar o ignorar por completo los deadlocks}
 
 In some cases, it may be admissible
 to simply accept the risk of deadlocks and manage them as they surface.

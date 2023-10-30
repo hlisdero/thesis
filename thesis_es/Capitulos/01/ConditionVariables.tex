@@ -63,7 +63,7 @@ and incorrect use can lead to subtle and
 hard-to-debug errors such as missed signals or spurious wakeups.
 We will look now at these errors in detail.
 
-\subsection{Missed signals}
+\subsection{Señales perdidas}
 
 A missed signal happens when a thread or process waiting on a condition variable
 fails to receive a signal even though it has been emitted.
@@ -123,7 +123,7 @@ with the threads emitting signals and
 that there are no race conditions or timing issues
 that could cause signals to be missed.
 
-\subsection{Spurious wakeups}
+\subsection{Despertares espurios (\textit{spurious wakeups})}
 
 A spurious wakeup happens when a thread waiting on a condition variable wakes up
 without receiving a signal or notification from another thread.
