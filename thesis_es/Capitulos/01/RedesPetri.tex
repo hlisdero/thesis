@@ -149,118 +149,119 @@ Además, si el peso de cada arco es igual a uno, llamamos a la red de Petri \emp
 \subsection{Disparo de transiciones}
 \label{sec:transition-firing}
 
-The transition firing rule is the core concept in Petri nets.
-Despite being deceptively simple, its implications are far-reaching and complex.
+La regla de disparo de transición es el concepto central de las redes de Petri. A pesar de ser
+aparentemente simple, sus implicaciones son de gran alcance y complejidad.
 
-\begin{definition}{Transition firing rule}{transition-firing-rule}
-      Let $ PN = (P, T, F, W, M_{0}) $ be a Petri net.
+\begin{definition}{Regla de disparo de transiciones}{transition-firing-rule}
+      Sea $ PN = (P, T, F, W, M_{0}) $ una red de Petri.
       \begin{enumerate}[label=(\roman*)]
-            \item A transition $t$ is said to be enabled if each input place $p$ of $t$
-                  is marked with at least $W(p, t)$ tokens,
-                  where $W(p,t)$ is the weight of the arc from $p$ to $t$.
-            \item An enabled transition may or may not fire,
-                  depending on whether or not the event takes place.
-            \item A firing of an enabled transition $t$ removes
-                  $W(t,p)$ tokens from each input place $p$ of $t$,
-                  where $W(t, p)$ is the weight of the arc from $t$ to $p$.
+            \item Se dice que una transición $t$ está habilitada si cada lugar de entrada $p$ de $t$
+                  marcado con al menos $W(p, t)$ marcas
+                  donde $W(p,t)$ es el peso del arco que va de $p$ de $t$.
+            \item Una transición activada puede dispararse o no, dependiendo de si el evento tiene
+                  lugar o no.
+            \item El disparo de una transición activada $t$ elimina
+                  $W(t,p)$ marcas de cada lugar de entrada $p$ de $t$
+                  donde $W(t, p)$ es el peso del arco de $t$ a $p$.
       \end{enumerate}
 \end{definition}
 
-Whenever several transitions are enabled for a given marking $M$,
-any one of them can be fired.
-The choice is nondeterministic.
-Two enabled transitions are said to be in \emph{conflict}
-if the firing of one of the transitions will disable the other transition.
-In this case, the transitions compete for the token placed in a shared input place.
+Siempre que se habiliten varias transiciones para un marcado $M$ dado, puede dispararse
+cualquiera de ellas. La elección es no determinista. Se dice que dos transiciones habilitadas
+están en \emph{conflicto} si el disparo de una de ellas inhabilita la otra transición.
+En este caso, las transiciones compiten por la ficha colocada en un lugar de entrada compartido.
 
-If two transitions $t_1$ and $t_2$ are enabled in some marking but are not in conflict,
-they can fire in either order, i.e., $t_1$ then $t_2$ or $t_2$ then $t_1$.
-Such transitions represent events that can occur concurrently or in parallel.
-In this sense, the Petri net model adopts an \emph{interleaved model of parallelism}, that is,
-the behavior of the system is the result of an arbitrary interleaving of the parallel events.
+Si dos transiciones $t_1$ y $t_2$ están habilitadas en algún marcado pero no están en conflicto, pueden
+dispararse en cualquier orden, es decir, $t_1$ luego $t_2$ o $t_2$ luego $t_1$.
+Tales transiciones representan eventos que pueden ocurrir concurrentemente o en paralelo.
+En este sentido, el modelo de red de Petri adopta un modelo de paralelismo basado en el intercalado (\emph{interleaved model of parallelism}),
+es decir, el comportamiento del sistema es el resultado de un intercalado arbitrario de los eventos paralelos.
 
-Transitions without input places or output places receive a special name.
+Las transiciones sin lugares de entrada ni lugares de salida reciben un nombre especial.
 
-\begin{definition}{Source transition}{source-transition}
-      A transition without any input place is called a source transition.
+\begin{definition}{Transición fuente (\textit{Source transition})}{source-transition}
+      Una transición sin ningún lugar de entrada se denomina transición fuente.
 \end{definition}
 
-\begin{definition}{Sink transition}{sink-transition}
-      A transition without any output place is called a sink transition.
+\begin{definition}{Transición sumidero (\textit{Sink transition})}{sink-transition}
+      Una transición sin lugar de salida se denomina transición de sumidero.
 \end{definition}
 
-It is noteworthy that a source transition is unconditionally enabled
-and produces tokens without consuming any, while the firing of a sink transition
-consumes tokens without producing any.
+Cabe destacar que una transición fuente se activa incondicionalmente y produce fichas sin
+consumir ninguna, mientras que el disparo de una transición sumidero consume fichas sin
+producir ninguna.
 
 \subsection{Simuladores en línea}
 
-To familiarize oneself with the dynamics of Petri nets,
-it is useful to simulate some examples online
-since seeing a Petri net in action is clearer than any static explanation on paper.
-We have gathered some tools for this purpose to ease the burden on the reader.
+Para familiarizarse con la dinámica de las redes de Petri, resulta útil simular algunos ejemplos
+en línea, ya que ver una red de Petri en acción es más claro que cualquier explicación estática
+sobre el papel. Hemos reunido algunas herramientas con este fin para aliviar la carga del lector.
 
 \begin{itemize}
-      \item A simple simulator by Igor Kim can be found on \url{https://petri.hp102.ru/}.
-            A tutorial video on Youtube and example nets are included in the tool.
-      \item A complement to this is a series of interactive tutorials by Prof. Wil van der Aalst
-            at the University of Hamburg. These tutorials are Adobe Flash Player files (with extension \texttt{.swf})
-            that modern web browsers cannot execute.
-            Luckily, an online Flash emulator like the one found on \url{https://flashplayer.fullstacks.net/?kind=Flash_Emulator}
-            can be used to upload the files and execute them.
-      \item Another online Petri net editor and simulator is \url{http://www.biregal.com/}.
-            The user can draw the net, add the tokens, and then manually fire transitions.
+      \item Puede encontrar un sencillo simulador hecho por Igor Kim en \url{https://petri.hp102.ru/}.
+            La herramienta incluye un vídeo tutorial en Youtube y redes de ejemplo.
+      \item Como complemento, el profesor Wil van der Aalst de la Universidad de Hamburgo ha
+            elaborado una serie de tutoriales interactivos. Estos tutoriales son archivos de Adobe
+            Flash Player (con extensión
+            \texttt{.swf}) que los navegadores web modernos no pueden ejecutar.
+            Por suerte, se puede
+            utilizar un emulador Flash en línea como el que se encuentra en \url{https://flashplayer.fullstacks.net/?kind=Flash_Emulator}
+            para cargar los archivos
+            y ejecutarlos.
+      \item Otro editor y simulador de redes de Petri en línea es \url{http://www.biregal.com/}.
+            El usuario puede dibujar la red, añadir los tokens y luego disparar manualmente las
+            transiciones.
 \end{itemize}
 
 \subsection{Ejemplos de modelado}
 
-In this subsection, several simple examples are presented to introduce
-some basic concepts of Petri nets that are useful in modeling.
-This subsection has been adapted from \cite{murata1989}.
+En esta subsección, se presentan varios ejemplos sencillos para introducir algunos conceptos
+básicos de las redes de Petri que son útiles en el modelado. Esta subsección se ha adaptado de
+\cite{murata1989}.
 
-For other modeling examples, such as the mutual exclusion problem,
-semaphores as proposed by Edsger W. Dijkstra, the producer/consumer problem,
-and the dining philosophers problem, the reader is referred to
-\cite[Chap. 3]{peterson1981} and \cite{reisig2013}.
+Para otros ejemplos de modelado, como el problema de exclusión mutua, los semáforos
+propuestos por Edsger W. Dijkstra, el problema del productor/consumidor y el problema de los
+filósofos cenando, se remite al lector a \cite[Chap. 3]{peterson1981} y \cite{reisig2013}.
 
 \subsubsection{Máquinas de estado finito}
 
-\acrfull{FSM} can be represented by a subclass of Petri nets.
+Las máquinas de estados finitos (\acrfull{FSM}) pueden representarse mediante una subclase de redes de Petri.
 
-As an example of a finite-state machine, consider a coffee vending machine.
-It accepts \EUR{1} or \EUR{2} coins and sells two types of coffee,
-the first costs \EUR{3} and the second \EUR{4}.
-Assume that the machine can hold up to \EUR{4} and does not return any change.
-Then, the state diagram of the machine can be represented
-by the Petri net shown in Fig. \ref{fig:state-machine-example}.
+Como ejemplo de máquina de estado finito, consideremos una máquina expendedora de café.
+Acepta monedas de \EUR{1} o \EUR{2} euros y vende dos tipos de café, el primero cuesta \EUR{3} euros y el
+segundo \EUR{4} euros.
+Supongamos que la máquina puede contener hasta \EUR{4} y no devuelve ningún cambio.
+Entonces, el diagrama de estados
+de la máquina puede representarse mediante la red de Petri
+que se muestra en la Fig. \ref{fig:state-machine-example}.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=\linewidth]{state-machine-example.svg}
-      \caption{The Petri net for a coffee vending machine, it is equivalent to a state diagram.}
+      \caption{La red de Petri para una máquina expendedora de café,
+            es equivalente a un diagrama de estados.}
       \label{fig:state-machine-example}
 \end{figure}
 
-The transitions represent the insertion of a coin of the labeled value,
-e.g., ``Insert \EUR{1} coin''.
-The places represent a possible state of the machine,
-i.e., the amount of money currently stored inside.
-The leftmost place labeled ``\EUR{0}'' is marked with a token
-and corresponds to the initial state of the system.
+Las transiciones representan la inserción de una moneda del valor etiquetado, por ejemplo,
+``Insert \EUR{1} coin''. Los lugares representan un posible estado de la máquina, es
+decir, la cantidad de dinero almacenada actualmente en su interior. El lugar situado más a la
+izquierda, etiquetado ``\EUR{0}'', está marcado con una ficha y corresponde al estado inicial del
+sistema.
 
-We can now present the following definition of this subclass of Petri nets.
+Ahora podemos presentar la siguiente definición de esta subclase de redes de Petri.
 
-\begin{definition}{State machines}{state-machines}
-      A Petri net in which each transition has exactly one incoming arc
-      and exactly one outgoing arc is known as a state machine.
+\begin{definition}{Máquinas de estado}{state-machines}
+      Una red de Petri en la que cada transición tiene exactamente un arco entrante y
+      exactamente un arco saliente se conoce como máquina de estados.
 
-      Any \acrshort{FSM} (or its state diagram) can be modeled with a state machine.
+      Cualquier \acrshort{FSM} (o su diagrama de estados) puede modelarse con una máquina de estados.
 \end{definition}
 
-The structure of a place $p_1$ having two (or more) output transitions $t_1$ and $t_2$ is called
-a \emph{conflict}, \emph{decision}, or \emph{choice}, depending on the application.
-This is seen in the initial place of Fig. \ref{fig:state-machine-example},
-where the user must select which coin to insert first.
+La estructura de un lugar $p_1$ que tiene dos (o más) transiciones de salida $t_1$ y $t_2$ se denomina
+conflicto, decisión o elección, según la aplicación en cuestión.
+Esto se ve en el lugar inicial de la Fig. \ref{fig:state-machine-example},
+donde el usuario debe seleccionar qué moneda introducir al principio.
 
 \subsubsection{Actividades en paralelo}
 
