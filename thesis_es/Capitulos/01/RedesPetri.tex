@@ -2,115 +2,106 @@
 
 \subsection{Visión general}
 
-\acrfull{PN} are a graphical and mathematical modeling tool
-used to describe and analyze the behavior of concurrent systems.
-They were introduced by the German researcher
-Carl Adam Petri in his doctoral dissertation \cite{petri1962}
-and have since been applied in a variety of fields
-such as computer science, engineering, and biology.
-A concise summary of the theory of Petri nets,
-its properties, analysis, and applications can be found in \cite{murata1989}.
+Las redes de Petri (\acrfull{PN}) son una herramienta de modelado gráfico y matemático utilizada para
+describir y analizar el comportamiento de los sistemas concurrentes. Fueron introducidas por el
+investigador alemán Carl Adam Petri en su tesis doctoral \cite{petri1962} y desde entonces se han aplicado en diversos
+campos como la informática, la ingeniería y la biología. Puede encontrar un resumen conciso
+de la teoría de las redes de Petri, sus propiedades, análisis y aplicaciones en \cite{murata1989}.
 
-A Petri net is a bipartite, directed graph
-consisting of a set of places, transitions, and arcs.
-There are two types of nodes: places and transitions.
-Places represent the state of the system,
-while transitions represent events or actions that can occur.
-Arcs connect places to transitions or transitions to places.
-There can be no arcs between places nor transitions,
-thus preserving the bipartite property.
+Una red de Petri es un grafo dirigido bipartito formado por un conjunto de lugares, transiciones
+y arcos. Hay dos tipos de nodos: lugares y transiciones. Los lugares representan el estado del
+sistema, mientras que las transiciones representan eventos o acciones que pueden ocurrir. Los
+arcos conectan lugares a transiciones o transiciones a lugares. No puede haber arcos entre
+dos lugares o entre dos transiciones, preservando así la propiedad bipartita.
 
-Places may hold zero or more tokens.
-Tokens are used to represent the presence or absence of entities in the system,
-such as resources, data, or processes.
-In the most simple class of Petri nets,
-tokens do not carry any information and they are indistinguishable from one another.
-The number of tokens at a place or the simple presence of a token is
-what conveys meaning in the net.
-Tokens are consumed and produced as transitions fire,
-giving the impression that they move through the arcs.
+Los lugares pueden contener cero o más marcas o fichas. Los tokens se utilizan para representar la
+presencia o ausencia de entidades en el sistema, como recursos, datos o procesos. En la clase
+más simple de redes de Petri, los tokens no llevan ninguna información y son indistinguibles
+unos de otros. El número de fichas en un lugar o la simple presencia de una ficha es lo que
+transmite significado en la red. Las fichas se consumen y se producen al dispararse las
+transiciones, lo que da la impresión de que se mueven a través de los arcos.
 
-In the conventional graphical representation,
-places are depicted using circles, while transitions are depicted as rectangles.
-Tokens are represented as black dots inside of the places,
-as seen in Fig. \ref{fig:petri-net-example}.
+En la representación gráfica convencional, los lugares se representan mediante círculos,
+mientras que las transiciones se representan como rectángulos. Las fichas se representan como
+puntos negros dentro de los lugares, como se ve en la Fig. \ref{fig:petri-net-example}.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=0.9\linewidth]{petri-net-example.svg}
-      \caption{Example of a Petri net. \uppercase{PLACE 1} contains a token.}
+      \caption{Ejemplo de una red de Petri. \uppercase{PLACE 1} contiene una marca.}
       \label{fig:petri-net-example}
 \end{figure}
 
-When a transition fires, it consumes tokens from its input places and
-produces tokens in its output places, reflecting a change in the state of the system.
-The firing of a transition is enabled when there are sufficient tokens in its input places.
-In Fig. \ref{fig:petri-net-transition-example}, we can see how successive firings happen.
+Cuando una transición se dispara, consume fichas de sus lugares de entrada y produce fichas en
+sus lugares de salida, lo que refleja un cambio en el estado del sistema. El disparo de una
+transición se activa cuando hay suficientes fichas en sus lugares de entrada.
+En la Fig. \ref{fig:petri-net-transition-example},
+podemos ver cómo se producen los disparos uno detrás del otro.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=0.9\linewidth]{petri-net-transition-example.svg}
-      \caption{Example of transition firing: Transition 1 fires first, then transition 2 fires.}
+      \caption{Ejemplo de disparo de una transición:
+            La transición 1 se dispara primero, luego se dispara la transición 2.}
       \label{fig:petri-net-transition-example}
 \end{figure}
 
-The firing of enabled transitions is not deterministic,
-i.e., they fire randomly as long as they are enabled.
-A disabled transition is considered \emph{dead}
-if there is no reachable state in the system that can lead to the transition being enabled.
-If all the transitions in the net are dead, then the net is considered \emph{dead} too.
-This state is analogous to the deadlock of a computer program.
+El disparo de las transiciones habilitadas no es determinista, es decir, se disparan
+aleatoriamente mientras estén habilitadas.
+Una transición deshabilitada se considera \emph{muerta} si
+no hay ningún estado alcanzable en el sistema que pueda llevar a que la transición se habilite.
+Si todas las transiciones de la red están muertas, entonces la red también se considera \emph{muerta}.
+Este estado es análogo al bloqueo (\textit{deadlock}) de un programa informático.
 
-Petri nets can be used to model and analyze a wide range of systems,
-from simple systems with a few components to complex systems with many interacting components.
-They can be used to detect potential problems in a system,
-optimize system performance, and design and implement systems more effectively.
+Las redes de Petri pueden utilizarse para modelar y analizar una amplia gama de sistemas,
+desde sistemas sencillos con unos pocos componentes hasta sistemas complejos con muchos
+componentes que interactúan entre sí. Pueden utilizarse para detectar problemas posibles en
+un sistema, optimizar su rendimiento y diseñar e implementar sistemas de forma más eficaz.
 
-They can also be used to model industrial processes \cite{aalst1994putting},
-to validate software requirements expressed as use cases \cite{silva2004applying}
-or to specify and analyze real-time systems \cite{kavi1996specification}.
+También pueden utilizarse para modelar procesos industriales \cite{aalst1994putting}, para
+validar requisitos de software expresados como casos de uso \cite{silva2004applying} o para
+especificar y analizar sistemas en tiempo real \cite{kavi1996specification}.
 
-In particular, Petri nets can be used to detect deadlocks in source code
-by modeling the input program as a Petri net and then analyzing the structure of the resulting net.
-It will be shown that this approach is formally sound and
-practicably amenable to source code written in the Rust programming language.
+En concreto, las redes de Petri pueden utilizarse para detectar deadlocks en el código fuente
+modelando el programa de entrada como una red de Petri y analizando después la estructura de
+la red resultante. Se demostrará que este enfoque es formalmente sólido y practicable para el
+código fuente escrito en el lenguaje de programación Rust.
 
 \subsection{Modelo matemático formal}
 
-A Petri net is a particular kind of bipartite, weighted, directed graph,
-equipped with an initial state called the \emph{initial marking}, $M_{0}$.
-For this work, the following general definition of a Petri net
-taken from \cite{murata1989} will be used.
+Una red de Petri es un tipo particular de grafo bipartito, con pesos y dirigido, dotado de un
+estado inicial denominado \emph{marcado inicial}, $M_0$.
+Para este trabajo, se utilizará la siguiente
+definición general de una red de Petri tomada de \cite{murata1989}.
 
 \begin{definition}{Petri net}{petri-net}
-      A Petri net is a 5-tuple, $ PN = (P, T, F, W, M_{0}) $ where:
+      Una red de Petri es una 5-tupla, $ PN = (P, T, F, W, M_{0}) $ donde:
 
       \begin{quote}
-            $ P = \{ p_1, p_2, \dots, p_m \} $ is a finite set of places,\\
-            $ T = \{ t_1, t_2, \dots, t_n \} $ is a finite set of transitions,\\
-            $ F \subseteq (P \times T) \cup (T \times P) $ is a set of arcs (flow relation),\\
-            $ W: F \leftarrow \{1, 2, 3, ... \} $ is a weight function for the arcs,\\
-            $ M_{0}: P \leftarrow \{0, 1, 2, 3, .... \} $ is the initial marking,\\
-            $ P \cap T = \varnothing $ and $ P \cup T \neq \varnothing $
+            $ P = \{ p_1, p_2, \dots, p_m \} $ es un conjunto finito de lugares,\\
+            $ T = \{ t_1, t_2, \dots, t_n \} $ es un conjunto finito de transiciones,\\
+            $ F \subseteq (P \times T) \cup (T \times P) $ es un conjunto de arcos (relación de flujo),\\
+            $ W: F \leftarrow \{1, 2, 3, ... \} $ es una función de peso para los arcos,\\
+            $ M_{0}: P \leftarrow \{0, 1, 2, 3, .... \} $ es el marcado inicial,\\
+            $ P \cap T = \varnothing $ y $ P \cup T \neq \varnothing $
       \end{quote}
 \end{definition}
 
-In the graphical representation, arcs are labeled with their weight,
-which is a non-negative integer $k$.
-Usually, the weight is omitted if it is equal to 1.
-A $k$-weighted arc can be interpreted as a set of $k$ distinct parallel arcs.
+En la representación gráfica, los arcos se etiquetan con su peso que es un número entero no
+negativo $k$. Normalmente el peso se omite si es igual a 1. Un arco con peso $k$ puede
+interpretarse como un conjunto de $k$ arcos paralelos distintos.
 
-A \emph{marking (state)} associates with each place a non-negative integer $l$.
-If a marking assigns to place $p$ a non-negative integer $l$,
-we say that $p$ is \emph{marked with $l$ tokens}.
-Pictorially, we denote his by placing $l$ black dots (tokens) in place $p$.
-The \emph{pth} component of $M$, denoted by $M(p)$, is the number of tokens in place $p$.
+Un \emph{marcado (estado)} asocia a cada lugar un número entero no negativo $l$.
+Si un marcado asigna al lugar $p$ un número entero no negativo $l$,
+decimos que $p$ está \emph{marcado con $l$ marcas o tokens}.
+Pictóricamente, denotamos esto colocando $l$ puntos negros (fichas) en el lugar $p$.
+El \emph{p-ésimo} componente de $M$, denotado por $M(p)$, es el número de fichas en el lugar $p$.
 
-An alternative definition of Petri nets uses \emph{bags} instead of a set to define the arcs,
-thus allowing multiple elements to be present.
-It can be found in the literature, e.g., \cite[Definition 2.3]{peterson1981}.
+Una definición alternativa de las redes de Petri utiliza un multiconjunto (\emph{bag}) en lugar de un conjunto para
+definir los arcos, permitiendo así la presencia de múltiples elementos. Puede encontrarse en la
+literatura, por ejemplo, \cite[Definition 2.3]{peterson1981}.
 
-As an example, consider the Petri net $ PN_{1} = (P, T, F, W, M) $ where:
+Como ejemplo, consideremos la red de Petri $ PN_{1} = (P, T, F, W, M) $ donde:
 
 \begin{quote}
       $ P = \{ p_1, p_2 \} $,\\
@@ -120,8 +111,8 @@ As an example, consider the Petri net $ PN_{1} = (P, T, F, W, M) $ where:
       $ M(p_1) = 0, M(p_2) = 0 $
 \end{quote}
 
-This net contains no tokens and all the arc weights are equal to 1.
-It is shown in Fig. \ref{fig:petri-net-formal-example}.
+Esta red no contiene fichas y todos los pesos de los arcos son iguales a 1.
+Se muestra en la Fig. \ref{fig:petri-net-formal-example}.
 
 \begin{figure}[!htb]
       \centering
@@ -130,26 +121,26 @@ It is shown in Fig. \ref{fig:petri-net-formal-example}.
       \label{fig:petri-net-formal-example}
 \end{figure}
 
-Fig. \ref{fig:petri-net-formal-example} contains an interesting structure
-that we will encounter later.
-This motivates the following definition.
+La Fig. \ref{fig:petri-net-formal-example}
+contiene una estructura interesante que encontraremos más adelante.
+Esto motiva la siguiente definición.
 
-\begin{definition}{Self-loop}{self-loop}
-      A place node $p$ and a transition node $t$ define a self-loop
-      if $p$ is both an input place and an output place of $t$.
+\begin{definition}{Bucle}{self-loop}
+      Un lugar $p$ y una transición $t$ definen un bucle si
+      $p$ es a la vez un lugar de entrada y un lugar de salida de $t$.
 \end{definition}
 
-In most cases, we are interested in Petri nets containing no self-loops,
-which are called \emph{pure}.
+En la mayoría de los casos, nos interesan las redes de Petri que no contienen bucles
+las cuales se denominan \emph{puras}.
 
-\begin{definition}{Pure Petri net}{pure-petri-net}
-      A Petri net is said to be pure if it has no self-loops.
+\begin{definition}{Red de Petri pura}{pure-petri-net}
+      Se dice que una red de Petri es pura si no tiene bucles.
 \end{definition}
 
-Moreover, if every arc weight is equal to one, we call the Petri net \emph{ordinary}.
+Además, si el peso de cada arco es igual a uno, llamamos a la red de Petri \emph{ordinaria}.
 
-\begin{definition}{Ordinary Petri net}{ordinary-petri-net}
-      A Petri net is said to be ordinary if all of its arc weights are 1's, i.e.,
+\begin{definition}{Red de Petri ordinaria}{ordinary-petri-net}
+      Se dice que una red de Petri es ordinaria si todos los pesos de sus arcos son 1, es decir,
       \begin{equation*}
             W(a) = 1 \quad \forall a \in F
       \end{equation*}
