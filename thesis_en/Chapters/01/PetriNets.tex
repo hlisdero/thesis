@@ -287,7 +287,7 @@ into two subtasks that may be executed in parallel.
 
 The transition ``Fork'' will fire before ``Task 1'' and ``Task 2''
 and that ``Join'' will only fire after both tasks are complete.
-But note that the order in which ``Tast 1'' and ``Tast 2'' execute is non-deterministic.
+But note that the order in which ``Task 1'' and ``Task 2'' execute is non-deterministic.
 ``Task 1'' could fire before, after, or at the same time that ``Task 2''.
 It is precisely this property of the firing rule in Petri nets
 that allows the modeling of concurrent systems.
@@ -344,7 +344,7 @@ It makes use of weighted edges to remove atomically
 $k - 1$ tokens from P3 before performing a write (transition T2),
 thus preventing readers from entering the right loop of the net.
 
-At most $k$ processes may be reading at the same same,
+At most $k$ processes may be reading at the same time,
 but when one process is reading, no process is allowed to read, that is P2 will be empty.
 It can be easily verified that the mutual exclusion property is satisfied for the system.
 
@@ -560,7 +560,7 @@ Every marking in the reachability set will be produced
 and so for any Petri net with an infinite reachability set,
 i.e., an infinite number of possible states,
 the corresponding tree would also be infinite.
-Nonetheless, this opposite is not true.
+Nonetheless, the opposite is not true.
 A Petri net with a finite reachability set can have an infinite tree
 (see Fig. \ref{fig:reachability-tree-bounded-net-counterexample}).
 This net is even \emph{safe}.
