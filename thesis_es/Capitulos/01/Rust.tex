@@ -1,271 +1,262 @@
 \section{El lenguaje de programación Rust}
 
-One of the most promising modern programming languages
-for concurrent and memory-safe programming is Rust\footnote{\url{https://www.rust-lang.org/}}.
-Rust is a multi-paradigm, general-purpose programming language that aims to provide developers
-with a safe, concurrent, and efficient way to write low-level code.
-It started as a project at Mozilla Research in 2009.
-The first stable release, Rust 1.0, was announced on May 15, 2015.
-For a brief history of Rust up to 2023, see \cite{thompson2023mit}.
+Uno de los lenguajes de programación modernos más prometedores para la programación
+concurrente y segura para la memoria es Rust\footnote{\url{https://www.rust-lang.org/}}.
+Rust es un lenguaje de programación multiparadigma y de propósito general
+cuyo objetivo es proporcionar a los desarrolladores una
+forma segura, concurrente y eficiente de escribir código de bajo nivel. Comenzó como un
+proyecto en Mozilla Research en 2009. La primera versión estable, Rust 1.0, se anunció el 15
+de mayo de 2015. Para una breve historia de Rust hasta 2023, véase \cite{thompson2023mit}.
 
-Rust's memory model based on the concept of \emph{ownership} and its expressive type system prevent
-a wide variety of error classes related to memory management and concurrent programming at compile-time:
+El modelo de memoria de Rust basado en el concepto de propiedad (\textit{ownership}) y su expresivo sistema de
+tipos evitan una gran variedad de clases de errores relacionados con la gestión de memoria y la
+programación concurrente en tiempo de compilación:
 
 \begin{itemize}
       \item Double free \cite[Chap. 4.1]{rust-book}
       \item Use after free \cite[Chap. 4.1]{rust-book}
       \item Dangling pointers \cite[Chap. 4.2]{rust-book}
       \item Data races \cite[Chap. 4.2]{rust-book}
-            (with some important caveats explained in \cite[Chap. 8.1]{rustonomicon})
-      \item Passing non-thread-safe variables \cite[Chap. 16.4]{rust-book}
+            (con algunas advertencias importantes expuestas en \cite[Chap. 8.1]{rustonomicon})
+      \item Pasar variables no seguras entre hilos \cite[Chap. 16.4]{rust-book}
 \end{itemize}
 
-The official compiler \emph{rustc}\footnote{\url{https://github.com/rust-lang/rust}}
-takes care of controlling how the memory is used and allocating and deallocating objects.
-If a violation of its strict rules is found, the program will simply not compile.
+El compilador oficial \emph{rustc}\footnote{\url{https://github.com/rust-lang/rust}}
+se encarga de controlar cómo se utiliza la memoria y de asignar y
+desasignar objetos.
+Si se encuentra una violación de sus reglas estrictas, el programa
+simplemente no será compilado.
 
-In this section, we will justify the choice of Rust
-to study the detection of deadlocks and lost signals.
-We will show how these problems can be studied separately,
-knowing that other errors are already caught at compile time.
-In other words, we will argue that
-the stability and safety of the language provide a firm foundation
-on which to build a tool that detects additional errors during compilation.
+En esta sección, justificaremos la elección de Rust para estudiar la detección de bloqueos y
+señales perdidas. Mostraremos cómo estos problemas pueden estudiarse por separado, sabiendo
+que otros errores ya se detectan en tiempo de compilación. En otras palabras, argumentaremos
+que la estabilidad y la seguridad del lenguaje proporcionan una base firme sobre la que
+construir una herramienta que detecte errores adicionales durante la compilación.
 
 \subsection{Características principales}
 
-Some of Rust's main features are:
+Algunas de las principales características de Rust son:
 
 \begin{itemize}
-      \item Type system: Rust has a powerful type system
-            that provides compile-time safety checks and prevents many common programming errors.
-            It includes features such as type inference, generics, enums, and pattern matching.
-            Every variable has a type but it is commonly inferred by the compiler.
-      \item Performance: Rust's performance is comparable to C and C++,
-            and it is often faster than many other popular programming languages
-            such as Java, Go, Python, or Javascript.
-            Rust's performance is achieved through a combination of features
-            such as zero-cost abstractions, minimal runtime, and efficient memory management.
-      \item Concurrency: Rust has built-in support for concurrency.
-            It supports several concurrency paradigms such as shared state,
-            message passing and asynchronous programming.
-            It does not force the developer to implement concurrency in a specific manner.
-      \item Ownership and borrowing: Rust uses a unique ownership model to manage memory,
-            allowing for efficient memory allocation and deallocation
-            without the risk of memory leaks or data races.
-            Furthermore, it does not rely on a garbage collector, thus saving resources.
-            The \emph{borrow checker} ensures that
-            there is only one owner of a resource at any given time.
-      \item Community-driven: Rust has a vibrant and growing community of developers
-            who contribute to the language's development and ecosystem.
-            Anyone can contribute to the language's development and suggest improvements.
-            The documentation is also open-source and significant decisions are documented
-            in the form of \acrfull{RFCs}\footnote{\url{https://rust-lang.github.io/rfcs/}}.
+      \item Sistema de tipos: Rust cuenta con un potente sistema de tipos que proporciona
+            comprobaciones de seguridad en tiempo de compilación y evita muchos errores comunes
+            de programación. Incluye características como la inferencia de tipos, los tipos genéricos,
+            los enums y el \textit{pattern matching}. Cada variable tiene un tipo pero éste suele ser
+            inferido por el compilador.
+      \item Performance: La performance de Rust es comparable a la de C y C++ y a menudo es más
+            rápido que muchos otros lenguajes de programación populares como Java, Go, Python o
+            Javascript. La performance de Rust se debe a una combinación de
+            características como las abstracciones de cero coste, un \textit{runtime} mínimo y
+            una gestión eficiente de la memoria.
+      \item Concurrencia: Rust tiene un buen soporte por defecto para la concurrencia. Soporta varios
+            paradigmas de concurrencia como el estado compartido, el pasaje de mensajes y la
+            programación asíncrona. No obliga al desarrollador a implementar la concurrencia de una
+            manera específica.
+      \item \textit{Ownership} y \textit{borrowing}: Rust utiliza un modelo de \textit{ownership} único para gestionar la
+            memoria, lo que permite una asignación y desasignación de memoria eficientes sin riesgo
+            de perder memoria o condiciones de carrera en el acceso a los datos.
+            Además, no depende de un recolector de basura (\textit{garbage collector}),
+            ahorrando recursos. El verificador de préstamos (\textit{borrow checker}) garantiza que sólo haya un
+            propietario (\textit{owner}) de un recurso en un momento dado.
+      \item Impulsado por la comunidad: Rust cuenta con una vibrante y creciente comunidad de
+            desarrolladores que contribuyen al desarrollo y al ecosistema del lenguaje. Cualquiera
+            puede contribuir al lenguaje y sugerir mejoras. La documentación también es de código abierto y las decisiones
+            importantes se documentan en forma de \acrfull{RFCs}\footnote{\url{https://rust-lang.github.io/rfcs/}}.
 \end{itemize}
 
-The release cycle of the official Rust compiler, \textit{rustc}, is remarkably fast.
-A new stable version of the compiler is released every 6 weeks \cite[Appendix G]{rust-book}.
-This is made possible by a complex automated testing system that compiles even all packages
-available on \texttt{crates.io}\footnote{\url{https://crates.io/}}
-using a program called \textit{crater}\footnote{\url{https://github.com/rust-lang/crater}}
-to verify that compiling and running the tests with the new version of the compiler
-does not break existing packages \cite{albini2019}.
+El ciclo de publicación del compilador oficial de Rust, \textit{rustc}, es notablemente rápido.
+Cada 6 semanas se publica una nueva versión estable del compilador \cite[Appendix G]{rust-book}.
+Esto es posible gracias a un complejo sistema de pruebas automatizado que
+compila incluso todos los paquetes disponibles en \texttt{crates.io}\footnote{\url{https://crates.io/}}
+utilizando un programa llamado \textit{crater}\footnote{\url{https://github.com/rust-lang/crater}}
+para verificar que la compilación y ejecución de las pruebas con la nueva versión del
+compilador no rompe los paquetes existentes \cite{albini2019}.
 
 \subsubsection{El verificador de préstamos (\textit{borrow checker})}
 
-Rust's borrow checker is an essential component of its ownership model,
-which is designed to ensure memory safety and prevent data races in concurrent code.
-The borrow checker analyzes Rust code at compile-time
-and enforces a set of rules to ensure that a program's memory is accessed safely and efficiently.
+El verificador de préstamos (\textit{borrow checker}) de Rust es un componente esencial de su modelo de \textit{ownership},
+diseñado para garantizar la seguridad de la memoria y evitar las carreras de datos (\textit{data races}) en el código
+concurrente. El borrow checker analiza el código Rust en tiempo de compilación y
+aplica un conjunto de reglas para garantizar que se accede a la memoria de un programa de
+forma segura y eficiente.
 
-The core idea behind the borrow checker is that
-each piece of memory in a Rust program has an owner.
-The owner may change during execution but
-there can only be one owner at any given time.
-Memory values can also be \emph{borrowed}, that is,
-used without swapping the owner,
-similar to accessing the value through a pointer
-or a reference in other programming languages.
-When a value is borrowed, the borrower receives a reference to the value,
-but the original owner retains ownership.
-The borrow checker enforces rules to ensure that
-a borrowed value is not modified while it is borrowed
-and that the borrower releases the reference before the owner goes out of scope.
+La idea central detrás del borrow checker es que cada porción de memoria en un
+programa Rust tiene un propietario. El propietario puede cambiar durante la ejecución, pero
+sólo puede haber un propietario en un momento dado. Los valores de memoria también pueden
+tomarse \emph{prestados} (\textit{borrowed}), es decir, utilizarse sin cambiar el propietario, de forma similar al acceso al
+valor a través de un puntero o una referencia en otros lenguajes de programación.
+Cuando se toma prestado un valor, el prestatario recibe una referencia al valor, pero el propietario original
+conserva la propiedad. El verificador de préstamos aplica reglas para garantizar que un valor
+prestado no se modifica mientras está prestado y que el prestatario libera la referencia antes de
+que el propietario salga de \textit{scope}.
 
-For clarity, we will now present some of the key rules enforced by the borrow checker:
+Para mayor claridad, presentaremos a continuación
+algunas de las reglas centrales aplicadas por el borrow checker:
 
 \begin{itemize}
-      \item No two mutable references to the same memory location can exist simultaneously.
-            This prevents data races, where two threads
-            try to modify the same memory location at the same time.
-      \item Mutable references cannot exist at the same time
-            as immutable references to the same memory location.
-            This ensures that mutable and immutable references
-            cannot be used simultaneously, preventing inconsistent reads and writes.
-      \item References cannot outlive the value they reference.
-            This ensures that references do not point to invalid memory locations,
-            preventing null pointer dereferences and other memory errors.
-      \item References cannot be used after their owner has been moved or destroyed.
-            This ensures that references do not point to memory that has been deallocated,
-            preventing use-after-free errors.
+      \item No pueden existir simultáneamente dos referencias mutables a la misma posición de
+            memoria. Esto evita las carreras de datos en las que dos hilos intentan modificar la
+            misma posición de memoria al mismo tiempo.
+      \item Las referencias mutables no pueden existir al mismo tiempo que las referencias
+            inmutables a la misma ubicación de memoria. Esto garantiza que las referencias mutables
+            e inmutables no puedan utilizarse simultáneamente, evitando lecturas y escrituras
+            incoherentes.
+      \item Las referencias no pueden sobrevivir al valor al que hacen referencia. Esto garantiza que
+            las referencias no apunten a ubicaciones de memoria no válidas, evitando desferencias de
+            punteros nulos y otros errores de memoria.
+      \item Las referencias no pueden utilizarse después de que su propietario haya sido desplazado o
+            destruido. Esto asegura que las referencias no apunten a memoria que ha sido
+            desasignada, evitando errores de uso después de liberar.
 \end{itemize}
 
-It can take some effort to write Rust code that satisfies these rules.
-The borrow checker is usually singled out as
-one aspect of the language that is confusing for newcomers.
-However, this discipline pays off in terms of
-increased memory safety and performance.
-By ensuring that Rust programs follow these rules,
-the borrow checker eliminates many common programming errors
-that can lead to memory leaks, data races, and other bugs,
-while also teaching good coding practices and patterns.
+Puede requerir cierto esfuerzo escribir código Rust que satisfaga estas reglas.
+El borrow checker suele señalarse como un aspecto del lenguaje que resulta confuso para los nuevos usuarios.
+Sin embargo, esta disciplina adquirida paga sus frutos en términos de mayor seguridad de memoria y
+performance durante la ejecución.
+Al garantizar que los programas Rust siguen estas reglas, el verificador de
+préstamos elimina muchos errores comunes de programación que pueden dar lugar a fugas de
+memoria, \textit{data races} y otros bugs, al tiempo que enseña buenas prácticas y patrones de
+programación.
 
 \subsubsection{Manejo de errores aplicado por el compilador}
 
-Error handling is an essential aspect of programming and
-is typically addressed in the design of programming languages.
-The myriad of approaches can be summarized in two separate groups.
+La gestión de errores es un aspecto esencial de la programación y suele abordarse en el diseño
+de los lenguajes de programación. La miríada de enfoques puede resumirse en dos grupos
+distintos.
 
-One group formed by languages such as C++, Java, or Python employs exceptions,
-utilizing \texttt{try} and \texttt{catch} blocks to handle exceptional conditions.
-When exceptions are thrown and not caught, the program terminates abruptly.
+Un grupo formado por lenguajes como C++, Java o Python emplea excepciones, utilizando
+bloques \texttt{try} y \texttt{catch} para manejar condiciones excepcionales. Cuando se lanzan
+excepciones y no se capturan, el programa termina abruptamente.
 
-The other group is formed by languages like C or Go, among others,
-where the convention is to communicate an error either through the return value of functions
-or through a function parameter specifically dedicated to this purpose.
-The disadvantage is that the compiler does not enforce error-checking on the programmer,
-which may lead to error cases not being taken into account when adding new functionality.
+El otro grupo lo forman lenguajes como C o Go, entre otros, en los que la convención es
+comunicar un error a través del valor de retorno de las funciones o mediante un parámetro de
+función específicamente dedicado a este fin. La desventaja es que el compilador no impone al
+programador la comprobación de errores, lo que puede hacer que no se tengan en cuenta los
+casos de error al añadir nuevas funciones.
 
-Rust takes a different approach by promoting the notion that functions should ideally not fail
-and that the function signature should reflect if the function may return an error.
-Instead of exceptions or integer error codes,
-Rust functions that may encounter errors return a
-\Rustinline{std::result::Result}\footnote{\url{https://doc.rust-lang.org/std/result/}} type,
-which can hold either the result of the computation
-or a custom error type accompanied by a description of the error.
-\emph{rustc} requires the programmer to write code for both cases
-and the language provides mechanisms to facilitate error handling \cite[Chap. 9.2]{rust-book}.
+Rust adopta un enfoque diferente promoviendo la noción de que las funciones idealmente no
+deberían fallar y que la firma de la función debería reflejar si la función puede devolver un
+error. En lugar de excepciones o códigos de error con números enteros, las funciones Rust que pueden
+terminar con errores devuelven un tipo
+\Rustinline{std::result::Result}\footnote{\url{https://doc.rust-lang.org/std/result/}} que puede contener el resultado del
+cálculo o un tipo de error personalizado acompañado de una descripción del error.
+\emph{rustc} impone que el programador escriba código para ambos casos y
+el lenguaje proporciona mecanismos para facilitar la gestión de errores \cite[Chap. 9.2]{rust-book}.
 
-In Rust, the focus lies on consistently managing the error case.
-Errors can be propagated to higher-level function calls
-until a consistent program state can be restored.
-However, there may be situations where recovery from an error state is not feasible.
-In such cases, the program can be instructed to panic,
-resulting in an abrupt and ungraceful shutdown,
-similar to an uncaught exception in other programming languages.
-During a panic, program execution is aborted, and the stack is unwound \cite[Chap. 9.1]{rust-book}.
-An error message containing details of the panic,
-e.g., the error message itself and its location, is generated.
-While panics can be caught by parent threads and
-in specific cases when the programmer so desires\footnote{\url{https://doc.rust-lang.org/std/panic/fn.catch\_unwind.html}},
-they typically lead to the termination of the current program.
-This structured panic mechanism makes
-the compiler aware of potential unrecoverable errors,
-enabling the generation of appropriate code to handle such cases.
+En Rust, el foco está puesto en la gestión coherente del caso de error. Los errores pueden
+propagarse a las llamadas a funciones de nivel superior hasta que pueda restablecerse un estado
+coherente del programa. Sin embargo, puede haber situaciones en las que la recuperación de un
+estado de error no sea factible. En tales casos, se puede ordenar al programa que entre en
+pánico, lo que resulta en un cierre abrupto y sin gracia (\textit{ungraceful}),
+similar a una excepción no capturada en otros lenguajes de programación.
+Durante un pánico, la ejecución del programa se aborta y la
+pila se despliega (\textit{stack unwinding}) \cite[Chap. 9.1]{rust-book}.
+Se genera un mensaje de error que
+contiene detalles del pánico, por ejemplo, el propio mensaje de error y su ubicación.
+Aunque los \textit{panic} pueden ser capturados por hilos padre (\textit{parent threads})
+y en casos específicos
+cuando el programador así lo desea\footnote{\url{https://doc.rust-lang.org/std/panic/fn.catch\_unwind.html}},
+normalmente conducen a la terminación del programa actual. Este
+mecanismo de pánico estructurado hace que el compilador sea consciente de los posibles
+errores irrecuperables, lo que permite la generación del código adecuado para manejar estos
+casos.
 
-Rust also provides a type \Rustinline{std::option::Option}\footnote{\url{https://doc.rust-lang.org/std/option/}}
-that represents either the presence of a value or the absence of it.
-The compiler again enforces discipline on the programmer to always handle the \Rustinline{None} case.
-Thus, Rust eliminates almost completely the need for a NULL pointer
-as found in other languages like C, C++, Java, Python, or Go.
+Rust también proporciona un tipo \Rustinline{std::option::Option}\footnote{\url{https://doc.rust-lang.org/std/option/}}
+que representa tanto la presencia de un valor como su ausencia.
+De nuevo, el compilador impone disciplina al programador para manejar
+siempre el caso \Rustinline{None}.
+De este modo, Rust elimina casi por completo la necesidad de un
+puntero NULL como se encuentra en otros lenguajes como C, C++, Java, Python o Go.
 
 \subsection{Adopción}
 
-In this subsection, we will briefly describe the trend
-in the adoption of the Rust programming language.
-This highlights the relevance of this work
-as a contribution to a growing community of programmers
-who emphasize the importance of safe and performant systems programming
-for the next years in the software industry.
+En esta subsección, describiremos brevemente la tendencia en la adopción del lenguaje de
+programación Rust. Esto resalta la relevancia de este trabajo como contribución a una
+comunidad creciente de programadores que hacen hincapié en la importancia de una
+programación de sistemas segura y eficaz para los próximos años en la industria del software.
 
-In the last few years, several major projects in the Open Source community and
-at private companies have decided to incorporate Rust to reduce the number of bugs
-related to memory management without sacrificing performance.
-Among them, we can name a few representative examples:
+En los últimos años, varios proyectos importantes de la comunidad de código abierto y de
+empresas privadas han decidido incorporar Rust para reducir el número de bugs relacionados
+con la gestión de la memoria sin sacrificar performance. Entre ellos, podemos citar algunos
+ejemplos representativos:
 
 \begin{itemize}
-      \item The Android Open Source Project encourages
-            the use of Rust for the SO components
-            below the \acrfull{ART} \cite{stoep2021}.
-      \item The Linux kernel, which introduces in version 6.1
-            (released in December 2022) official tooling
-            support for programming components in Rust
+      \item El Android Open Source Project fomenta el uso de Rust para los componentes del
+            SO por debajo del \acrfull{ART} \cite{stoep2021}.
+      \item El kernel Linux introduce en la versión 6.1 (publicada en diciembre de 2022)
+            soporte oficial de herramientas para la programación de componentes en Rust
             \cite{corbet2022,desimone2022}.
-      \item At Mozilla, the Oxidation project was created in 2015
-            to increase the usage of Rust in Firefox and related projects.
-            As of March 2023, the lines of code in Rust represent more than
-            10\% of the total in Firefox Nightly \cite{mozilla-oxidation}.
-      \item At Meta, the use of Rust as a development language server-side
-            is approved and encouraged since July 2022 \cite{garcia2022}.
-      \item At Cloudflare, a new HTTP proxy in Rust was built from scratch
-            to overcome the architectural limitations of NGINX,
-            reducing CPU usage by 70\% and memory usage by 67\% \cite{wu2022}.
-      \item At Discord, reimplementing a crucial service written in Go
-            in Rust provided great benefits in performance
-            and solved a performance penalty due to the garbage collection in Go \cite{howarth2020}.
-      \item At npm Inc., the company behind the npm registry, Rust allowed scaling CPU-bound services
-            to more than 1.3 billion downloads per day \cite{rust-npm-case-study}.
+      \item En Mozilla, el proyecto Oxidation se creó en 2015 para aumentar el uso de Rust en
+            Firefox y proyectos relacionados. En marzo de 2023, las líneas de código en Rust
+            representan más del 10\% del total en Firefox Nightly \cite{mozilla-oxidation}.
+      \item En Meta, el uso de Rust como lenguaje de desarrollo del lado del servidor está aprobado
+            y es alentado desde julio de 2022 \cite{garcia2022}.
+      \item En Cloudflare, se construyó desde cero un nuevo proxy HTTP en Rust para superar las
+            limitaciones architectónicas de NGINX, reduciendo el uso de CPU en un 70\% y el de
+            memoria en un 67\% \cite{wu2022}.
+      \item En Discord, la reimplementación en Rust de un servicio crucial escrito en Go
+            proporcionó grandes beneficios en el rendimiento y resolvió una pérdida de
+            rendimiento debida al \emph{garbage collection} en Go \cite{howarth2020}.
+      \item En npm Inc, la empresa detrás del npm registry, Rust permitió escalar los servicios limitados por
+            la CPU a más de 1.300 millones de descargas al día \cite{rust-npm-case-study}.
 \end{itemize}
 
-In other cases, Rust has proved to be a great choice in existing C/C++ projects to rewrite modules
-that process untrusted user input, for instance, parsers,
-and reduce the number of security vulnerabilities due to memory issues \cite{chifflier2017writing}.
+En otros casos, Rust ha demostrado ser una gran elección en proyectos C/C++ existentes para
+reescribir módulos que procesan entradas de usuario no fiables, por ejemplo, analizadores
+sintácticos, y reducir el número de vulnerabilidades de seguridad debidas a problemas de
+memoria \cite{chifflier2017writing}.
 
-Moreover, the interest of the developer community in Rust is undeniable,
-as it has been rated for 7 years in a row as the programming language most ``loved'' by programmers
-in the Stack Overflow Developer Survey \cite{so-survey2022}.
+Además, el interés de la comunidad de desarrolladores por Rust es innegable, ya que ha sido
+calificado durante 7 años consecutivos como el lenguaje de programación más "querido" (\textit{loved}) por
+los programadores en la encuesta Stack Overflow Developer Survey \cite{so-survey2022}.
 
 \subsection{Importancia del uso seguro de la memoria}
 
-In this subsection, compelling evidence supporting
-the use of a memory-safe programming language is presented.
-The goal is to highlight the importance of advancing research in the compile-time detection of errors
-to prevent bugs that are subsequently difficult to correct in production systems.
+En esta subsección, se presentan pruebas convincentes que apoyan el uso de un lenguaje de
+programación que soporte un uso seguro de la memoria. El objetivo es resaltar la importancia de avanzar en la
+investigación sobre la detección de errores en tiempo de compilación para evitar fallos que
+posteriormente son difíciles de corregir en los sistemas en producción.
 
-Several empirical investigations have concluded that
-around 70\% of the vulnerabilities found in large C/C++ projects are due to memory handling errors.
-This high figure can be observed in projects such as:
+Varias investigaciones empíricas han concluido que alrededor del 70\% de las vulnerabilidades
+encontradas en grandes proyectos C/C++ se deben a errores en el manejo de la memoria. Esta
+cifra elevada puede observarse en proyectos como:
 
 \begin{itemize}
       \item Android Open Source Project \cite{memory-bugs-android},
-      \item the Bluetooth and media components of Android \cite{memory-bugs-android-media-bluetooth},
-      \item the Chromium Projects behind the Chrome web browser \cite{memory-bugs-chrome},
-      \item the CSS component of Firefox \cite{memory-bugs-firefox},
-      \item iOS and macOS \cite{memory-bugs-ios-macos},
-      \item Microsoft products \cite{miller-security-microsoft2019, memory-bugs-microsoft},
+      \item los componentes Bluetooth y multimedia de Android \cite{memory-bugs-android-media-bluetooth},
+      \item el Proyecto Chromium detrás del navegador web Chrome \cite{memory-bugs-chrome},
+      \item el componente CSS de Firefox \cite{memory-bugs-firefox},
+      \item iOS y macOS \cite{memory-bugs-ios-macos},
+      \item productos de Microsoft \cite{miller-security-microsoft2019, memory-bugs-microsoft},
       \item Ubuntu \cite{memory-bugs-ubuntu}
 \end{itemize}
 
-Numerous tools have set the goal to address these vulnerabilities
-caused by improper memory allocation in already established codebases.
-However, their use leads to a noticeable loss of performance and
-not all vulnerabilities can be prevented \cite{szekeres2013sok}.
-An example of a representative tool in this area, more precisely
-a dynamic data racer detector for multithreaded programs in C,
-can be found in \cite{savage1997eraser},
-whose algorithm was later improved in \cite{jannesari2009helgrind+} and
-integrated into the Helgrind tool, part of the well-known
-Valgrind instrumentation framework\footnote{\url{https://valgrind.org/}}.
+Numerosas herramientas se han fijado el objetivo de abordar estas vulnerabilidades causadas
+por una asignación inadecuada de memoria en bases de código ya establecidas.
+Sin embargo, su uso conlleva una pérdida notable de rendimiento y no todas las vulnerabilidades pueden
+evitarse \cite{szekeres2013sok}.
+Un ejemplo de herramienta representativa en este ámbito, más
+concretamente un detector dinámico de data races para programas multihilo en C, puede
+encontrarse en \cite{savage1997eraser},
+cuyo algoritmo se mejoró posteriormente en \cite{jannesari2009helgrind+}
+y se integró en la herramienta Helgrind, parte del conocido framework de instrumentación
+Valgrind\footnote{\url{https://valgrind.org/}}.
 
-In \cite{jaeger2014mind}, the authors provide
-a detailed survey of programming language features that
-compromise the security of the resulting programs.
-They discuss the intrinsic security characteristics of programming languages
-and list recommendations for the education of developers or evaluators for secure software.
-Type safety is mentioned as one of the key elements
-for eliminating complete classes of bugs from the start.
-Another noteworthy consideration is using a language where the specifications are
-as complete, explicit, and formally defined as possible.
-The concept of \acrfull{UB} should be included with caution and only sparingly.
-Examples from the C/C++ specification illustrate the confusion
-that follows from not following these principles.
-The authors conclude that memory safety achieved
-through garbage collection poses a threat to security
-and that other mechanisms should be considered instead.
+En \cite{jaeger2014mind}, los autores ofrecen un estudio detallado de las características de
+los lenguajes de programación que comprometen la seguridad de los programas resultantes.
+Hablan de las características de seguridad intrínsecas de los lenguajes de programación y
+enumeran recomendaciones para la formación de desarrolladores o evaluadores de software
+seguro. La seguridad de tipos se menciona como uno de los elementos clave para eliminar
+clases completas de errores desde el principio. Otra consideración digna de mención es utilizar
+un lenguaje en el que las especificaciones sean lo más completas, explícitas y formalmente
+definidas posible. El concepto de \acrfull{UB} debe incluirse con
+precaución y sólo con moderación. Algunos ejemplos de la especificación C/C++ ilustran la
+confusión que se deriva de no seguir estos principios. Los autores concluyen que la
+seguridad de la memoria conseguida mediante la recogida de basura (\textit{garbage collection})
+supone una amenaza para la seguridad y que en su lugar deberían considerarse otros mecanismos.
 
-We must note that Rust itself, like any other piece of software,
-is not exempt from security vulnerabilities.
-Serious bugs have been discovered in the standard library in the past \cite{davidoff2018}.
-Besides, code generation in Rust also includes mitigations
-to exploits of various kinds \cite[Chap. 11]{rustc-book}.
-However, this is far from the well-known issues in C and C++.
+Debemos tener en cuenta que el propio Rust, como cualquier otra producto de software, no está
+exento de vulnerabilidades de seguridad. En el pasado se han descubierto bugs serios en la
+biblioteca estándar \cite{davidoff2018}. Además, la generación de código en Rust también incluye
+mitigaciones a exploits de diversa índole \cite[Chap. 11]{rustc-book}. Sin embargo, esto
+dista mucho de los problemas ampliamente conocidos en C y C++.
