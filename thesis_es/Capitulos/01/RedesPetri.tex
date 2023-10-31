@@ -265,349 +265,343 @@ donde el usuario debe seleccionar qué moneda introducir al principio.
 
 \subsubsection{Actividades en paralelo}
 
-Contrary to finite-state machines, Petri nets can also model parallel or concurrent activities.
-In Fig. \ref{fig:parallel-activities-example} an example of this is shown,
-where the net represents the division of a bigger task
-into two subtasks that may be executed in parallel.
+A diferencia de las máquinas de estados finitos, las redes de Petri también pueden modelar
+actividades paralelas o concurrentes.
+En la Fig. \ref{fig:parallel-activities-example} se muestra un ejemplo de ello, en el que la
+red representa la división de una tarea mayor en dos subtareas que pueden ejecutarse en
+paralelo.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=0.8\linewidth]{parallel-activities-example.svg}
-      \caption{The Petri net depicting two parallel activities in a fork-join fashion.}
+      \caption{La red de Petri que representa dos actividades paralelas en forma de bifurcación.}
       \label{fig:parallel-activities-example}
 \end{figure}
 
-The transition ``Fork'' will fire before ``Task 1'' and ``Task 2''
-and that ``Join'' will only fire after both tasks are complete.
-But note that the order in which ``Tast 1'' and ``Tast 2'' execute is non-deterministic.
-``Task 1'' could fire before, after, or at the same time that ``Task 2''.
-It is precisely this property of the firing rule in Petri nets
-that allows the modeling of concurrent systems.
+La transición ``Fork'' se disparará antes que ``Task 1'' y ``Task 2'' y que ``Join'' sólo se disparará después
+de ambas tareas se completan. Pero tenga en cuenta que el orden en que se ejecutan la ``Task 1'' y
+la ``Task 1''  no es determinista. La tarea 1 podría dispararse antes, después o al mismo tiempo
+que la tarea 2. Es precisamente esta propiedad de la regla de disparo en las redes de Petri la
+que permite modelar sistemas concurrentes.
 
-\begin{definition}{Concurrency in Petri nets}{petri-net-concurrency}
-      Two transitions are said to be concurrent if they are causally independent, i.e.,
-      the firing of one transition does not cause and is not triggered by the firing of the other.
+\begin{definition}{Concurrencia en redes de Petri}{petri-net-concurrency}
+      Se dice que dos transiciones son concurrentes si son causalmente independientes, es
+      decir, el disparo de una transición no causa ni es provocado por el disparo de la otra.
 \end{definition}
 
-Note that each place in the net in Fig. \ref{fig:parallel-activities-example}
-has exactly one incoming arc and one outgoing arc.
-This subclass of Petri nets allows the representation of concurrency but not decisions (conflicts).
+Observe que cada lugar de la red de la Fig. \ref{fig:parallel-activities-example}
+tiene exactamente un arco entrante y un arco saliente.
+Esta subclase de redes de Petri permite representar la concurrencia pero no las
+decisiones (conflictos).
 
-\begin{definition}{Marked graphs}{marked-graphs}
-      A Petri net in which each place has exactly one incoming arc
-      and exactly one outgoing arc is known as a marked graph.
+\begin{definition}{Grafos marcados (\textit{marked graphs})}{marked-graphs}
+      Una red de Petri en la que cada lugar tiene exactamente un arco entrante y exactamente
+      un arco saliente se conoce como grafo marcado (\textit{marked graph}).
 \end{definition}
 
 \subsubsection{Protocolos de comunicación}
 
-Communications protocols can also be represented in Petri nets.
-Fig. \ref{fig:communication-protocols-example} illustrates a simple protocol
-in which Process 1 sends messages to Process 2 and
-waits for an acknowledgment to be received before continuing.
-Both processes communicate through a buffered channel whose maximum capacity is one message.
-Therefore, only one message may be traveling between the processes at any given time.
-For simplicity, no timeout mechanism was included.
+Los protocolos de comunicación también pueden representarse en redes de Petri.
+La fig. \ref{fig:communication-protocols-example}
+ilustra un protocolo sencillo en el que el Proceso 1 envía mensajes al Proceso 2 y espera a
+recibir un acuse de recibo antes de continuar.
+Ambos procesos se comunican a través de un
+canal con búfer cuya capacidad máxima es de un mensaje.
+Por lo tanto, sólo un mensaje puede
+estar viajando entre los procesos en un momento dado.
+Para simplificar, no se ha incluido ningún mecanismo de \emph{timeout}.
 
 \begin{figure}[!htbp]
       \centering
       \includesvg[width=\linewidth]{communication-protocols-example.svg}
-      \caption{A simplified Petri net model of a communication protocol.}
+      \caption{Modelo simplificado de red de Petri de un protocolo de comunicación.}
       \label{fig:communication-protocols-example}
 \end{figure}
 
-A timeout for the send operation could be incorporated into the model
-by adding a transition $t_{timeout}$ with edges from ``Wait for ACK'' to ``Ready to send''.
-This maps the decision between receiving the acknowledgment and the timeout.
+Se podría incorporar al modelo un tiempo de espera máximo para la operación de envío añadiendo una
+transición $t_{timeout}$ con aristas de ``Wait for ACK'' a ``Ready to send''.
+Esto mapea la decisión entre recibir el acuse de recibo y el tiempo de espera.
 
 \subsubsection{Control de sincronización}
 
-In a multithreaded system, resources and information are shared among several threads.
-This sharing must be controlled or synchronized
-to ensure the correct operation of the overall system.
-Petri nets have been used to model a variety of synchronization mechanisms,
-including the mutual exclusion, readers-writers, and producers-consumers problems \cite{murata1989}.
+En un sistema multihilo, los recursos y la información se comparten entre varios hilos. Esta
+compartición debe controlarse o sincronizarse para garantizar el correcto funcionamiento del
+sistema global. Las redes de Petri se han utilizado para modelar diversos mecanismos de
+sincronización, incluidos los problemas de exclusión mutua, lectores-escritores y productores-
+consumidores \cite{murata1989}.
 
-A Petri net for a readers-writers system with $k$ processes
-is shown in Fig. \ref{fig:readers-writers-example}.
-Each token represents a process and the choice of T1 or T2
-represents whether the process performs a read or a write operation.
+En la Fig. \ref{fig:readers-writers-example} se muestra una red de Petri para un sistema de lectores-escritores con $k$ procesos.
+Cada marca representa un proceso y la elección de T1 o T2 representa si el proceso realiza una
+operación de lectura o de escritura.
 
-It makes use of weighted edges to remove atomically
-$k - 1$ tokens from P3 before performing a write (transition T2),
-thus preventing readers from entering the right loop of the net.
+Utiliza aristas ponderadas para eliminar atómicamente $k - 1$ tokens de P3 antes de realizar una
+escritura (transición T2), evitando así que los lectores entren en el bucle derecho de la red.
 
-At most $k$ processes may be reading at the same same,
-but when one process is reading, no process is allowed to read, that is P2 will be empty.
-It can be easily verified that the mutual exclusion property is satisfied for the system.
+Como máximo $k$ procesos pueden estar leyendo al mismo tiempo, pero cuando un proceso esté
+leyendo, ningún proceso podrá leer, es decir, P2 estará vacío. Se puede comprobar fácilmente
+que la propiedad de exclusión mutua se satisface para el sistema.
 
 \begin{figure}[!htbp]
       \centering
       \includesvg[width=\linewidth]{readers-writers-example.svg}
-      \caption{A Petri net system with k processes that either read or write.}
+      \caption{Un sistema de redes de Petri con k procesos que leen o escriben.}
       \label{fig:readers-writers-example}
 \end{figure}
 
-It should be pointed out that this system is not free from starvation,
-since there is no guarantee that a write operation will eventually take place.
-The system is on the other hand free from deadlocks.
+Hay que señalar que este sistema no está libre de inanición (\textit{starvation}),
+ya que no hay garantía de que una operación de escritura vaya a producirse en algún momento.
+Por otro lado, el sistema sí está libre de deadlocks.
 
 \subsection{Propiedades importantes}
 
-In this subsection, we will look at fundamental concepts for the analysis of Petri nets
-that will facilitate the understanding of the nets we will be dealing with in the rest of the work.
+En esta subsección veremos conceptos fundamentales para el análisis de redes de Petri que
+facilitarán la comprensión de las redes que trataremos en el resto del trabajo.
 
 \subsubsection{Alcanzabilidad}
 \label{sec:reachability}
 
-Reachability is one of the most important questions
-when studying the dynamic properties of a system.
-The firing of enabled transitions causes changes in the location of the tokens.
-In other words, it changes the marking $M$.
-A sequence of firings creates a sequence of markings
-where each marking may be denoted as a vector of length $n$,
-with $n$ being the number of places in the Petri net.
+La alcanzabilidad es una de las cuestiones más importantes cuando se estudian las propiedades
+dinámicas de un sistema. El disparo de transiciones habilitadas provoca cambios en la
+ubicación de las marcas. En otras palabras, cambia el marcado $M$. Una secuencia de disparos
+crea una secuencia de marcados en la que cada marcado puede denotarse como un vector de
+longitud $n$, siendo $n$ el número de lugares de la red de Petri.
 
-A \emph{firing} or \emph{occurence sequence} is denoted by
-$ \sigma = M_0\; t_1\; M_1\; t_2\; M_2\; \cdots\; t_l\; M_l$ or simply
-$ \sigma = t_1\; t_2\; \cdots\; t_l\; $, since the markings
-resulting from each firing are derived
-from the transition firing rule described in Sec. \ref{sec:transition-firing}.
+Una \emph{secuencia de disparos} u \emph{ocurrencias} se denota por
+$ \sigma = M_0\; t_1\; M_1\; t_2\; M_2\; \cdots\; t_l\; M_l$ o simplemente
+$ \sigma = t_1\; t_2\; \cdots\; t_l\; $, ya que las marcas
+resultantes de cada disparo se derivan de la
+regla de disparo de transición descrita en la Sec. \ref{sec:transition-firing}.
 
-\begin{definition}{Reachability}{reachability}
-      We say that a marking $M$ is reachable from $M_0$
-      if there exists a firing sequence $\sigma$ such that $M$ is contained in $\sigma$.
+\begin{definition}{Alcanzabilidad (\textit{Reachability})}{reachability}
+      Decimos que una marca $M$ es alcanzable desde $M_0$ si existe una secuencia de disparo $\sigma$
+      tal que $M$ está contenida en $\sigma$.
 \end{definition}
 
-The set of all possible markings reachable from $M_0$ is denoted by $R(N, M_0)$ or more simply
-$R(M_0)$ when the net meant is clear.
-This set is called the \emph{reachability set}.
+El conjunto de todas las marcas posibles alcanzables desde $M_0$ se denota por $R(N, M_0)$ o más
+sencillamente $R(M_0)$ cuando la red en cuestión es obvia. Este conjunto se denomina \emph{conjunto de alcanzabilidad}.
 
-A problem of utmost importance in the theory of Petri nets can be presented then,
-namely the \emph{reachability problem}:
-Finding if $M_n \in R(M_0, N)$ for a given net and initial marking.
+Se puede presentar entonces un problema de suma importancia
+en la teoría de las redes de Petri, a saber, el \emph{Problema de alcanzabilidad}:
+Encontrar si $M_n \in R(M_0, N)$ para una red y un marcado inicial dados.
 
-In some applications, we are just interested in the markings of a subset of places
-and we can ignore the remaining ones.
-This leads to a variation of the problem known as the \emph{submarking reachability problem}.
+En algunas aplicaciones, sólo nos interesan los marcados de un subconjunto de lugares y podemos
+ignorar los restantes. Esto da lugar a una variación del problema conocida como
+\emph{problema de alcanzabilidad del submarcado} (\textit{submarking reachability problem}).
 
-It has been shown that the reachability problem is decidable \cite{mayr1981}.
-Nevertheless, it was also shown that it takes exponential space
-(formally, it is EXPSPACE-hard) \cite{lipton1976}.
-New methods have been proposed to make the algorithms more efficient \cite{kungas2005petri}.
-Recently, \cite{czerwinski2020reachability} improved
-the lower bound and showed that the problem is not ELEMENTARY.
-These results highlight that the reachability problem is still
-an active area of research in theoretical computer science.
+Se ha demostrado que el problema de la alcanzabilidad es decidible \cite{mayr1981}.
+Sin embargo, también se ha demostrado que ocupa un espacio exponencial (formalmente, es
+EXPSPACE-hard) \cite{lipton1976}. Se han propuesto nuevos métodos para que los algoritmos
+sean más eficientes \cite{kungas2005petri}. Recientemente, \cite{czerwinski2020reachability} mejoraron el
+límite inferior y demostraron que el problema no es ELEMENTARY. Estos resultados ponen de
+relieve que el problema de la alcanzabilidad sigue siendo un área activa de investigación en
+teória de la computación.
 
-For this and other key problems, the most important theoretical results
-obtained up to 1998 are detailed in \cite{esparza1994decidability}.
+Para éste y otros problemas clave, los resultados teóricos más importantes obtenidos hasta
+1998 se detallan en \cite{esparza1994decidability}.
 
 \subsubsection{Acotamiento y seguridad}
 
-During the execution of a Petri net, tokens may accumulate in some places.
-Applications need to ensure that the number of tokens in a given place does not
-exceed a certain tolerance.
-For example, if a place represents a buffer,
-we are interested that the buffer will never overflow.
+Durante la ejecución de una red de Petri, los tokens pueden acumularse en algunos lugares.
+Diversas aplicaciones sulen necesitar garantizar que el número de fichas en un lugar determinado no supere
+una cierta tolerancia. Por ejemplo, si un lugar representa un búfer, nos interesa que el búfer
+nunca se desborde.
 
-\begin{definition}{Boundedness}{boundedness}
-      A place in a Petri net is k-bounded or k-safe
-      if the number of tokens in that place cannot exceed a finite integer $k$
-      for any marking reachable from $M_0$.
+\begin{definition}{Acotamiento (\textit{Boundedness})}{boundedness}
+      Un lugar de una red de Petri es k-acotada o es k-seguro si el número de fichas
+      de ese lugar no puede superar un número entero finito $k$ para cualquier marcado
+      alcanzable desde $M_0$.
 
-      A Petri net is k-bounded or simply bounded if all places are bounded.
+      Una red de Petri es k-acotada o simplemente acotada si todos los lugares están acotados.
 \end{definition}
 
-Safeness is a special case of boundedness.
-It applies when the place contains either 1 or 0 tokens during execution.
+La seguridad es un caso especial de la acotación.
+Aplica cuando el lugar contiene 1 ó 0 fichas durante la ejecución.
 
-\begin{definition}{Safeness}{safeness}
-      A place in a Petri net is safe if the number of tokens in that place never exceeds one.
+\begin{definition}{Seguridad (\textit{Safeness})}{safeness}
+      Un lugar de una red de Petri es seguro si el número de fichas de ese lugar nunca es
+      superior a uno.
 
-      A Petri net is safe if each place in that net is safe.
+      Una red de Petri es segura si cada lugar de esa red es seguro.
 \end{definition}
 
-The nets in Fig. \ref{fig:state-machine-example}, \ref{fig:parallel-activities-example}
-and \ref{fig:communication-protocols-example} are all safe.
+Las redes de las Fig. \ref{fig:state-machine-example}, \ref{fig:parallel-activities-example}
+y \ref{fig:communication-protocols-example} son todas seguras.
 
-The net in Fig. \ref{fig:readers-writers-example}
-is k-bounded because all its places are k-bounded.
+La red de la Fig. \ref{fig:readers-writers-example} es k-acotada porque todos sus lugares son k-acotados.
 
 \subsubsection{Liveness}
 
-The concept of liveness is analogous to
-the complete absence of deadlocks in computer programs.
+El concepto de liveness es análogo a la ausencia total de deadlocks en los programas informáticos.
 
 \begin{definition}{Liveness}{liveness}
-      A Patri net $(N, M_0)$ is said to be live
-      (or equivalently $M_0$ is said to be a live marking for N) if,
-      for every marking reachable from $M_0$, it is possible to fire any transition
-      of the net by progressing through some firing sequence.
+      Se dice que una red Patri $(N, M_0)$ está viva (o equivalentemente se dice que $M_0$ es una
+      marca viva (\textit{live}) para $N$) si, para cada marca alcanzable desde $M_0$, es posible disparar
+      cualquier transición de la red progresando a través de alguna secuencia de disparo.
 \end{definition}
 
-When a net is live, it can always continue executing,
-no matter the transitions that fired before.
-Eventually, every transition can be fired again.
-If a transition can be fired only once and there is no way to enable it again,
-then the net is not live.
+Cuando una red está viva, siempre puede seguir ejecutándose, sin importar las transiciones que
+se dispararon antes. Eventualmente, cada transición puede dispararse de nuevo. Si una
+transición sólo puede dispararse una vez y no hay forma de volver a activarla, entonces la red
+no es viva (\textit{live}).
 
-This is equivalent to saying that the Petri net is \emph{deadlock-free}.
-Let us now define what constitutes a deadlock and show examples of it.
+Esto equivale a decir que la red de Petri está \emph{libre de bloqueo} (\textit{deadlock-free}).
+Definamos ahora lo que constituye un bloqueo/deadlock y mostremos ejemplos de ello.
 
-\begin{definition}{Deadlock in Petri nets}{petri-net-deadlock}
-      A deadlock in a Patri net is a transition (or a set of transitions) that cannot fire
-      for any marking reachable from $M_0$.
-      The transition (or a set of transitions) cannot become enabled again
-      after a certain point in the execution.
+\begin{definition}{Bloqueo en redes de Petri}{petri-net-deadlock}
+      Un bloqueo o \textit{deadlock} en una red Patri es una transición (o un conjunto de transiciones) que
+      no puede dispararse para ninguna marca alcanzable desde $M_0$. La transición (o un
+      conjunto de transiciones) no puede volver a activarse después de un cierto punto de la
+      ejecución.
 \end{definition}
 
-A transition is \emph{live} if it is not deadlocked.
-If a transition is live, it is always possible to pick a suitable firing
-to get from the current marking to a marking that enables the transition.
+Una transición está \emph{viva} si no está bloqueada.
+Si una transición está viva, siempre es posible
+elegir una serie de disparos de transiciones adecuada
+para pasar del marcado actual a un marcado que habilite la transición.
 
-The nets in Fig. \ref{fig:state-machine-example}, \ref{fig:parallel-activities-example}
-and \ref{fig:communication-protocols-example} are all live.
-In all these cases, after some firings,
-the net returns to the initial state and can restart the cycle.
+Las redes de las Fig. \ref{fig:state-machine-example}, \ref{fig:parallel-activities-example}
+and \ref{fig:communication-protocols-example} están todas vivas.
+En todos estos casos, después de algunos disparos,
+la red vuelve al estado inicial y puede reiniciar el ciclo.
 
-The net in Fig. \ref{fig:petri-net-example} is not live.
-After two firings it finishes executing and nothing more can happen.
-The net in Fig. \ref{fig:petri-net-formal-example} is also not live, because
-T1 will only execute once and only T2 can be enabled from that point on.
+La red de la Fig. \ref{fig:petri-net-example} no está viva.
+Después de dos disparos termina de ejecutarse y no puede
+ocurrir nada más.
+La red de la Fig. \ref{fig:petri-net-formal-example} tampoco está viva,
+porque T1 sólo se ejecutará una vez y a partir de ese momento sólo se podrá activar T2.
 
 \subsection{Análisis de alcanzabilidad}
 
-Having introduced the reachability set $R(N, M_0)$ in Sec. \ref{sec:reachability},
-we can now present a major analysis technique for Petri nets: the \emph{reachability tree}.
+Tras haber introducido el conjunto de alcanzabilidad $R(N, M_0)$ en la sección \ref{sec:reachability},
+ahora podemos presentar una técnica de análisis importante para las redes de Petri: \emph{el árbol de
+      alcanzabilidad} (\textit{reachability tree}).
 
-We will run the algorithm for constructing the reachability tree step by step
-and then present its advantages and drawbacks.
-In general terms, the reachability tree has the following structure:
-Nodes represent markings generated from $M_0$, the root of the tree, and its successors.
-Each arc represents a transition firing, which transforms one marking into another.
+Ejecutaremos paso a paso el algoritmo para construir el árbol de alcanzabilidad y, a
+continuación, presentaremos sus ventajas e inconvenientes. En términos generales, el árbol de
+alcanzabilidad tiene la siguiente estructura: Los nodos representan las marcas generadas a partir
+de $M_0$, la raíz del árbol y sus sucesores.
+Cada arco representa un disparo de transición que transforma un marcado en otro.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=0.5\linewidth]{reachability-tree-example.svg}
-      \caption{A marked Petri net for illustrating the construction of a reachability tree.}
+      \caption{Una red de Petri marcada para ilustrar la construcción de un árbol de alcanzabilidad.}
       \label{fig:reachability-tree-example}
 \end{figure}
 
-Consider the Petri net shown in Fig. \ref{fig:reachability-tree-example}.
-The initial marking is $(1, 0, 0)$.
-In this initial marking, two transitions are enabled: T1 and T3.
-Given that we would like to obtain the entire reachability set,
-we define a new node in the reachability tree for each reachable marking,
-which results from firing each transition.
-An arc, labeled by the transition fired, leads from the initial marking
-(the root of the tree) to each of the new markings.
-After this first step (Fig. \ref{fig:reachability-tree-step-1}),
-the tree contains all markings that are immediately reachable from the initial marking.
+Considere la red de Petri mostrada en la Fig. \ref{fig:reachability-tree-example}.
+La marca inicial es $(1, 0, 0)$.
+En este marcado inicial se habilitan dos transiciones: T1 y T3.
+Dado que queremos obtener todo el conjunto de alcanzabilidad,
+definimos un nuevo nodo en el árbol de alcanzabilidad para cada
+marcado alcanzable, que resulta de disparar cada transición. Un arco, etiquetado por la
+transición disparada, conduce desde la marca inicial (la raíz del árbol) hasta cada una de las
+nuevas marcas. Tras este primer paso (Fig. \ref{fig:reachability-tree-step-1}),
+el árbol contiene todas las marcas que son inmediatamente alcanzables desde la marca inicial.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=0.5\linewidth]{reachability-tree-step-1.svg}
-      \caption{The first step building the reachability tree
-            for the Petri net in Fig. \ref{fig:reachability-tree-example}.}
+      \caption{Primer paso para construir el árbol de alcanzabilidad
+            de la red de Petri de la Fig. \ref{fig:reachability-tree-example}.}
       \label{fig:reachability-tree-step-1}
 \end{figure}
 
-Now we must consider all markings reachable from the leaves of the tree.
+Ahora debemos considerar todas las marcas alcanzables desde las hojas del árbol.
 
-From marking $(0,0,1)$ we cannot fire any transition.
-This is known as a \emph{dead marking}.
-In other words, it is a ``dead-end'' node.
-This class of end-states is particularly relevant for deadlock analysis.
+A partir del marcado $(0,0,1)$ no podemos disparar ninguna transición. Esto se conoce como un
+\emph{marcado muerto} (\textit{dead marking}).
+En otras palabras se trata de un nodo ``sin salida''.
+Esta clase de estados finales es especialmente relevante para el análisis de bloqueos.
 
-From the marking on the right of the tree, denoted $(1, 1, 0)$, we can fire T1 or T3.
-If we fire T1, we obtain $(0, 1, 1)$ and if T3 fires, the resulting marking is $(1, 2, 0)$.
-This produces the tree of Fig. \ref{fig:reachability-tree-step-2}.
+A partir de la marca de la derecha del árbol, denotada $(1, 1, 0)$, podemos disparar T1 o T3.
+Si disparamos T1, obtenemos $(0, 1, 1)$ y si dispara T3, la marca resultante es $(1, 2, 0)$.
+Esto produce el árbol de la Fig. \ref{fig:reachability-tree-step-2}.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=0.7\linewidth]{reachability-tree-step-2.svg}
-      \caption{The second step building the reachability tree
-            for the Petri net in Fig. \ref{fig:reachability-tree-example}.}
+      \caption{Segundo paso en la construcción del árbol de alcanzabilidad
+            de la red de Petri de la Fig. \ref{fig:reachability-tree-example}.}
       \label{fig:reachability-tree-step-2}
 \end{figure}
 
-Note that starting with marking $(0, 1, 1)$, only the transition T2 is enabled,
-which will lead to a marking $(0, 0, 1)$ that was already seen before.
-If instead we take $(1, 2, 0)$ we have again the same possibilities as starting from $(1, 1, 0)$.
-It is easy to see that the tree will continue to grow down that path.
-The tree is therefore infinite and this is because
-the net in Fig. \ref{fig:reachability-tree-example} is not bounded.
-See Fig. \ref{fig:reachability-tree-final-step} for the abbreviated final result.
+Observe que partiendo de la marca $(0, 1, 1)$, sólo se habilita la transición T2 que conducirá a una
+marca $(0, 0, 1)$ ya vista anteriormente.
+Si en cambio tomamos $(1, 2, 0)$ tenemos de nuevo las
+mismas posibilidades que partiendo de $(1, 1, 0)$.
+Es fácil ver que el árbol seguirá creciendo por ese
+camino. Por tanto, el árbol es infinito y
+esto se debe a que la red de la Fig. \ref{fig:reachability-tree-example} no está acotada.
+Veáse en la Fig. \ref{fig:reachability-tree-final-step} el resultado final abreviado.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=\linewidth]{reachability-tree-final-step.svg}
-      \caption{The infinite reachability tree for the Petri net in Fig.
-            \ref{fig:reachability-tree-example}.}
+      \caption{El árbol de alcanzabilidad infinita para
+            la red de Petri de la Fig. \ref{fig:reachability-tree-example}.}
       \label{fig:reachability-tree-final-step}
 \end{figure}
 
-The previously presented method enumerates the elements in the reachability set.
-Every marking in the reachability set will be produced
-and so for any Petri net with an infinite reachability set,
-i.e., an infinite number of possible states,
-the corresponding tree would also be infinite.
-Nonetheless, this opposite is not true.
-A Petri net with a finite reachability set can have an infinite tree
-(see Fig. \ref{fig:reachability-tree-bounded-net-counterexample}).
-This net is even \emph{safe}.
-In conclusion, dealing with a bounded or safe net is not
-a guarantee that the total number of reachable states will be finite.
+El método presentado anteriormente enumera los elementos del conjunto de alcanzabilidad.
+Se producirá cada marca del conjunto de alcanzabilidad y, por tanto, para cualquier red de Petri
+con un conjunto de alcanzabilidad infinito, es decir, un número infinito de estados posibles, el
+árbol correspondiente también sería infinito.
+Sin embargo, lo contrario no es cierto. Una red de
+Petri con un conjunto de alcanzabilidad finito puede tener un árbol infinito
+(véase la Fig. \ref{fig:reachability-tree-bounded-net-counterexample}).
+Esta red es incluso \emph{segura}.
+En conclusión, tratar con una red acotada o segura no
+es garantía de que el número total de estados alcanzables sea finito.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=0.9\linewidth]{reachability-tree-bounded-net-counterexample.svg}
-      \caption{A simple Petri net with an infinite reachability tree.}
+      \caption{Una red de Petri simple con un árbol de alcanzabilidad infinito.}
       \label{fig:reachability-tree-bounded-net-counterexample}
 \end{figure}
 
-For the reachability tree to be a useful analysis tool,
-it is necessary to devise a method to limit it to a finite size.
-This implies in general a certain loss of information since the method will have to map
-an infinite number of reachable markings onto a single element.
-The reduction to a finite representation may be accomplished by the following means.
+Para que el árbol de alcanzabilidad sea una herramienta de análisis útil, es necesario idear un
+método que lo limite a un tamaño finito. Esto implica en general una cierta pérdida de
+información, ya que el método tendrá que mapear (o mejor dicho reducir)
+un número infinito de marcados alcanzables a un solo elemento.
+La reducción a una representación finita puede lograrse por los siguientes medios.
 
-Notice on one hand that we may encounter duplicate nodes
-in our tree and we always naively treat them as new.
-This is illustrated most clearly in Fig. \ref{fig:reachability-tree-bounded-net-counterexample}.
-It is thus possible to stop the exploration of the successors of a duplicated node.
+Observe por un lado que podemos encontrarnos con nodos duplicados en nuestro árbol y que
+siempre los tratamos ingenuamente como nuevos. Esto se ilustra más claramente en la Fig.
+\ref{fig:reachability-tree-bounded-net-counterexample}.
+Por tanto, es posible detener la exploración de los sucesores de un nodo duplicado.
 
-Notice on the other hand that some markings are strictly different from previously seen markings
-but they enable the same set of transitions.
-We say in this case that the marking with additional tokens \emph{covers} the one
-that has the minimum number of tokens needed to enable the set of transitions in question.
-Firing some transitions may allow us to accumulate an arbitrary number of tokens in one place.
-For example, firing T3 in the Petri net seen in
-Fig. \ref{fig:reachability-tree-example} exhibits exactly this behavior.
-Therefore, it would suffice to mark the accumulating place
-with a special label $\omega$, which stands for infinity
-since we could get as many tokens as we wish in that place.
+Nótese, por otro lado, que algunas marcados son estrictamente diferentes de las marcas vistas
+anteriormente pero permiten el mismo conjunto de transiciones. Decimos en este caso que la
+marca con fichas adicionales \emph{cubre} (\textit{covers}) la que tiene el número mínimo de fichas necesarias para
+permitir el conjunto de transiciones en cuestión.
+Disparar algunas transiciones puede permitirnos acumular un número arbitrario de fichas en un lugar.
+Por ejemplo, disparar T3 en la red de Petri que se ve en la
+Fig. \ref{fig:reachability-tree-example} muestra exactamente este comportamiento.
+En conclusión, bastaría con marcar el lugar de acumulación con una etiqueta especial $\omega$, que significa infinito,
+ya que podríamos obtener tantas marcas como quisiéramos en ese lugar.
 
-For instance, the result of converting the tree of Fig. \ref{fig:reachability-tree-final-step}
-to a finite tree is shown in Fig. \ref{fig:reachability-tree-final-step-finite}.
+Por ejemplo, el resultado de convertir el árbol de la Fig. \ref{fig:reachability-tree-final-step}
+en un árbol finito se muestra en la Fig. \ref{fig:reachability-tree-final-step-finite}.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=0.7\linewidth]{reachability-tree-final-step-finite.svg}
-      \caption{The finite reachability tree for the Petri net in Fig.
-            \ref{fig:reachability-tree-example}.}
+      \caption{El árbol de alcanzabilidad finito para
+            la red de Petri de la Fig. \ref{fig:reachability-tree-example}.}
       \label{fig:reachability-tree-final-step-finite}
 \end{figure}
 
-For more details about
+Para más detalles sobre
 
 \begin{enumerate}
-      \item the technique for representing infinite reachability trees using $\omega$,
-      \item a definition of the algorithm and precise steps for constructing the reachability tree,
-      \item mathematical proof that the reachability tree generated by it is finite,
-      \item and the distinction between the reachability tree and the \emph{reachability graph}
+      \item la técnica de representación de árboles de alcanzabilidad infinita mediante $\omega$,
+      \item una definición del algoritmo y los pasos precisos para construir el árbol de alcanzabilidad,
+      \item la demostración matemática de que el árbol de alcanzabilidad generado por el algoritmo es finito,
+      \item y la distinción entre el árbol de alcanzabilidad y el \emph{grafo de alcanzabilidad} (\textit{reachability graph})
 \end{enumerate}
 
-the reader is referred to \cite{murata1989} and \cite{peterson1981}.
-These concepts are beyond the scope of this work
-and are not required in the following chapters.
+se remite al lector a \cite{murata1989} y \cite{peterson1981}.
+Estos conceptos están fuera del alcance de este trabajo y
+no son necesarios en los capítulos siguientes.
