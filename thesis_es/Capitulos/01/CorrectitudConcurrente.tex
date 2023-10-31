@@ -1,48 +1,45 @@
 \section{Correctitud de programas concurrentes}
 
-In the area of concurrent computing, one of the main challenges is
-to prove the correctness of a concurrent program.
-Unlike a sequential program where for each input the same output
-is always obtained, in a concurrent program the output may depend
-on how instructions from different processes or
-threads were interleaved during execution.
+En el área de la computación concurrente, uno de los principales retos es demostrar la
+correctitud de un programa concurrente. A diferencia de un programa secuencial en el que para
+cada entrada se obtiene siempre la misma salida, en un programa concurrente la salida puede
+depender de cómo se hayan intercalado las instrucciones de los distintos procesos o hilos
+durante la ejecución.
 
-The correctness of a concurrent program is then defined
-in terms of the properties of the computation performed
-and not only in terms of the obtained result.
-In the literature \cite{ben-ari2006,coulouris2012,tanenbaum2017},
-two types of correctness properties are defined:
+La correctitud de un programa concurrente se define entonces en términos de las propiedades
+de la computación realizada y no sólo en términos del resultado obtenido.
+En la literatura \cite{ben-ari2006,coulouris2012,tanenbaum2017}, se definen dos tipos de
+propiedades de correctitud:
 
 \begin{itemize}
-    \item \textbf{Safety properties}: The property must \emph{always} be true.
-    \item \textbf{Liveness properties}: The property must \emph{eventually} become true.
+    \item \textbf{Propiedades de seguridad (\emph{Safety properties}):}: La propiedad debe ser \emph{siempre} verdadera.
+    \item \textbf{Propiedades de liveness}: La propiedad debe volverse \emph{eventualmente} verdadera.
 \end{itemize}
 
-Two desirable safety properties in a concurrent program are:
+Dos propiedades de seguridad deseables en un programa concurrente son:
 
 \begin{itemize}
-    \item \textbf{Mutual exclusion}: Two processes must not access shared resources at the same time.
-    \item \textbf{Absence of deadlock}: A running system must be able to continue performing its task,
-          that is, progressing and producing useful work.
+    \item \textbf{Exclusión mutua}: Dos procesos no deben acceder a los recursos compartidos al mismo tiempo.
+    \item \textbf{Ausencia de bloqueo (\emph{deadlock})}: Un sistema en funcionamiento debe poder seguir realizando
+          su tarea, es decir, progresando y produciendo trabajo útil.
 \end{itemize}
 
-Synchronization primitives such as mutexes,
-semaphores (as proposed by \cite{Dijkstra2002}),
-monitors (as proposed by \cite{hansen1972structured,hansen1973operating}),
-and condition variables (as proposed by \cite{hoare1974monitors}) are usually used
-to implement coordinated access of threads or processes to shared resources.
-However, the correct use of these primitives is difficult to achieve in practice
-and can introduce errors that are difficult to detect and correct.
-Currently, most general-purpose languages, whether compiled or interpreted,
-do not allow these errors to be detected in all cases.
+Las primitivas de sincronización como los mutexes, los monitores
+(propuestos por \cite{hansen1972structured,hansen1973operating}),
+los semáforos (propuestos por \cite{Dijkstra2002}) y las variables de
+condición (propuestas por \cite{hoare1974monitors}) suelen utilizarse para implementar el acceso
+coordinado de hilos o procesos a recursos compartidos. Sin embargo, el uso correcto de estas
+primitivas es difícil de conseguir en la práctica y puede introducir errores difíciles de detectar y
+corregir. Actualmente, la mayoría de los lenguajes de propósito general, ya sean compilados o
+interpretados, no permiten detectar estos errores en todos los casos.
 
-Given the increasing importance of concurrent programming due to the proliferation
-of multithreaded and multithreaded hardware systems,
-minimizing the occurrence of errors associated with thread or process synchronization
-holds significant importance for the industry.
-Deadlock-free operation is an unavoidable requirement for many projects, such as
-operating systems \cite{ArpaciDusseau2018}, autonomous vehicles \cite{Perronnet2019}
-and aircraft \cite{carreno2005safety,monzon2009deadlock}.
+Dada la creciente importancia de la programación concurrente debido a la proliferación de
+sistemas de hardware multihilo y multihilo, minimizar la aparición de errores asociados a la
+sincronización de hilos o procesos tiene una importancia innegable para la industria. El
+funcionamiento libre de deadlocks es un requisito fundamental para muchos proyectos, como los
+sistemas operativos \cite{ArpaciDusseau2018},
+las aeronaves \cite{carreno2005safety,monzon2009deadlock}
+y los vehículos autónomos \cite{Perronnet2019}.
 
-In the next section, we will have a closer look at the conditions that cause a deadlock
-and the strategies used to cope with them.
+En la próxima sección examinaremos más detenidamente las condiciones que provocan un
+deadlock y las estrategias utilizadas para hacerles frente.
