@@ -1,21 +1,19 @@
-In this chapter, the literature on formal verification of Rust code
-and Petri net modeling for deadlock detection is briefly reviewed.
-Some of these previous publications contain approaches
-that have guided this work.
+En este capítulo, se revisa brevemente la literatura sobre la verificación formal del código Rust
+y el modelado de redes de Petri para la detección de deadlocks. Algunas de estas publicaciones
+anteriores contienen enfoques que han guiado este trabajo.
 
-In the next two sections, we will look at the existing tools,
-their scope and their goals compared to the tool developed in this thesis.
+En las dos secciones sucesivas examinaremos las herramientas existentes, su alcance y sus
+objetivos en comparación con la herramienta desarrollada en esta tesis.
 
-Afterward, a survey of the existing Petri net libraries in the Rust ecosystem
-as of early 2023 is provided to justify the need to implement a library
-from the ground up.
+A continuación, se ofrece un estudio de las bibliotecas de redes de Petri existentes en el
+ecosistema Rust a principios de 2023 para justificar la necesidad de implementar una biblioteca
+desde cero.
 
-As the next step, we explore the research community behind the \acrfull{MCC}
-and the model checkers that participate in it
-to confirm the potential of these tools
-to analyze Petri net models of significant size.
-This is relevant since the model checker acts
-as the backend to the tool developed in this work.
+Posteriormente, exploramos la comunidad de investigadores detrás del Concurso
+de Verificación de Modelos (\acrfull{MCC}) y los verificadores de modelos que participan en él
+para confirmar el potencial de estas herramientas para analizar modelos de redes de Petri de
+tamaño significativo. Esto es relevante ya que el verificador de modelos actúa como backend
+de la herramienta desarrollada en este trabajo.
 
-Finally, three of the existing file formats for exchanging Petri nets are presented
-and their purpose in the context of this work is explained.
+Por último, se presentan tres de los formatos de archivo existentes para el intercambio de redes
+de Petri y se explica su finalidad en el contexto de este trabajo.
