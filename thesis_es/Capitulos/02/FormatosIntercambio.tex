@@ -1,121 +1,111 @@
-\section{Exchange file formats for Petri nets}
+\section{Formatos de archivo para intercambio de redes de Petri}
 
-As observed in the preceding chapter,
-Petri nets are a widely used tool for modeling software systems.
-However, due to the different classes of Petri nets
-(simple Petri nets, high-level Petri nets, timed Petri nets,
-stochastic Petri nets, colored Petri nets, to name a few),
-designing a standardized exchange file format
-compatible with all applications has proven challenging.
-One reason for this is that
-Petri nets can be implemented and represented in multiple ways,
-depending on the specific objectives, given that they are a type of graph.
+Como se ha observado en el capítulo anterior, las redes de Petri son una herramienta muy
+utilizada para modelar sistemas de software. Sin embargo, debido a las diferentes clases de
+redes de Petri (redes de Petri simples, redes de Petri de alto nivel, redes de Petri con tiempo,
+redes de Petri estocásticas, redes de Petri coloreadas, por nombrar algunas), diseñar un
+formato de archivo de intercambio estandarizado compatible con todas las aplicaciones ha
+resultado todo un reto. Una de las razones es que las redes de Petri pueden implementarse y
+representarse de múltiples formas, en función de los objetivos específicos, visto que son un tipo
+de grafo.
 
-In order to guarantee a certain degree of interoperability between the tool developed
-as part of this thesis and other existing and future tools, it is paramount
-to investigate which file formats would be more convenient to support.
-The aim is to support file formats that are suited to analysis as well as visualization,
-allowing for the possibility of extension to additional formats in the future,
-via a well-defined API in the Petri net library.
-A literature review led to three relevant file formats that are presented next.
+Para garantizar un cierto grado de interoperabilidad entre la herramienta desarrollada en el
+marco de esta tesis y otras herramientas existentes y futuras, es primordial investigar qué
+formatos de archivo sería más conveniente soportar. El objetivo es admitir formatos de archivo
+que sean adecuados tanto para el análisis como para la visualización, permitiendo la posibilidad
+de ampliación a formatos adicionales en el futuro, a través de una API bien definida en la
+biblioteca de redes de Petri. Una revisión de la literatura condujo a tres formatos de archivo
+relevantes que se presentan a continuación.
 
 \subsection{Petri Net Markup Language}
 
-The \acrfull{PNML}\footnote{\url{https://www.pnml.org/}}
-is a standard file format designed
-for the exchange of Petri nets
-among different tools and software applications.
-Its development was initiated
-at the `Meeting on XML/SGML based Interchange Formats for Petri Nets'
-held in Aarhus in June 2000 \cite{jungel2000petri,weber2003petri},
-with the goal of providing
-a standardized and widely accepted format for Petri net models.
-PNML is an ISO standard consisting, as of 2023, of three parts:
+El \acrfull{PNML}\footnote{\url{https://www.pnml.org/}}
+es un formato de archivo estándar diseñado
+para el intercambio de redes de Petri entre distintas herramientas y aplicaciones de software. Su
+desarrollo se inició en el ``Meeting on XML/SGML based Interchange Formats for Petri Nets''
+celebrada en Aarhus en junio de 2000 \cite{jungel2000petri,weber2003petri}
+con el objetivo de proporcionar un formato estandarizado y ampliamente
+aceptado para redes de Petri. PNML es una norma ISO que consta, a partir de
+2023, de tres partes:
 
 \begin{itemize}
       \item ISO/IEC 15909-1:2004\footnote{\url{https://www.iso.org/standard/38225.html}}
-            (and its latest revision ISO/IEC 15909-1:2019\footnote{\url{https://www.iso.org/standard/67235.html}})
-            for concepts, definitions, and graphical notation.
+            (y su última revisión ISO/IEC 15909-1:2019\footnote{\url{https://www.iso.org/standard/67235.html}})
+            para conceptos, definiciones y notación gráfica.
       \item ISO/IEC 15909-2:2011\footnote{\url{https://www.iso.org/standard/43538.html}}
-            for defining a transfer format based on XML.
+            para la definición de un formato de transferencia basado en XML.
       \item ISO/IEC 15909-3:2021\footnote{\url{https://www.iso.org/standard/81504.html}}
-            for the extensions and structuring mechanisms.
+            para las extensiones y los mecanismos de estructuración.
 \end{itemize}
 
-It has become a de-facto standard
-for exchanging Petri net models across different tools and systems.
-It resulted from many years of hard work
-to unify the notation as discussed in \cite{hillah:hal-01176335}.
+Se ha convertido en un estándar \emph{de facto} para intercambiar modelos en redes de Petri entre
+diferentes herramientas y sistemas. Es el resultado de muchos años de duro trabajo para
+unificar la notación, tal y como se expone en \cite{hillah:hal-01176335}.
 
-\acrshort{PNML} has been designed to be a flexible and extensible format
+\acrshort{PNML} ha sido diseñado para ser un formato flexible y extensible que pueda representar
+diferentes clases de redes de Petri, incluidas las redes de Petri simples y las redes de Petri de
+alto nivel. Se basa en \acrfull{XML}, lo que facilita su lectura y
+análisis tanto por humanos como por máquinas. Además, \acrshort{PNML} admite el uso de metadatos
+para proporcionar información adicional sobre los modelos de redes de Petri, como la autoría,
+la fecha de creación e información sobre licencias.
+
+has been designed to be a flexible and extensible format
 that can represent different classes of Petri nets,
 including simple Petri nets and high-level Petri nets.
-It is based on the \acrfull{XML}
+It is based on the
 which makes it easy to read and parse by humans and machines alike.
-Additionally, \acrshort{PNML} supports the use of metadata
+Additionally,  supports the use of metadata
 to provide additional information about the Petri net models,
 such as authorship, date of creation, and licensing information.
 
-The development of \acrshort{PNML} has significantly improved
-the interoperability and exchange of Petri net models
-among different tools and systems.
-Before the adoption of \acrshort{PNML},
-exchanging Petri net models was a challenging task,
-as different tools used proprietary formats
-that were often incompatible with each other.
-\acrshort{PNML} has greatly simplified this process,
-enabling researchers and practitioners
-to share and collaborate on Petri net models with ease.
-Its use has also facilitated the development of new tools
-and software applications for Petri nets,
-as it provides a standard format
-that can be easily parsed and processed by different systems.
-For instance, it is the format used
-in \cite{zhang2022deadlocks} and it is supported in \cite{meyer2020}.
+El desarrollo de \acrshort{PNML} ha mejorado significativamente la interoperabilidad y el intercambio de
+modelos de redes de Petri entre diferentes herramientas y sistemas. Antes de la adopción de
+\acrshort{PNML} el intercambio de modelos de redes de Petri era una tarea ardua puesto que las distintas
+herramientas utilizaban formatos propietarios que a menudo eran incompatibles entre sí. El
+\acrshort{PNML} ha simplificado enormemente este proceso, permitiendo a investigadores y profesionales
+compartir y colaborar en modelos de redes de Petri con facilidad. Su uso también
+ha facilitado el desarrollo de nuevas herramientas y aplicaciones de software para redes de
+Petri porque proporciona un formato estándar que puede ser analizado y procesado fácilmente
+por distintos sistemas. En particular es el formato utilizado en \cite{zhang2022deadlocks} y está
+soportado en \cite{meyer2020}.
 
-\subsection{GraphViz DOT format}
+\subsection{Formato GraphViz DOT}
 
-The DOT format is a graph description language
-used for creating visual representations of graphs and networks,
-which is part of the open-source GraphViz suite\footnote{\url{https://graphviz.org/}}.
-It was created in the early 1990s at AT\&T Labs Research
-as a simple, concise, and human-readable language for describing graphs.
-The GraphViz suite provides several tools for working with DOT files,
-including the ability to automatically generate layouts for complex graphs and
-to export visualizations in a range of formats, including PNG, PDF, and SVG.
+El formato DOT es un lenguaje de descripción de grafos utilizado para crear representaciones
+visuales de grafos y redes, que forma parte de la suite de código abierto GraphViz\footnote{\url{https://graphviz.org/}}.
+Fue creado a principios de la década de 1990 en AT\&T Labs Research como un lenguaje sencillo, conciso y
+legible por humanos para la descripción de grafos. La suite GraphViz proporciona varias
+herramientas para trabajar con archivos DOT, incluida la capacidad de generar
+automáticamente diseños para gráficos complejos y de exportar visualizaciones en diversos
+formatos, como PNG, PDF y SVG.
 
-DOT can be used to represent Petri nets in a graphical format, which makes it easy
-to visualize the structure and behavior of the system being modeled.
-It is particularly useful for visualizing large Petri nets,
-as the user can navigate through the image
-to gain an understanding of how the tokens flow through the net.
+DOT puede utilizarse para representar redes de Petri en un formato gráfico, lo que facilita la
+visualización de la estructura y el comportamiento del sistema que se está modelando.
+Resulta especialmente útil para visualizar redes de Petri de gran tamaño, ya que el usuario puede
+navegar por la imagen para comprender cómo fluyen las marcas por la red.
 
-The DOT format is text-based and easy to use,
-making it a popular choice for generating visual representations of graphs.
-This simplicity also means that DOT files can be easily generated by programs
-and can be read by a wide range of software tools,
-which is essential for interoperability.
-Additionally, DOT allows for the specification of various graph properties,
-such as node shapes, colors, and styles \cite{dot2015},
-which can be used to represent different aspects of a Petri net,
-such as places, transitions, and arcs.
-This flexibility in specifying visual properties also enables users
-to customize the visualization to their needs and
-to highlight particular features of the Petri net
-that are relevant to their analysis.
+El formato DOT está basado en texto plano y es fácil de usar, conviertiéndolo en una opción
+popular para generar representaciones visuales de gráficos.
+Esta facilidad también significa que los archivos DOT pueden ser generados fácilmente por programas y pueden ser leídos por una
+amplia gama de herramientas de software, un aspecto esencial para la interoperabilidad.
+Además, DOT permite especificar diversas propiedades de los grafos, como formas de
+nodos, colores y estilos \cite{dot2015} que pueden utilizarse para representar diferentes
+aspectos de una red de Petri, como lugares, transiciones y arcos. Esta flexibilidad a la hora de
+especificar las propiedades visuales también permite a los usuarios personalizar la
+visualización según sus necesidades y resaltar características particulares de la red de Petri que
+sean relevantes para su análisis.
 
 \subsection{LoLA - Low-Level Petri Net Analyzer}
 \label{sec:lola-format}
 
-\acrfull{LoLA} \cite{schmidt2000lola} is a state-of-the-art model checker
-whose development started in 1998 at the Humboldt University of Berlin.
-It is currently maintained by the University of
-Rostock and is published under the GNU Affero General Public License.
-\acrshort{LoLA} is a tool that can check
-if a system satisfies a given property expressed in \acrfull{CTL*}.
-Its particular strength is the evaluation of simple properties
-such as deadlock freedom or reachability as stated on the website.
-
-This is the model checker used in \cite{meyer2020} and in this work.
-Therefore, it is necessary to implement the file format required by the tool.
-Examples are presented in Sec. \ref{sec:integration-tests}.
+\acrfull{LoLA} \cite{schmidt2000lola} es un verificador de modelos de
+última generación cuyo desarrollo comenzó en 1998 en la Universidad Humboldt de Berlín.
+Actualmente lo mantiene la Universidad de Rostock y se publica bajo la Licencia Pública
+General Affero de GNU. \acrshort{LoLA} es una herramienta que puede comprobar si un sistema
+satisface una propiedad dada expresada en \acrfull{CTL*}. Su punto
+fuerte es la evaluación de propiedades sencillas como la libertad de bloqueo (\textit{deadlock freedom}) o la
+alcanzabilidad, tal y como se indica en la página web.
+Este es el verificador de modelos utilizado en \cite{meyer2020} y en este trabajo.
+En consecuencia, es
+necesario implementar el formato de archivo requerido por la herramienta.
+En la Sec. \ref{sec:integration-tests} se presentan ejemplos.
