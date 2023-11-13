@@ -1,44 +1,37 @@
-\section{In search of a backend}
+\section{En busca de un backend}
 
-To put it succinctly, two approaches for translating Rust code to Petri nets exist.
-The first option is to create a translator from scratch,
-while the second option is to build upon an existing tool.
+Para ponerlo de forma sucinta, existen dos enfoques para traducir código Rust a redes de Petri. La primera
+opción es crear un traductor desde cero, mientras que la segunda consiste en basarse en una
+herramienta ya existente.
 
-The first option may seem attractive at first,
-considering that it gives the developer
-the freedom to shape the tool according to his/her desires.
-Features can be added as required and
-data structures can be tailored to the specific purpose.
-Nonetheless, this flexibility comes at a high price.
-In order to support a reasonable subset of the Rust programming language,
-substantial amounts of effort need to be invested into the task.
-Complex language constructs, such as macros, generics, or the rich type system itself,
-must be comprehended in their most intricate details to be translated effectively.
-The result is, essentially, a new compiler for Rust code.
-Noting that the Rust compiler was developed over many years and
-with the support of a large community of contributors,
-it becomes clear that this path is nothing more than work duplication.
-It is indeed a Herculean labor that would require the full-time dedication of a whole team
-to maintain and keep up-to-date with the newest changes in the Rust language and the compiler.
+La primera opción puede parecer atractiva al principio, teniendo en cuenta que da al
+desarrollador la libertad de moldear la herramienta según sus deseos. Se pueden añadir
+funciones según las necesidades y adaptar las estructuras de datos al propósito específico. Sin
+embargo, esta flexibilidad tiene un alto precio. Para dar soporte a un subconjunto razonable del
+lenguaje de programación Rust, es necesario invertir grandes cantidades de esfuerzo en la tarea.
+Las construcciones complejas del lenguaje, como las macros, los \textit{generics} o mismo el rico sistema
+de tipos, deben ser comprendidas en sus detalles más intrincados para poder ser
+traducidas con eficacia. El resultado es, esencialmente, un nuevo compilador para código Rust.
+Teniendo en cuenta que el compilador de Rust se desarrolló a lo largo de muchos años y con el
+apoyo de una gran comunidad de colaboradores, queda claro que este camino no es más que
+una duplicación de trabajo. De hecho, es una labor hercúlea que requeriría la dedicación a
+tiempo completo de un equipo completo para mantener al día de los cambios más recientes en el lenguaje Rust y
+en el compilador.
 
-On the other hand, there is the possibility
-of integrating with the existing Rust compiler,
-which is available under an open-source license
-and its documentation is extensive and regularly updated.
-This frees the implementation partly from having to deal with the changes to the language,
-giving more time to focus on the features that add value to the users.
-Hence the compiler plays the role of a backend on which the static analysis relies.
-Of course, this requires learning the compiler internals
-but this is not the first time that a tool sets off to do this.
-For instance, the official Rust linter,
+Por otro lado, existe la posibilidad de integrarse con el compilador de Rust existente, que está
+disponible bajo una licencia de código abierto y su documentación es extensa y se actualiza con
+regularidad. Esto libera en parte a la implementación de tener que ocuparse de los cambios en
+el lenguaje, lo que da más tiempo para centrarse en las características que añaden valor a los
+usuarios. De ahí que el compilador desempeñe el papel de \emph{backend} en el que se apoya el
+análisis estático. Por supuesto, esto requiere aprender las interioridades del compilador, pero no
+es la primera vez que una herramienta se propone ello. A modo de ejemplo, el linter oficial de Rust,
 \emph{clippy}\footnote{\url{https://github.com/rust-lang/rust-clippy}},
-analyzes the Rust code for incorrect, inefficient, or non-idiomatic constructs.
-It is an extremely valuable tool for developers that goes beyond the standard checks
-performed during compilation.
+analiza el código Rust en busca de construcciones incorrectas, ineficaces o no
+idiomáticas. Se trata de una herramienta muy valiosa para los desarrolladores que va más allá
+de las comprobaciones estándar realizadas durante la compilación.
 
-Supporting all the language features from the beginning
-and collaborating with the community is key to the success of the proposed solution.
-Therefore, it is advisable to integrate with the existing ecosystem
-and reuse as much work as possible.
-Due to the above reasons, this project is based on \emph{rustc}.
-We will now study the relevant parts of the Rust compiler in more detail.
+Dar soporte a todas las características del lenguaje desde el principio y colaborar con la comunidad es
+clave para el éxito de la solución propuesta. Por lo tanto, es aconsejable integrarse con el
+ecosistema existente y reutilizar todo el trabajo posible. Por todo ello, este proyecto se basa en
+\emph{rustc}. A continuación estudiaremos con más detalle los componentes centrales del compilador de
+Rust.

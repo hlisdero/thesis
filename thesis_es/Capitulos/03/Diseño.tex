@@ -1,14 +1,12 @@
-Now that the relevant background topics have been covered,
-we can proceed to delve into the specifics of the design of the translation process.
-The design is marked by three crucial architectural choices
-that will be elaborated on in this chapter:
+Una vez cubiertos los temas de fondo pertinentes, podemos proceder a profundizar en los
+aspectos específicos del diseño del proceso de traducción. El diseño está marcado por tres
+opciones arquitectónicas cruciales sobre las que se profundizará en este capítulo:
 
 \begin{enumerate}
-    \item The decision to utilize the Rust compiler as a backend for the translation.
-    \item Basing the translation on the \acrfull{MIR}.
-    \item Inlining function calls in the Petri net.
+    \item La decisión de utilizar el compilador Rust como backend para la traducción.
+    \item Basar la traducción en el \acrfull{MIR}.
+    \item Hacer un \textit{inlining} de las llamadas a funciones en la red de Petri.
 \end{enumerate}
 
-Throughout this chapter,
-we will conduct an in-depth analysis
-of the Rust compiler's internal mechanisms and its relevant compilation stages.
+A lo largo de este capítulo, analizaremos en profundidad los mecanismos internos del
+compilador de Rust y sus etapas de compilación relevantes para este trabajo.
