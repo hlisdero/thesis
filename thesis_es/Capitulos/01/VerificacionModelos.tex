@@ -1,67 +1,58 @@
 \section{Verificación de modelos}
 
-Model checking is a technique used in software development
-to formally verify the correctness of a system's behavior
-with respect to its specifications or requirements.
-It involves constructing a mathematical model of the system
-and analyzing it to ensure that it meets certain properties,
-such as mutual exclusion when accessing shared resources,
-absence of data races and deadlock-freedom.
+La comprobación de modelos es una técnica utilizada en el desarrollo de software para verificar
+formalmente la corrección del comportamiento de un sistema con respecto a sus
+especificaciones o requisitos. Consiste en construir un modelo matemático del sistema y
+analizarlo para garantizar que cumple ciertas propiedades, como la exclusión mutua al acceder
+a recursos compartidos, la ausencia de carreras de datos (\textit{data races}) y la ausencia de deadlocks.
 
-The process of model checking begins by constructing a finite-state model of the system,
-typically using a formal language, in the case of this work the language of Petri nets.
-The model captures the system's behavior and the properties that are to be verified.
-The next step is to perform an exhaustive search of the state space of the model
-to ensure that all possible behaviors have been considered.
-This search can be performed automatically using specialized software tools.
+El proceso de comprobación de modelos comienza construyendo un modelo de estado finito
+del sistema, típicamente utilizando un lenguaje formal, en el caso de este trabajo el lenguaje de
+las redes de Petri. El modelo captura el comportamiento del sistema y las propiedades que
+deben verificarse. El siguiente paso es realizar una búsqueda exhaustiva del espacio de estados
+del modelo para asegurarse de que se han considerado todos los comportamientos posibles.
+Esta búsqueda puede realizarse automáticamente utilizando herramientas de software
+especializadas.
 
-During the search, the model checker looks for counterexamples,
-which are sequences of events that violate the system's specifications.
-If a counterexample is found, the model checker provides information
-on the state of the system at the time of the violation,
-helping developers to identify and fix the problem.
+Durante la búsqueda, el verificador de modelos busca contraejemplos, es decir secuencias de
+eventos que violen las especificaciones del sistema. Si se encuentra un contraejemplo, el
+verificador de modelos proporciona información sobre el estado del sistema en el momento de
+la violación, lo que ayuda a los desarrolladores a identificar y solucionar el problema.
 
-Model checking has become a widely-applied technique
-in the development of critical software systems,
-such as aerospace \cite{carreno2005safety,monzon2009deadlock}
-and automotive control systems \cite{Perronnet2019},
-medical devices, and financial systems.
-By verifying the correctness of the software before it is deployed,
-developers can ensure that the system meets its requirements and is safe to use.
+La comprobación de modelos se ha convertido en una técnica ampliamente aplicada en el
+desarrollo de sistemas de software críticos, como los sistemas de control aeroespaciales
+\cite{carreno2005safety,monzon2009deadlock} y de automóviles \cite{Perronnet2019},
+los dispositivos médicos y los sistemas financieros. Al verificar la corrección del
+software antes de su despliegue, los desarrolladores pueden garantizar que el sistema cumple
+sus requisitos y es seguro de usar.
 
-One of the main advantages of model checking is
-that it provides a formal and rigorous approach to verifying software correctness.
-Unlike traditional testing methods, which can only demonstrate the presence of errors,
-model checking can prove the absence of errors.
-This is particularly relevant for safety-critical systems like the ones mentioned before,
-where a single error can have catastrophic consequences for human lives.
-Model checking can also be automated, allowing developers to quickly
-and efficiently verify the correctness of complex software systems.
-This reduces the time and cost of software development
-and increases confidence in the correctness of the system.
+Una de las principales ventajas de la comprobación de modelos es que proporciona un enfoque
+formal y riguroso para verificar la correctitud del software. A diferencia de los métodos de
+prueba (test) tradicionales, que sólo pueden demostrar la presencia de errores, la comprobación de
+modelos puede demostrar la ausencia de errores. Esto es especialmente relevante para sistemas
+de seguridad crítica como los mencionados anteriormente en los que un solo error puede tener
+consecuencias catastróficas para vidas humanas. La comprobación de modelos también puede
+automatizarse, lo que permite a los desarrolladores verificar de forma rápida y eficaz la
+correctitud de sistemas de software complejos. Esto reduce el tiempo y el coste del desarrollo de
+software y aumenta la confianza en el sistema.
 
-It is known that formal software verification tools are currently applied
-in a few very specific fields where
-formal proof of the correctness of the system is required.
-\cite{reid:hatra:2020} discusses the importance of bringing verification
-tools closer to developers through an approach
-that seeks to maximize the cost-benefit ratio of its use.
-Improvements in the usability of existing tools and
-approaches to incorporate their use into the developer's routine are presented.
-The paper starts from the premise that from the developer's point of view,
-verification can be seen as a different type of unit or integration test.
-Therefore, it is of utmost importance that running the verification is as easy as possible
-and feedback is provided to the developer promptly during the development process
-to increase adoption.
+Se sabe que las herramientas formales de verificación de software se aplican actualmente en
+unos pocos campos muy específicos en los que se requiere una demostración formal de la correctitud
+del sistema. \cite{reid:hatra:2020} habla de la importancia de acercar las herramientas de
+verificación a los desarrolladores mediante un enfoque que busque maximizar la relación coste-
+beneficio de su uso. Se presentan mejoras en la usabilidad de las herramientas existentes y
+enfoques para incorporar su uso a la rutina del desarrollador. El paper parte de la premisa
+de que, desde el punto de vista del desarrollador, la verificación puede verse como un tipo
+diferente de prueba unitaria o de integración. Por lo tanto, es de suma importancia que la
+ejecución de la verificación sea lo más sencilla posible y que se proporcione retroalimentación (feedback)
+al desarrollador con rapidez durante el proceso de desarrollo para aumentar su adopción.
 
-The main conclusion from this section is
-that model checking could bring substantial improvements
-to the table in terms of increased safety and reliability of software systems.
-These objectives align with the goals of
-the Rust programming language and the goals of this work.
-Detecting deadlocks and missed signals in the source code at compile time could
-help developers prevent hard-to-find bugs and get quick feedback on the correct use
-of synchronization primitives, saving time and thus money in the development process.
-One particular goal of this work is
-to make the tool user-friendly and easy to get started with
-so that its adoption benefits the larger community of Rust developers.
+La principal conclusión de esta sección es que la comprobación de modelos podría aportar
+mejoras sustanciales en términos de mayor seguridad y fiabilidad de los sistemas de software.
+Estos objetivos se alinean con las metas del lenguaje de programación Rust y los objetivos de
+este trabajo. Detectar los bloqueos y las señales perdidas en el código fuente en tiempo de
+compilación podría ayudar a los desarrolladores a evitar errores difíciles de encontrar y a
+obtener feedback rápidamente sobre el uso correcto de las primitivas de sincronización, ahorrando
+tiempo y, además, dinero en el proceso de desarrollo. Un objetivo concreto de este trabajo es
+hacer que la herramienta sea fácil de usar y de empezar a utilizar, de modo que su adopción
+beneficie a la comunidad entera de desarrolladores de Rust.
