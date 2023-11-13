@@ -1,125 +1,107 @@
-\section[Interception strategy]
- {Interception strategy:\\Selecting a suitable starting point for the translation}
+\section{Selección de un punto de partida adecuado para la traducción}
 \label{sec:interception-strategy}
 
-In this section, a rationale for selecting the \acrfull{MIR}
-as the starting point for the translation to a Petri net is elucidated.
-This architectural design choice is justified for several reasons.
+En esta sección, se elucidan los motivos para seleccionar la \acrfull{MIR}
+como punto de partida para la traducción a una red de Petri. Esta elección
+de diseño arquitectural se justifica por varias razones.
 
-\subsection{Benefits}
+\subsection{Beneficios}
 
-First, the \acrshort{MIR} is
-the lowest machine-independent \acrshort{IR} used in \emph{rustc}.
-It captures the semantics of Rust code
-after it has undergone a series of optimization passes
-without relying on the details of any particular machine.
-By intercepting the translation at this stage,
-the static analysis tool leverages the benefits of these optimizations,
-such as constant folding, dead code elimination, and inlining,
-which results in a more efficient and overall smaller Petri net representation.
+En primer lugar, la \acrshort{MIR} es la \acrshort{IR} más baja en rustc
+que aún es independiente de la arquitectura de la computadora.
+Captura la semántica del código Rust después de que haya sido sometido a una serie de pases
+de optimización sin depender de los detalles de cualquier máquina en particular.
+Al interceptar la traducción en esta fase, la herramienta de
+análisis estático aprovecha las ventajas de estas optimizaciones,
+como el plegado de constantes (\textit{constant folding}),
+la eliminación de código muerto y el \textit{inlining}, lo que da como resultado una representación de
+la red de Petri más eficiente y, en general, más pequeña.
 
-Second, intercepting the compilation after the previous stages are completed
-offers an advantage in terms of efficiency and code reuse.
-By this stage, the Rust compiler has already performed crucial steps
-such as borrow checking, type checking,
-monomorphization of generic code, and macro expansion, among others.
-These steps are resource-intensive
-and involve complex analysis of the Rust code to ensure correctness and safety.
-Re-implementing these steps in our tool from scratch
-would be redundant and time-consuming.
-It would require duplicating the efforts of the Rust compiler
-and may introduce potential inconsistencies or errors.
-By building on top of the existing \acrshort{MIR},
-we take advantage of the work already done by \emph{rustc}.
-This not only saves effort but also aligns our static analysis tool
-with the same level of correctness and safety as the Rust compiler.
+En segundo lugar, interceptar la compilación una vez completadas las etapas anteriores ofrece
+una ventaja en términos de eficiencia y reutilización del código. En esta etapa, el compilador de
+Rust ya ha realizado pasos cruciales como el \emph{borrow checking}, la comprobación de
+tipos, la monomorfización del código genérico y la expansión de macros, entre otros. Estos
+pasos consumen muchos recursos e implican un análisis complejo del código Rust para
+garantizar su correctitud y seguridad. Reimplementar estos pasos en nuestra herramienta desde
+cero sería redundante y llevaría mucho tiempo. Requeriría duplicar los esfuerzos del
+compilador de Rust y podría introducir posibles incoherencias o errores. Al construir sobre el
+\acrshort{MIR} existente, aprovechamos al máximo el trabajo ya realizado por \emph{rustc}.
+Esto no sólo ahorra esfuerzo,
+sino que también alinea nuestra herramienta de análisis estático con el mismo nivel de
+correctitud y seguridad que el compilador de Rust.
 
-Third, it simplifies the maintenance task of staying up-to-date
-with the ongoing additions to the Rust language and its compiler.
-Rust is a fast-evolving language and its compiler is
-constantly updated with new features, bug fixes, and performance optimizations.
-Repurposing the \acrshort{MIR} means our tool can benefit from these updates
-without having to independently implement and maintain those changes.
-This provides overall a more robust and reliable static analysis solution.
+En tercer lugar, simplifica la tarea de mantenimiento de mantenerse al día con las continuas
+incorporaciones al lenguaje Rust y a su compilador. Rust es un lenguaje en rápida evolución y
+su compilador se actualiza constantemente con nuevas características, correcciones de errores y
+mejores de performance. Reutilizar la \acrshort{MIR} significa que nuestra herramienta puede
+beneficiarse de estas actualizaciones sin tener que implementar y mantener esos cambios de
+forma independiente. Esto proporciona en general una solución de análisis estático más robusta
+y fiable.
 
-Furthermore, as it will be explained in the next section, the \acrshort{MIR}
-is based on the concept of a \acrfull{CFG}, i.e., a type of graph found in compilers.
-That means that \acrshort{MIR} and Petri nets are both graph representations,
-which makes the \acrshort{MIR} particularly amenable to translation.
-Both \acrshort{MIR} and Petri nets can be seen as graphical models
-that capture the relationships and interactions between different entities.
-The \acrshort{MIR} graph represents the underlying execution flow within a Rust program,
-while a Petri net captures the state transitions and event occurrences in a system.
-Therefore, it becomes easier to convert the \acrshort{MIR} to a Petri net,
-as the graph structure and relationships are already present.
-This allows for a more straightforward and efficient translation process
-without having to create a graph structure from thin air,
-resulting in better integration between the \acrshort{MIR}
-and the Petri net model for deadlock detection.
+Adicionalmente, como se explicará en la siguiente sección, la \acrshort{MIR} se basa en el concepto de grafo de
+flujo de control (\acrfull{CFG}), o en otras palabras, un tipo de grafo que se encuentra en los compiladores.
+Esto significa que tanto la \acrshort{MIR} como las redes de Petri son representaciones gráficas, lo que hace
+que la \acrshort{MIR} sea especialmente adecuada para una traducción. Tanto la \acrshort{MIR}  como las redes de Petri
+pueden considerarse modelos gráficos que capturan las relaciones e interacciones entre
+diferentes entidades. El grafo \acrshort{MIR} representa el flujo de ejecución subyacente dentro de un
+programa Rust, mientras que una red Petri captura las transiciones de estado y las ocurrencias
+de eventos en un sistema. Consecuentemente, resulta más fácil convertir la \acrshort{MIR} en una red de Petri,
+dado que la estructura del grafo y las relaciones ya están presentes. Esto permite un proceso de
+traducción más directo y eficiente sin tener que crear una estructura de grafos de la nada, lo que
+resulta en una mejor integración entre el \acrshort{MIR} y el modelo de red de Petri para la detección de
+deadlocks.
 
-Finally, working with the \acrshort{MIR} synergizes
-with incremental compilation and modular analysis.
-In fact, one of the reasons why \acrshort{MIR} was introduced
-in the first place was incremental compilation \cite{matsakis2016mir}.
-Even though it is not mandatory in the initial implementation,
-the tool could profit from incremental compilation
-and perform analysis on a per-crate/per-module basis,
-allowing for faster and more efficient analysis of large Rust codebases.
+Para concluir, trabajar con la \acrshort{MIR} crea sinergias con la compilación incremental y el análisis
+modular. De hecho, una de las razones por las que se introdujo MIR en primer lugar fue la
+compilación incremental \cite{matsakis2016mir}. Aunque no es obligatorio en la implementación
+inicial, la herramienta podría beneficiarse de la compilación incremental y realizar análisis por
+crate/por módulo, lo que permitiría un análisis más rápido y eficiente de grandes bases de
+código Rust.
 
-\subsection{Limitations}
+\subsection{Limitaciones}
 
-There are however some limitations to the approach of basing the translation
-on the \acrfull{MIR}.
+A pesar de los numerosos beneficios, el enfoque de basar la traducción
+en la \acrfull{MIR} tiene algunas limitaciones.
 
-The most important one is that the \acrshort{MIR} is subject to change.
-No stability guarantees are made in terms of
-how the Rust code will be translated to \acrshort{MIR}
-or which its constituent elements \acrshort{MIR} are.
-These are internal details that the compiler developers reserve for themselves.
-In short, \acrshort{MIR} as an interface is not stable.
-As work on the compiler continues,
-the \acrshort{MIR} undergoes modifications
-to incorporate new language features, optimizations, or bug fixes,
-which may require frequent updates and adjustments to the translation process,
-increasing the maintenance cost.
+La más importante es que la \acrshort{MIR} está sujeta a cambios. No se ofrecen garantías de estabilidad
+en cuanto a cómo se traducirá el código Rust a \acrshort{MIR} o cuáles son sus elementos constitutivos.
+Se trata de detalles internos que los desarrolladores del compilador se reservan para sí
+mismos. En resumen, la \acrshort{MIR} como interfaz no es estable. A medida que se sigue trabajando en
+el compilador, la \acrshort{MIR} sufre modificaciones para incorporar nuevas características del lenguaje,
+optimizaciones o correcciones de errores, lo que puede requerir frecuentes actualizaciones y
+ajustes en el proceso de traducción, aumentando el coste de mantenimiento.
 
-In the course of this project, this situation happened numerous times.
-As an example, in the period between mid-February 2023 and mid-April 2023,
-the code was modified 7 times to accommodate these changes.
-They were always a few lines of code in size and detected by tests.
-We will discuss how tests play a significant role
-in coping with these changes in Sec. \ref{sec:integration-tests}.
+En el transcurso de este proyecto esta situación se produjo en varias ocasiones. A
+modo de ejemplo, en el periodo comprendido entre mediados de febrero de 2023 y mediados
+de abril de 2023, el código se modificó 7 veces para dar cabida a estos cambios. Siempre
+fueron de unas pocas líneas de código y se detectaron mediante pruebas. Hablaremos de cómo
+las pruebas desempeñan un papel importante a la hora de lidiar con estos cambios en la
+Sec. \ref{sec:integration-tests}.
 
-On the same note, \cite{meyer2020} also relied on the \acrshort{MIR}
-but did not incorporate tests to deal with the newer nightly versions.
-As a result, the toolchain was pinned to an exact nightly
-version\footnote{\url{https://github.com/Skasselbard/Granite/blob/master/rust-toolchain}}
-to prevent the implementation from breaking before the publication of the thesis.
+En la misma línea, \cite{meyer2020} también se basó en la \acrshort{MIR} pero no incorporó pruebas para
+hacer frente a las versiones nightly más recientes. Como resultado, la cadena de herramientas
+se fijó a una versión nightly exacta\footnote{\url{https://github.com/Skasselbard/Granite/blob/master/rust-toolchain}}
+para evitar que la implementación se rompiera antes de la publicación de la tesis.
 
-Another drawback worth mentioning is that, in some instances,
-generic code could take the form of a function whose behavior can be modeled
-by the same Petri net in all cases.
-Under these circumstances, the \acrshort{MIR} could be ``condensed'' further
-before translating it to a Petri net.
-Similarly, some parts of the \acrshort{MIR} may be superfluous
-to the deadlock detection analysis and its translation may enlarge the output,
-which slows down the reachability analysis done by the model checker.
-This can be countered with careful optimizations,
-which will be proposed in Sec. \ref{sec:future-work-petri-net-reduction}
-and \ref{sec:future-work-no-cleanup}.
+Otro inconveniente digno de mención es que, en algunos casos, el código genérico podría
+adoptar la forma de una función cuyo comportamiento puede ser modelado por la misma red de
+Petri en todos los casos. En estas circunstancias, el \acrshort{MIR} podría ``condensarse'' aún más antes de
+traducirlo a una red de Petri. Del mismo modo, algunas partes del MIR pueden ser superfluas
+para el análisis de detección de bloqueo y su traducción puede agrandar la salida, lo que
+ralentiza el análisis de alcanzabilidad realizado por el verificador de modelos. Esto puede
+contrarrestarse con optimizaciones cuidadosas
+que se propondrán en las Sec. \ref{sec:future-work-petri-net-reduction} y \ref{sec:future-work-no-cleanup}.
 
-\subsection{Synthesis}
+\subsection{Síntesis}
 
-In conclusion, despite the drawbacks mentioned earlier,
-intercepting the translation at the \acrshort{MIR} level offers significant advantages,
-including maximizing the utilization of the existing compiler code,
-reducing the implementation effort, and a more natural mapping to Petri nets.
-These benefits outweigh the cons and make the \acrshort{MIR}
-a compelling starting point for the translation
-in the context of building a static analysis tool
-for detecting deadlocks and missed signals in Rust code.
+En conclusión, a pesar de los inconvenientes mencionados anteriormente, interceptar la
+traducción en el nivel \acrshort{MIR} ofrece ventajas significativas, entre las que se incluyen la
+maximización de la utilización del código del compilador existente, la reducción del esfuerzo
+de implementación y un mapeo más natural a las redes de Petri. Estas ventajas superan a los
+contras y hacen de la \acrshort{MIR} un punto de partida convincente para la traducción en el contexto
+de la construcción de una herramienta de análisis estático para detectar deadlocks y señales
+perdidas en el código Rust.
 
-Both \cite{meyer2020} and \cite{zhang2022deadlocks} base their translations
-on the \acrshort{MIR} as well and to the best knowledge of this author, there is
-no analogous tool that performed a translation to Petri nets
-starting from a higher-level \acrshort{IR}.
+Tanto \cite{meyer2020} como \cite{zhang2022deadlocks} basan también sus traducciones en la \acrshort{MIR} y,
+hasta donde sabe este autor, no existe ninguna herramienta análoga que realice una traducción
+a redes de Petri partiendo de una representación intermedia de nivel superior.
