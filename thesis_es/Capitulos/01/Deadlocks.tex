@@ -1,236 +1,225 @@
 \section{Bloqueo mutuo (\textit{deadlocks})}
 
-Deadlocks are a common problem that arises in concurrent systems,
-which are systems where multiple threads or processes are
-running simultaneously and potentially sharing resources.
-They have been studied at least since \cite{dijkstra1964},
-who coined the term ``deadly embrace'' in Dutch, which did not catch on.
+Los bloqueos o \textit{deadlocks} son un problema común en sistemas concurrentes, es decir, sistemas
+en los que varios hilos o procesos se ejecutan simultáneamente y potencialmente comparten
+recursos. Se han estudiado al menos desde \cite{dijkstra1964}
+quien acuñó el término ``abrazo mortal'' en holandés el cual cayó eventualmente en desuso.
 
-A deadlock occurs when two or more threads or processes
-are blocked and unable to continue executing
-because each is waiting for the other to release a resource that it needs.
-This results in a situation where none of the threads or processes
-can make progress and the system becomes effectively stuck.
-An alternative equivalent definition of deadlocks
-in terms of program states can be found in \cite{holt1972some}.
+Un deadlock se produce cuando dos o más hilos o procesos están bloqueados y no pueden seguir
+ejecutándose porque cada uno está esperando a que el otro libere un recurso que necesita.
+Esto da lugar a una situación en la que ninguno de los hilos o procesos puede progresar y el sistema
+queda efectivamente atascado. En \cite{holt1972some} puede encontrarse una definición alternativa
+equivalente de los bloqueos en términos de los estados del programa.
 
-Deadlocks can be a serious problem in concurrent systems,
-as they can cause the system to become unresponsive or even crash.
-Therefore, it would be advantageous to be able to detect and prevent deadlocks.
-They can happen in any concurrent system where multiple threads or processes
-are competing for shared resources.
-Examples of shared resources that can lead to deadlocks include system memory,
-input/output devices, locks, and other types of synchronization primitives.
+Los deadlocks pueden ser un problema grave en los sistemas concurrentes, ya que
+pueden provocar que el sistema deje de responder o incluso que se interrumpa la ejecución abruptamente.
+Por lo tanto, sería ventajoso poder detectar y prevenir los dealocks.
+Pueden producirse en cualquier sistema concurrente
+en el que varios hilos o procesos compiten por recursos compartidos.
+Algunos ejemplos de recursos compartidos que pueden provocar deadlocks son la memoria del
+sistema, los dispositivos de entrada/salida, los \textit{locks} y otros tipos de primitivas de
+sincronización.
 
-Deadlocks can be difficult to detect and prevent
-because they depend on the precise timing of events in the system.
-Even in cases where deadlocks can be detected, resolving them can be difficult,
-as it may require releasing resources that have already been acquired or
-rolling back completed transactions.
-To avoid deadlocks, it is important to carefully
-manage shared resources in a concurrent system.
-This can involve using techniques such as resource allocation algorithms,
-deadlock detection algorithms, and other types of synchronization primitives.
-By carefully managing shared resources,
-it is possible to prevent deadlocks from occurring and
-ensure the smooth operation of concurrent systems.
+Los bloqueos pueden ser difíciles de detectar y prevenir
+porque dependen de la sincronización precisa de los eventos en el sistema.
+Incluso en los casos en los que pueden detectarse
+los deadlocks, resolverlos puede ser difícil, ya que puede requerir liberar recursos que
+ya han sido adquiridos o deshacer transacciones completadas.
+Para evitar los bloqueos, es importante gestionar cuidadosamente
+los recursos compartidos en un sistema concurrente.
+Esto puede implicar el uso de técnicas como algoritmos de asignación de recursos,
+algoritmos de detección de bloqueos y otros tipos de primitivas de sincronización.
+Gestionando cuidadosamente los recursos compartidos
+es posible evitar que se produzcan bloqueos y
+garantizar el buen funcionamiento de los sistemas concurrentes.
 
-To understand the concept in more detail,
-consider a simple example where two processes, A and B,
-are competing for two resources, X and Y.
-Initially, process A has acquired resource X and is waiting to acquire resource Y,
-while process B has acquired resource Y and is waiting to acquire resource X.
-In this situation, neither process can continue executing
-because it is waiting for the other process to release a resource that it needs.
-This results in a deadlock, as neither process can make progress.
-Fig. \ref{fig:state-graph-example} illustrates this situation.
-The cycle therein indicates a deadlock, as will be explained in the next section.
+Para entender el concepto con más detalle,
+considérese un ejemplo sencillo en el que dos
+procesos, A y B, compiten por dos recursos, X e Y.
+Inicialmente, el proceso A ha adquirido el
+recurso X y está esperando adquirir el recurso Y,
+mientras que el proceso B ha adquirido el
+recurso Y y está esperando adquirir el recurso X.
+En esta situación, ninguno de los dos procesos puede seguir ejecutándose
+porque está esperando a que el otro proceso libere un
+recurso que necesita.
+Esto da lugar a un deadlock, ya que ninguno de los dos procesos
+puede progresar.
+La Fig. \ref{fig:state-graph-example} ilustra esta situación.
+El ciclo que aparece en ella indica un deadlock
+como se explicará en la siguiente sección.
 
 \begin{figure}[!htb]
       \centering
       \includesvg[width=0.3\linewidth]{state-graph-example.svg}
-      \caption{Example of a state graph with a cycle indicating a deadlock.}
+      \caption{Ejemplo de un grafo de estados con un ciclo que indica un bloqueo mutuo.}
       \label{fig:state-graph-example}
 \end{figure}
 \subsection{Condiciones necesarias}
 \label{sec:coffman-conditions}
 
-According to the classic paper on the topic \cite{coffman1971deadlocks},
-the following conditions need to hold for a deadlock to arise.
-They are sometimes called ``Coffman conditions''.
+Según el paper clásico sobre el tema \cite{coffman1971deadlocks}, deben darse las siguientes
+condiciones para que se produzca un deadlock.
+A veces se las denominan ``condiciones de Coffman''.
 
 \begin{enumerate}
-      \item \textbf{Mutual Exclusion}: At least one resource in the system must
-            be held in a non-sharable mode, meaning that only one thread or process can use it at a time,
-            e.g., a variable behind a mutex.
-      \item \textbf{Hold and Wait}: At least one thread or process in the system must
-            be holding a resource and waiting to acquire additional resources
-            that are currently being held by other threads or processes.
-      \item \textbf{No Preemption}: Resources cannot be preempted, which means that a thread or process
-            holding a resource cannot be forced to release it until it has completed its task.
-      \item \textbf{Circular Wait}: There must be a circular chain of two or more threads or processes,
-            where each thread or process is waiting for a resource held by the next one in the chain.
-            This is usually visualized in a graph representing the order in which the resources are acquired.
+      \item \textbf{Exclusión mutua (\textit{Mutual Exclusion})}:
+            Al menos un recurso del sistema debe mantenerse en un modo no
+            compartible, lo que significa que sólo un hilo o proceso puede utilizarlo a la vez, por
+            ejemplo, una variable detrás de un mutex.
+      \item \textbf{Retener y esperar (\textit{Hold and Wait})}:
+            Al menos un hilo o proceso del sistema debe estar reteniendo un
+            recurso y esperando para adquirir recursos adicionales que en ese momento están siendo
+            retenidos por otros hilos o procesos.
+      \item \textbf{Sin apropiación (\textit{No Preemption})}:
+            Los recursos no pueden apropiarse, lo que significa que un hilo o proceso
+            que posea un recurso no puede ser obligado a liberarlo hasta que haya completado su
+            tarea.
+      \item \textbf{Espera circular (\textit{Circular Wait})}:
+            Debe haber una cadena circular de dos o más hilos o procesos, en la
+            que cada hilo o proceso esté esperando un recurso en poder del siguiente de la cadena.
+            Esto suele visualizarse en un gráfico que representa el orden en que se adquieren los
+            recursos.
 \end{enumerate}
 
-Usually, the first three conditions are characteristics of the system under study, i.e.,
-the protocols used for acquiring and releasing resources,
-while the fourth may or may not materialize depending
-on the interleaving of instructions during the execution.
+Usualmente, las tres primeras condiciones son características del sistema estudiado, es decir,
+los protocolos utilizados para adquirir y liberar recursos, mientras que la cuarta puede
+materializarse o no en función del intercalado de instrucciones durante la ejecución.
 
-It is worth noting that the Coffman conditions are in general necessary
-but not sufficient for a deadlock to manifest.
-The conditions are indeed sufficient in the case of single-instance resource systems.
-But they only indicate the possibility of deadlock in systems
-where there are multiple indistinguishable instances of the same resource.
+Cabe señalar que las condiciones de Coffman son en general necesarias pero no suficientes
+para que se manifieste un bloqueo. En efecto, las condiciones son suficientes en el caso de
+sistemas de recursos de una sola instancia (una unidad de cada recurso).
+Pero sólo indican la posibilidad de un deadlock
+en los sistemas en los que hay múltiples instancias indistinguibles del mismo recurso.
 
-In the general case, if any one of the conditions is not met, a deadlock cannot occur,
-but the presence of all four conditions does not necessarily guarantee a deadlock.
-Nonetheless, the Coffman conditions are a useful framework for understanding and
-analyzing the causes of deadlocks in concurrent systems
-and they can help guide the development of strategies for preventing and resolving deadlocks.
+En el caso general, si no se cumple alguna de las condiciones, no puede producirse un bloqueo,
+pero la presencia de las cuatro condiciones no garantiza necesariamente un bloqueo. No
+obstante, las condiciones de Coffman son un marco útil para comprender y analizar las causas
+de los bloqueos en los sistemas concurrentes y pueden ayudar a orientar el desarrollo de
+estrategias para prevenir y resolver los bloqueos.
 
 \subsection{Estrategias}
 \label{sec:deadlock-strategies}
 
-Several strategies for handling deadlocks exist,
-each of which has its strengths and weaknesses.
-In practice, the most effective strategy will depend on the specific requirements
-and constraints of the system being developed.
-Designers and developers must carefully consider the trade-offs between different strategies
-and choose the approach that is best suited to their needs.
-Interested readers are referred to \cite{coffman1971deadlocks,singhal1989deadlock}.
+Existen varias estrategias para gestionar los bloqueos,
+cada una de las cuales tiene sus puntos fuertes y débiles.
+En la práctica, la estrategia más eficaz dependerá de los requisitos y
+limitaciones específicos del sistema que se esté desarrollando.
+Los diseñadores y desarrolladores deben considerar cuidadosamente
+las compensaciones entre las distintas
+estrategias y elegir el enfoque que mejor se adapte a sus necesidades.
+Se remite a los lectores
+interesados a \cite{coffman1971deadlocks,singhal1989deadlock}.
 
 \subsubsection{Prevención}
 
-One way to deal with deadlocks is to prevent them from occurring in the first place.
-The idea is for deadlocks to be excluded a priori.
-With this objective in mind, we must ensure that at every point in time
-at least one of the necessary conditions developed in Sec. \ref{sec:coffman-conditions}
-is not satisfied.
-This restricts the possible protocols in which requests for resources may be made.
-We will now look at each condition separately
-and elaborate on the most common approaches.
+Una forma de hacer frente a los bloqueos es evitar que se produzcan en primer lugar. La idea es
+que los bloqueos se excluyan a priori. Con este objetivo en mente, debemos asegurarnos de que
+en cada momento no se cumple al menos una de las condiciones necesarias desarrolladas en la
+Sec. \ref{sec:coffman-conditions}.
+Esto restringe los posibles protocolos en los que se pueden realizar solicitudes de
+recursos. A continuación examinaremos cada condición por separado y desarrollaremos los
+enfoques más comunes.
 
-If the first condition must be false,
-then the program should allow shared access to all resources.
-Lock-free synchronization algorithms may be used for this purpose
-since they do not implement mutual exclusion.
-This is difficult to achieve in practice for all resource types,
-since for example a file may not be shared by more than one thread or process
-during an update of the file contents.
+Si la primera condición debe ser falsa, entonces el programa debe permitir el acceso
+compartido a todos los recursos. Los algoritmos de sincronización sin bloqueo pueden
+utilizarse para este fin, ya que no implementan la exclusión mutua. Esto es difícil de conseguir
+en la práctica para todos los tipos de recursos, ya que, por ejemplo, un archivo no puede ser
+compartido por más de un hilo o proceso durante una actualización del contenido del archivo.
 
-Looking at the second condition, a feasible approach would be to impose that
-each thread or process acquires all the required resources at once and that
-the thread or process cannot proceed until access to all of them has been granted.
-This all-or-nothing policy causes a significant performance penalty,
-given that resources may be allocated to a specific thread or process
-but may remain unused for long periods.
-In simpler terms, it decreases concurrency.
+En cuanto a la segunda condición, un enfoque viable sería imponer que cada hilo o proceso
+adquiera todos los recursos necesarios a la vez y que el hilo o proceso no pueda continuar hasta
+que se le haya concedido acceso a todos ellos. Esta política de ``todo o nada'' provoca una
+penalización significativa del rendimiento, dado que los recursos pueden asignarse a un hilo o
+proceso específico pero pueden permanecer sin utilizar durante largos periodos. En términos
+más sencillos, disminuye la concurrencia.
 
-If the no preemption condition is denied, then resources may be recovered
-in certain circumstances, e.g., using resource allocation algorithms that
-ensure that resources are never held indefinitely.
-After a timeout or when a condition is satisfied,
-the thread or process releases the resource
-or a supervisor process recovers the resource forcibly.
-Usually, this works well when the state of the resource can be easily saved
-and restored later.
-One example of this is the allocation of CPU cores in a modern \acrfull{OS}.
-The scheduler allocates one processor core to one task and
-may switch to a different task or
-may move the task to a new processor core at any moment just
-by saving the contents of the registers \cite[Chap. 6]{ArpaciDusseau2018}.
-However, if preserving the resource state is not possible,
-preemption may entail a loss of the progress done so far,
-which is not acceptable in many scenarios.
+Si se deniega la condición de no apropiación, los recursos pueden recuperarse en determinadas
+circunstancias, por ejemplo, utilizando algoritmos de asignación de recursos que garanticen que
+los recursos nunca se retienen indefinidamente. Tras un tiempo de espera o cuando se cumple
+una condición, el hilo o proceso libera el recurso o un proceso supervisor lo recupera a la
+fuerza. Normalmente, esto funciona bien cuando el estado del recurso puede guardarse
+fácilmente y restaurarse más tarde. Un ejemplo de ello es la asignación de núcleos de CPU en
+un sistema operativo (\acrshort{OS}) moderno.
+El \textit{scheduler} asigna un núcleo de procesador a una
+tarea y puede cambiar a una tarea diferente o puede mover la tarea a un nuevo núcleo de
+procesador en cualquier momento simplemente guardando el contenido de los registros
+\cite[Chap. 6]{ArpaciDusseau2018}. Sin embargo, si no es posible preservar el
+estado de los recursos, el adelantamiento puede implicar una pérdida del progreso realizado
+hasta el momento, lo que no es aceptable en muchos escenarios.
 
-Lastly, if the state graph of the resources never forms a cycle,
-then the fourth necessary condition is false and deadlocks are prevented.
-To achieve this one could introduce a linear ordering of resource types.
-In other words, if a process or thread has been allocated resources of type $r_i$,
-it may subsequently require only those resources
-of types that follow $r_i$ in the ordering.
-This involves using special synchronization primitives
-that allow resources to be shared in a controlled manner and
-enforcing strict rules for resource acquisition and release.
-Under these conditions, the state graph will be strictly speaking
-a forest (an acyclical graph), thus no deadlocks are possible.
+Por último, si el grafo de estados de los recursos nunca forma un ciclo, entonces la cuarta
+condición necesaria es falsa y se evitan los bloqueos. Para lograrlo, se podría introducir una
+ordenación lineal de los tipos de recursos. En otras palabras, si a un proceso o hilo se le han
+asignado recursos del tipo $r_i$, podrá requerir posteriormente sólo aquellos recursos de tipos que
+sigan a $r_i$ en el ordenamiento. Esto implica utilizar primitivas de sincronización especiales que
+permitan compartir recursos de forma controlada y aplicar reglas estrictas para la adquisición y
+liberación de recursos. En estas condiciones, el grafo de estado será estrictamente un bosque
+(un grafo acíclico), por lo que no es posible que se produzcan bloqueos.
 
-In practical applications, a combination of the previous strategies may prove useful
-when none of them is entirely applicable.
+En aplicaciones prácticas, una combinación de las estrategias anteriores puede resultar útil
+cuando ninguna de ellas sea totalmente aplicable.
+
 \subsubsection{Evasión (\textit{avoidance})}
 
-Avoidance is another strategy for dealing with deadlocks,
-which involves dynamically detecting and
-avoiding potential deadlocks \emph{before} they arise.
-For this, the system requires global knowledge in advance regarding
-which resources a thread or process will request during its lifetime.
-Note that, in linguistic terms,
-``deadlock avoidance'' and ``deadlock prevention'' may seem similar,
-but in the context of deadlock handling, they are distinct concepts.
+La evitación es otra estrategia para hacer frente a los bloqueos, que consiste en detectar y evitar
+dinámicamente los bloqueos potenciales \emph{antes} de que se produzcan. Para ello, el sistema
+requiere un conocimiento global por adelantado sobre qué recursos solicitará un hilo o proceso
+durante su vida. Tenga en cuenta que, en términos lingüísticos, ``evitar un bloqueo''
+y ``prevenir un bloqueo'' pueden parecer similares, pero en el contexto de la gestión de bloqueos, son
+conceptos distintos.
 
-One of the classic deadlock avoidance algorithms
-is the Banker's algorithm \cite{dijkstra1964}.
-Another relevant algorithm is proposed by \cite{habermann1969prevention}.
+Uno de los algoritmos clásicos para evitar el bloqueo es el algoritmo de Banker \cite{dijkstra1964}.
+Otro algoritmo relevante es el propuesto por \cite{habermann1969prevention}.
 
-Regrettably, these techniques are only effective in highly specific scenarios,
-such as in an embedded system where the complete set of tasks to be executed
-and their required locks are known a priori.
-Consequently, deadlock avoidance is not a commonly used solution
-applicable to a broad range of situations.
+Lamentablemente, estas técnicas sólo son efectivas en escenarios muy específicos, como en un
+sistema embebido en el que se conoce a priori
+el conjunto completo de tareas a ejecutar y el \textit{locks} necesarios.
+En consecuencia, la evitación de bloqueos no es una solución de uso
+común aplicable a una amplia gama de situaciones.
 
 \subsubsection{Detección y recuperación}
 
-Another strategy to handle deadlocks is to detect them
-\emph{after} they take place and recover from them.
-For a survey of algorithms for deadlock detection
-in distributed systems, see \cite{singhal1989deadlock}.
-We will briefly present the general idea behind one of them for illustration purposes.
+Otra estrategia para gestionar los bloqueos es detectarlos \emph{después} de que se produzcan y
+recuperarse de ellos. Para un estudio de los algoritmos de detección de bloqueos en sistemas
+distribuidos, véase \cite{singhal1989deadlock}. Presentaremos brevemente la idea general que subyace a
+uno de ellos con fines ilustrativos.
 
-The \acrfull{RAG} is a commonly used method
-for detecting deadlocks in concurrent systems.
-It represents the relationship between threads/processes
-and resources in the system as a directed graph.
-Each process and resource is represented by a node in the graph
-and a directed edge is drawn from a process to a resource
-if the process is currently holding that resource.
-This is analogous to the state graph shown in Fig. \ref{fig:state-graph-example}
-but with the threads/processes represented in the diagram.
-The state graph may also be applied to deadlock detection \cite{coffman1971deadlocks}.
+El gráfico de asignación de recursos (\acrfull{RAG}) es un método comúnmente utilizado para detectar
+bloqueos en sistemas concurrentes. Representa la relación entre hilos/procesos y recursos en el
+sistema como un grafo dirigido. Cada proceso y recurso está representado por un nodo en el
+grafo y se traza una arista dirigida desde un proceso a un recurso si el proceso está actualmente
+ocupando ese recurso.
+Esto es análogo al grafo de estado mostrado en la Fig. \ref{fig:state-graph-example} pero con los
+hilos/procesos representados en el diagrama. El grafo de estado también puede aplicarse a la
+detección de bloqueos \cite{coffman1971deadlocks}.
 
-To detect deadlocks using the \acrshort{RAG}, we need to look for cycles in the graph.
-If there is a cycle in the graph, it indicates that
-a set of processes is waiting for resources
-that are currently being held by other processes in the cycle.
-Therefore no process in the cycle can make progress.
+Para detectar bloqueos mediante el \acrshort{RAG} tenemos que buscar ciclos en el gráfico.
+Si hay un ciclo en el gráfico, indica que un conjunto de procesos está esperando recursos que en ese
+momento están en manos de otros procesos del ciclo. Por lo tanto, ningún proceso del ciclo
+puede avanzar.
 
-The recovery part of the process involves
-terminating one of the threads or processes in the cycle.
-This causes the resources to be released and
-the other threads or processes are allowed to continue.
+La parte de recuperación del proceso consiste en terminar uno de los hilos o procesos del ciclo.
+Esto hace que se liberen los recursos y que los demás hilos o procesos puedan continuar.
 
-\acrfull{DBMS} incorporate subsystems for detecting and resolving deadlocks.
-A deadlock detector is executed at intervals,
-generating a regular allocation graph,
-otherwise called the \acrfull{TWF} graph,
-and examining it for any cycles.
-If a cycle (deadlock) is identified, the system must be restarted.
-An excellent overview of deadlock detection
-in distributed database systems is \cite{knapp1987deadlock}.
-The subject of concurrency control and recovery from deadlocks in \acrshort{DBMS} is
-extensively discussed in \cite{bernstein1987concurrency}.
+Los sistemas de gestión de bases de datos (\acrfull{DBMS}) incorporan subsistemas para detectar y
+resolver los bloqueos. Un detector de bloqueos se ejecuta a intervalos, generando un gráfico de
+asignación regular, también llamado gráfico de transacción-espera (\acrfull{TWF}), y examinándolo en
+busca de cualquier ciclo. Si se identifica un ciclo (deadlock), el sistema debe reiniciarse. Una
+excelente visión general de la detección de bloqueos en sistemas de bases de datos distribuidos
+es \cite{knapp1987deadlock}. El tema del control de la concurrencia y la recuperación de los bloqueos en
+los \acrshort{DBMS} se trata ampliamente en \cite{bernstein1987concurrency}.
 
 \subsubsection{Aceptar o ignorar por completo los deadlocks}
 
-In some cases, it may be admissible
-to simply accept the risk of deadlocks and manage them as they surface.
-This approach may be appropriate in systems where the cost of preventing
-or detecting deadlocks is too high, or where the frequency of deadlocks is low enough
-that the impact on system performance is minimal,
-or where the data loss incurred each time is tolerable.
+En algunos casos, puede ser admisible aceptar simplemente el riesgo de que se produzcan
+deadlocks y gestionarlos a medida que vayan apareciendo. Este enfoque puede ser adecuado
+en sistemas en los que el coste de prevenir o detectar los deadlocks sea demasiado
+elevado, o en los que la frecuencia de los deadlocks sea lo suficientemente baja como
+para que el impacto en el rendimiento del sistema sea mínimo, o en los que la pérdida de datos
+que se produzca cada vez sea tolerable.
 
-UNIX is an example of an \acrshort{OS} following this principle \cite[p. 477]{shibu2016}.
-Other major operating systems also exhibit this behavior.
-On the other hand, a life-critical system cannot afford
-to pretend its operation will be deadlock-free for any reason.
+UNIX es un ejemplo de sistema operativo que sigue este principio \cite[p. 477]{shibu2016}. Otros
+sistemas operativos populares también muestran este comportamiento. Por otro lado, un
+sistema de misión crítica no puede permitirse fingir que su funcionamiento estará libre de bloqueos por
+ningún motivo.
