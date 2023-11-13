@@ -1,63 +1,66 @@
-\section{Model checkers}
+\section{Verificadores de modelos}
 
-The choice of an appropriate model checker is a vital part of this work,
-as it is the backend responsible for verifying the absence of deadlocks.
-Fortunately, several model checkers have been developed for analyzing Petri nets.
+La elección de un verificador de modelos adecuado es una parte vital de este trabajo porque es
+el responsable de verificar la ausencia de bloqueos. Afortunadamente se han desarrollado
+varios comprobadores de modelos para analizar redes de Petri.
 
-The \acrfull{MCC} \cite{khhjp2021} organized at the Sorbonne University in Paris
-is a great source for state-of-the-art model checkers.
-It is an annual competition where submitted model checkers are run on a series of
-Petri net models from academia and industry\footnote{\url{https://mcc.lip6.fr/2023/models.php}}.
-These models have been contributed by many individuals over a period of more than a decade
-and the total number of benchmarks has grown steadily as new models have been added.
+El \acrfull{MCC} \cite{khhjp2021} organizado en la
+Universidad de la Sorbona de París es una gran fuente de verificadores de modelos de última
+generación. Se trata de un concurso anual en el que los verificadores de modelos presentados
+se ejecutan sobre una serie de modelos de redes de Petri procedentes del mundo académico y de la
+industria\footnote{\url{https://mcc.lip6.fr/2023/models.php}}.
+Estos modelos han sido aportados por muchas personas a lo largo de un periodo de
+más de una década y el número total de puntos de referencia ha crecido paulatinamente a
+medida que se han ido añadiendo nuevos modelos.
 
-Every year, the benchmarks include \acrfull{P/T nets}, i.e., Petri nets, and \acrfull{CPN}.
-The number of places in the nets can range from a dozen to more than 70000 and transitions
-can range from less than a hundred to more than a million.
-This highlights the broad applicability of the model checkers that take part in the competition.
+Cada año, los puntos de referencia incluyen redes de lugares/transiciones (\acrfull{P/T nets}), es
+decir, redes de Petri, y redes de Petri coloreadas (\acrfull{CPN}). El número de lugares en las redes
+puede oscilar entre una docena y más de 70000 y las transiciones entre menos de un
+centenar y más de un millón. Esto pone de manifiesto la aplicabilidad práctica de los
+verificadores de modelos que participan en el concurso.
 
-The results are published on the official website (see for instance \cite{mcc:2022}) and consist of:
+Los resultados se publican en la página web oficial (véase por ejemplo \cite{mcc:2022}) y
+consisten en:
 
 \begin{enumerate}
-      \item a list of the qualified tools that participated,
-      \item the techniques implemented in each of the tools,
-      \item a section dedicated to detailing the experimental conditions under which the contest took place
-            (the hardware used and the time necessary to complete the runs),
-      \item the results in the form of tables, plots, and even the execution logs of each program,
-      \item a list of winners for each category,
-      \item an analysis of the reliability of the tools based on the comparison of the results.
+      \item una lista de las herramientas cualificadas que participaron,
+      \item las técnicas aplicadas en cada una de las herramientas,
+      \item una sección dedicada a detallar las condiciones experimentales en las que se desarrolló el
+            concurso (el hardware utilizado y el tiempo necesario para completar las ejecuciones),
+      \item los resultados en forma de tablas, gráficos e incluso los registros de ejecución de cada programa,
+      \item la lista de ganadores de cada categoría,
+      \item un análisis de la fiabilidad de las herramientas basado en la comparación de los resultados.
 \end{enumerate}
 
-A brief look at the slides of the 2022 edition\footnote{\url{https://mcc.lip6.fr/2022/pdf/MCC-PN2022.pdf}}
-reproduced in Fig. \ref{fig:mcc2022-tools} illustrates
-that several model checkers have demonstrated uninterrupted participation,
-with notable examples including:
+Un breve vistazo a las diapositivas de la edición de 2022\footnote{\url{https://mcc.lip6.fr/2022/pdf/MCC-PN2022.pdf}}
+reproducidas en la Fig. \ref{fig:mcc2022-tools} ilustra que varios verificadores de modelos han demostrado una participación ininterrumpida, con ejemplos
+notables que incluyen:
 
 \begin{itemize}
-      \item \acrfull{TAPAAL} maintained by the Aalborg University
-            in Denmark\footnote{\url{https://www.tapaal.net/}},
-            winner of a gold medal in the 2023 edition.
-      \item \acrfull{LoLA} maintained by the University of Rostock
-            in Germany\footnote{\url{https://theo.informatik.uni-rostock.de/theo-forschung/tools/lola/}},
-            winner in previous editions and a base for other models.
+      \item \acrfull{TAPAAL} mantenida
+            por la Universidad de Aalborg en Dinamarca\footnote{\url{https://www.tapaal.net/}},
+            ganadora de una medalla de oro en la edición de 2023.
+      \item \acrfull{LoLA} mantenido por la Universidad de
+            Rostock en Alemania\footnote{\url{https://theo.informatik.uni-rostock.de/theo-forschung/tools/lola/}},
+            ganador en ediciones anteriores y fue utilizado base para otros verificadores de modelos.
       \item ITS-tools \cite{thierrymieg:hal-02104373},
-            which was also combined with \acrshort{LoLA} and won medals
-            in 2020\footnote{\url{https://github.com/yanntm/its-lola}}.
+            que también se combinó con \acrshort{LoLA} y obtuvo medallas en
+            2020\footnote{\url{https://github.com/yanntm/its-lola}}.
 \end{itemize}
 
 \begin{figure}[!htb]
       \centering
       \includegraphics[width=\linewidth]{mcc2022-tools.png}
-      \caption{Model checker participation in the MCC over the years.}
+      \caption{Participación de los verificadores de modelos en el MCC a lo largo de los años.}
       \label{fig:mcc2022-tools}
 \end{figure}
 
-These observations collectively indicate
-the maturity and vibrancy of the model checker community.
-The establishment of a well-developed tool landscape,
-fostered by international collaboration and the open-source dissemination of results, benchmarks, and techniques,
-presents a valuable opportunity for leveraging these tools within the realm of software development.
-Specifically, in the context of integrating them as backends for a language-specific translator
-that takes care of automating the Petri net model creation process.
-By capitalizing on the academic efforts invested in the model checkers,
-increased safety and reliability in software projects can be achieved.
+Estas observaciones indican colectivamente la madurez y vitalidad de la comunidad de
+verificadores de modelos. El establecimiento de un panorama de herramientas bien
+desarrollado, fomentado por la colaboración y la difusión de código abierto de resultados, \textit{benchmarks} y técnicas,
+presenta una valiosa oportunidad para aprovechar estas herramientas en el ámbito del
+desarrollo de software. Concretamente, en el contexto de integrarlas como backends para un
+traductor para un lenguaje de programación específico que se encargue de automatizar el proceso de creación de
+modelos de redes de Petri. Capitalizando los esfuerzos académicos invertidos en los
+verificadores de modelos, se puede lograr una mayor seguridad y fiabilidad en los proyectos
+de software.
