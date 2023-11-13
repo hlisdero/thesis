@@ -1,76 +1,67 @@
-\section{Function inlining in the translation to Petri nets}
+\section{Inlining de funciones en la traducción a redes de Petri}
 \label{sec:function-inlining}
 
-In this section, a thorough analysis and motivation for the third design decision
-listed at the beginning of the chapter, namely inlining function calls, is presented.
+En esta sección se presenta un análisis exhaustivo y la motivación de la tercera decisión de
+diseño enumerada al principio del capítulo, a saber, el inlining de las llamadas a funciones.
 
-Modeling functions in \acrshort{PN} is a crucial aspect of the translation
-because it is the basic unit of the \acrshort{MIR}.
-By representing the functions in the \acrshort{MIR} as \acrshort{PN} and connecting them accordingly,
-the control flow and data shared between the threads in the program
-can be captured in a formal framework.
-Afterward, the Petri net is analyzed by a model checker
-in order to identify potential deadlocks or lost signals.
-This approach is especially useful when working with large and complex systems
-that may have many interrelated threads and functions,
-where the deadlock situation may not be evident even to an experienced code reviewer.
+El modelado de funciones en \acrshort{PN} es un aspecto crucial de la traducción porque es la unidad
+básica del \acrshort{MIR}. Al representar las funciones en la \acrshort{MIR} como \acrshort{PN}
+y conectarlas entre sí, el flujo de control y los datos compartidos
+entre los hilos del programa pueden capturarse en un marco formal.
+Posteriormente, la red de Petri es analizada por un verificador de modelos con el fin de
+identificar posibles deadlocks o señales perdidas. Este enfoque es especialmente útil
+cuando se trabaja con sistemas grandes y complejos que pueden tener muchos hilos y funciones
+interrelacionados, en los que la situación de deadlock puede no ser evidente ni siquiera para un
+revisor de código experimentado.
 
-When translating \acrshort{MIR} functions to \acrshort{PN}, one key question that arises is
-whether to reuse the same representation for every call to a specific function or
-to ``inline'' the corresponding representation every time the function is called.
-Expressed differently, each function maps to a subnet
-in the final \acrshort{PN} obtained after the translation, i.e.,
-a connected subgraph formed by the places and transitions
-that model the behavior of the specific function.
-This smaller part of the net can either be present only once in the \acrshort{PN}
-and all calls to this function connect to it,
-or be repeated for every instance of a call to the function in the Rust code.
+Al traducir funciones \acrshort{MIR} a \acrshort{PN},
+una cuestión clave que se plantea es si reutilizar la misma
+representación para cada llamada a una función específica o hacer un ``inline'' de la representación
+correspondiente cada vez que se llama a la función. Expresado de otro modo, cada función
+mapea a una subred en la \acrshort{PN} final obtenida tras la traducción, es decir, un subgrafo conectado
+formado por los lugares y transiciones que modelan el comportamiento de la función
+específica.
+Esta parte más pequeña de la red puede estar presente sólo una vez en la \acrshort{PN} y todas
+las llamadas a esta función se conectan a ella, o repetirse para cada instancia de una llamada a
+la función en el código Rust.
 
-Reusing the same model for every function seems at first glance more efficient,
-as the \acrshort{PN} obtained is smaller.
-However, this approach can also lead to invalid states
-that were not present in the original Rust program.
-These can be the source of false positives during deadlock detection,
-as these extraneous states may violate
-the safety guarantees offered by the compiler.
+Reutilizar el mismo modelo para cada función parece a primera vista más eficiente, ya que la
+\acrshort{PN} obtenido es menor. Sin embargo, este enfoque también puede dar lugar a estados no válidos
+que no estaban presentes en el programa Rust original. Éstos pueden ser la fuente de falsos
+positivos durante la detección de bloqueos porque que estos estados extraños pueden violar las
+garantías de seguridad ofrecidas por el compilador.
 
-On the other hand, inlining the model every time a function is called results in
-a larger \acrshort{PN}, which requires more memory and \acrshort{CPU} time to be analyzed,
-but it can also improve the accuracy of the analysis by ensuring
-that each function call is represented by a separate Petri net structure
-that captures its specific data dependencies in the context
-in which the function call occurs in the code.
+Por otro lado, un inline del modelo cada vez que se llama a una función da como resultado un \acrshort{PN}
+más grande que requiere más memoria y tiempo de \acrshort{CPU} para ser analizado pero también
+puede mejorar la precisión del análisis al garantizar que cada llamada a una función esté
+representada por una estructura de red de Petri independiente que capture sus dependencias de
+datos específicas en el contexto en el que se produce la llamada a la función en el código.
 
-\subsection{The basic case}
+\subsection{El caso básico}
 
-The impact of these subtle details can only
-be fully comprehended with an appropriate example.
-Therefore, consider first the most simple abstraction of a function call in
-the language of Petri nets, formed by a single transition and
-two places representing the start and end of the function.
-This is seen in Fig. \ref{fig:simplest-function}.
-The function call is treated as a black box,
-all details are abstracted away in the transition.
-We care only about where the function starts and where it ends.
+El impacto de estos sutiles detalles sólo puede comprenderse plenamente con un ejemplo
+apropiado. En consecuencia, consideremos primero la abstracción más simple de una llamada a una
+función en el lenguaje de las redes de Petri, formada por una sola transición y dos lugares que
+representan el inicio y el final de la función.
+Esto se ve en la Fig. \ref{fig:simplest-function}.
+La llamada a la función se trata como una caja negra, todos los
+detalles se abstraen en la transición. Sólo nos importa dónde empieza y dónde acaba la
+función.
 
 \begin{figure}[!htb]
     \centering
     \includesvg[width=0.3\linewidth]{simplest-function.svg}
-    \caption{The simplest Petri net model for a function call.}
+    \caption{El modelo de red de Petri más simple posible para una llamada de función.}
     \label{fig:simplest-function}
 \end{figure}
 
-Observe now such a function in the context of a Rust program.
-Listing \ref{lst:repeated-function-call} provides a simple example
-in which one function is called
-five times consecutively in a \Rustinline{for} loop.
-A possible \acrshort{PN} that models the program
-is found in Fig. \ref{fig:repeated-function-call}.
-It should be emphasized that
-this net and the subsequent ones in this section
-do \emph{not} result from a translation of the MIR.
-They are simplifications to showcase the difficulties
-of dealing with functions called in various places in the code.
+Observe ahora una función de este tipo en el contexto de un programa Rust.
+El listado \ref{lst:repeated-function-call} ofrece un ejemplo sencillo
+en el que una función es llamada cinco veces consecutivas en un bucle \Rustinline{for}.
+Una posible \acrshort{PN} que modele el programa se encuentra en la Fig. \ref{fig:repeated-function-call}.
+Cabe destacar que esta red y las siguientes de esta sección \emph{no} son el resultado de una traducción de la MIR.
+Son simplificaciones para ilustrar las dificultades de tratar con funciones llamadas en varios
+lugares en el código.
 
 \begin{listing}[!htb]
     \begin{minted}{Rust}
@@ -82,26 +73,25 @@ of dealing with functions called in various places in the code.
             }
         }
     \end{minted}
-    \caption{A simple Rust program with a repeated function call.}
+    \caption{Un programa sencillo de Rust con una llamada repetida a una función.}
     \label{lst:repeated-function-call}
 \end{listing}
 
 \begin{figure}[!htb]
     \centering
     \includesvg[width=0.7\linewidth]{repeated-function-call.svg}
-    \caption{A possible Petri net for the code in Listing \ref{lst:repeated-function-call} applying the model of Fig. \ref{fig:simplest-function}.}
+    \caption{Una posible red de Petri para el código del listado \ref{lst:repeated-function-call}
+        aplicando el modelo de la Fig. \ref{fig:simplest-function}.}
     \label{fig:repeated-function-call}
 \end{figure}
 
-\subsection{A characterization of the problem}
+\subsection{Una caracterización del problema}
 
-The troublesome scenario has not emerged so far.
-It manifests only when a function is called
-in at least two different places in the code or,
-in simpler terms, the expression \Rustinline{simple_function()} appears twice or more.
-Listing \ref{lst:two-simple-function-calls} satisfies this condition
-and is designed to exhibit
-the extraneous behavior described at the beginning of the section.
+El escenario problemático no ha surgido hasta ahora. Sólo se manifiesta cuando se llama a una
+función en al menos dos lugares distintos del código o, en términos más sencillos, cuando la
+expresión \Rustinline{simple_function()} aparece dos veces o más.
+El listado \ref{lst:two-simple-function-calls} satisface esta condición y
+está diseñado para mostrar el comportamiento extráneo descrito al principio de la sección.
 
 \begin{listing}[!htb]
     \begin{minted}{Rust}
@@ -117,150 +107,130 @@ the extraneous behavior described at the beginning of the section.
             simple_function();
         }
     \end{minted}
-    \caption{A simple Rust program that calls a function in two different places.}
+    \caption{Un sencillo programa Rust que llama a una función en dos lugares diferentes.}
     \label{lst:two-simple-function-calls}
 \end{listing}
 
-As stated before, the first approach to modeling the program consists
-in reusing the function model for both calls.
-This is shown in Fig. \ref{fig:two-function-calls-incorrect-1}.
+Como ya se ha dicho, el primer enfoque para modelar el programa consiste en reutilizar el
+modelo de función para ambas llamadas. Esto se muestra en la Fig. \ref{fig:two-function-calls-incorrect-1}.
 
 \begin{figure}[!htbp]
     \centering
     \includesvg[width=0.88\linewidth]{two-function-calls-incorrect-1.svg}
-    \caption{A first (incorrect) Petri net for the code in Listing \ref{lst:two-simple-function-calls}.}
+    \caption{Una primera red de Petri (incorrecta) para el código del listado \ref{lst:two-simple-function-calls}.}
     \label{fig:two-function-calls-incorrect-1}
 \end{figure}
 
-It is evident to the reader that
-the program in Listing \ref{lst:two-simple-function-calls}
-never calls the \Rustinline{panic!} macro and always terminates successfully,
-given that the variable \Rustinline{second_call}
-is never \Rustinline{true} before line 9.
+Es evidente para el lector que el programa del Listado \ref{lst:two-simple-function-calls}
+nunca llama a la macro \Rustinline{panic!} y siempre termina con éxito,
+dado que la variable \Rustinline{second_call} nunca es \Rustinline{true} antes de la línea 9.
 
-Yet, the \acrshort{PN} depicted in Fig. \ref{fig:two-function-calls-incorrect-1}.
-is conspicuously flawed, making it unsuitable as a model for the program.
-The reason is that after firing the transition labeled \texttt{RETURN\_simple\_function}
-a token is placed in \texttt{check\_flag} but \emph{also} in \texttt{main\_end\_place}.
-The token in \texttt{main\_end\_place} will eventually appear in \texttt{PROGRAM\_END},
-which indicates a normal termination of the program.
-This is technically correct since we know that the program terminates successfully.
+Sin embargo, la \acrshort{PN} representada en la Fig. \ref{fig:two-function-calls-incorrect-1} es conspicuamente defectuosa,
+lo que la hace inadecuada como modelo para el programa. La razón es que después de disparar la transición
+etiquetada \texttt{RETURN\_simple\_function} se coloca un token en \texttt{check\_flag} pero también en
+\texttt{main\_end\_place}. El token en \texttt{main\_end\_place} aparecerá finalmente en \texttt{PROGRAM\_END}, lo
+que indica una terminación normal del programa.
+Esto es técnicamente correcto ya que sabemos que el programa termina con éxito.
 
-Nonetheless, there are concerning issues regarding the second token.
-The token in \texttt{check\_flag} could be consumed either
-by the transition \texttt{flag\_is\_false} or \texttt{flag\_is\_true}.
-If it is consumed by the latter, a token will be placed in \texttt{PROGRAM\_PANIC},
-signaling an erroneous termination of the program.
-This is absurd because it means that the program could panic
-but also \emph{always} ends normally, as seen in the previous paragraph.
+No obstante, existen problemas que conciernen al segundo token.
+El token en \texttt{check\_flag} puede ser consumido
+por la transición \texttt{flag\_is\_false} o \texttt{flag\_is\_true}.
+Si es consumida por esta última, se colocará un testigo en \texttt{PROGRAM\_PANIC},
+señalando una terminación errónea del programa.
+Esto es absurdo porque significa que el programa podría entrar en pánico pero
+también que \emph{siempre} termina normalmente, como se ha visto en el párrafo anterior.
 
-The situation becomes worse if we follow the path of firing \texttt{flag\_is\_false}.
-In that case, the token triggers another function call, which is in principle correct,
-but nothing prevents it from doing this over and over again.
-The conclusion is that an infinite amount of tokens could accumulate
-in \texttt{main\_end\_place} or \texttt{PROGRAM\_END}
-in the circumstance that, by pure chance,
-the transition \texttt{flag\_is\_true} does not fire.
+La situación empeora si seguimos el camino de disparar \texttt{flag\_is\_false}.
+En ese caso, el token desencadena otra llamada a la función,
+lo que en principio es correcto, pero nada impide que lo haga una y otra vez.
+La conclusión es que podría acumularse una cantidad infinita de
+tokens en \texttt{main\_end\_place} o \texttt{PROGRAM\_END} en el caso de que,
+por pura casualidad, la transición \texttt{flag\_is\_true} no se dispare.
 
-It has become clear that we must discard this model and look for a better solution.
-One possibility is to split the transition labeled \texttt{RETURN\_simple\_function}
-in two separate transitions depending on the function call order
-as illustrated in Fig. \ref{fig:two-function-calls-incorrect-2}.
+Está claro que debemos descartar este modelo y buscar una solución mejor. Una posibilidad es
+dividir la transición etiquetada \texttt{RETURN\_simple\_function} en dos transiciones separadas según
+el orden de llamada a la función, como se ilustra en la Fig. \ref{fig:two-function-calls-incorrect-2}.
 
 \begin{figure}[!htbp]
     \centering
     \includesvg[width=0.94\linewidth]{two-function-calls-incorrect-2.svg}
-    \caption{A second (also incorrect) Petri net for the code in Listing \ref{lst:two-simple-function-calls}.}
+    \caption{Una segunda red de Petri (también incorrecta) para el código del Listado \ref{lst:two-simple-function-calls}.}
     \label{fig:two-function-calls-incorrect-2}
 \end{figure}
 
-This second attempt unfortunately comes with its own set of extraneous states.
-First, the program may now exit after calling the function only once.
-Nothing prevents the transition \texttt{RETURN\_simple\_function\_2} from firing first.
-This is equivalent to saying that the execution flow jumps
-from line 5 to line 11 in Listing \ref{lst:two-simple-function-calls},
-which is obviously not a property present in the original Rust code.
+Desafortunadamente, este segundo intento viene acompañado de su propio conjunto de estados extraños.
+En primer lugar, ahora el programa puede salir después de llamar a la función una sola vez.
+Nada impide que la transición \texttt{RETURN\_simple\_function\_2} se dispare primero.
+Esto equivale a decir que el flujo de ejecución salta de la línea 5 a la línea 11 en el Listado \ref{lst:two-simple-function-calls},
+lo que obviamente no es una propiedad presente en el código Rust original.
 
-On the other hand, the problem of the infinite loop persists.
-The \acrshort{PN} may continue firing indefinitely as long as
-\texttt{flag\_is\_true} and \texttt{RETURN\_simple\_function\_2} do not fire.
-There is no guarantee that the transitions fire in a specific order.
-As seen in Sec. \ref{sec:transition-firing},
-the transition firing is non-deterministic.
+Por otro lado, persiste el problema del bucle infinito.
+La \acrshort{PN} puede seguir disparándose indefinidamente
+mientras \texttt{flag\_is\_true} y \texttt{RETURN\_simple\_function\_2} no se disparen.
+No hay ninguna garantía de que las transiciones se disparen en un orden específico.
+Como se vio en la Sec. \ref{sec:transition-firing}, el disparo de las transiciones no es determinista.
 
 \clearpage
-\subsection{A feasible solution}
+\subsection{Una solución viable}
 
-Having observed the difficulties of modeling function calls,
-we turn our attention to the other approach to modeling function calls:
-Inlining the \acrshort{PN} representation.
-Some of the lessons learned from the preceding subsection are:
+Una vez observadas las dificultades de modelar las llamadas de función, volvemos nuestra
+atención al otro enfoque para modelar las llamadas de función:
+La incrustación o \textit{inlining} de la representación \acrshort{PN}.
+Algunas de las lecciones aprendidas de la subsección anterior son:
 
 \begin{itemize}
-    \item Creating a loop in the net where there is no loop in the original program
-          opens the door to infinite sequences of transition firings.
-          This could in turn break the \emph{safety} property of the \acrshort{PN}.
-    \item As the token symbolizes the program counter,
-          there must be only one token in the \acrshort{PN} at any given time.
-    \item The program state may change between function calls.
-          Accordingly, separate places should model these states.
-          Put differently, the state when calling a function the first time
-          may not be the same as when calling the function a second time.
+    \item Crear un bucle en la red donde no lo hay en el programa original abre la puerta a
+          secuencias infinitas de disparos de transición. Esto podría a su vez romper la
+          propiedad de \emph{safety} de la \acrshort{PN}.
+    \item Como el token simboliza el contador del programa,
+          sólo debe haber un token en la \acrshort{PN} en cualquier momento dado.
+    \item El estado del programa puede cambiar entre llamadas a funciones. En consecuencia,
+          deben modelarse estos estados por separado. Dicho de otro modo, el estado al llamar a
+          una función la primera vez puede no ser el mismo que al llamar a la función por segunda
+          vez.
 \end{itemize}
 
-Fig. \ref{fig:two-function-calls-correct} introduces
-the inlining approach implemented in the tool.
-The \acrshort{PN} therein is correct.
-It matches the structure of the Rust code more closely.
-It does not contain any loops nor
-it creates additional tokens when firing transitions,
-i.e., none of the transitions has two outputs.
-It is worth mentioning that the resulting \acrshort{PN} is a state machine
-(Definition \ref{definition:state-machines})
-as expected for a single-threaded program.
-This was not the case for Fig. \ref{fig:two-function-calls-incorrect-1}
-and \ref{fig:two-function-calls-incorrect-2}.
+La Fig. \ref{fig:two-function-calls-correct} presenta el enfoque de inlining implementado en la herramienta.
+La \acrshort{PN} en ella es correcta. Se ajusta mejor a la estructura del código Rust.
+No contiene ningún bucle ni crea tokens adicionales al disparar transiciones,
+es decir, ninguna de las transiciones tiene dos salidas.
+Cabe mencionar que la \acrshort{PN} resultante es una máquina de estados (Definición \ref{definition:state-machines}),
+tal y como se espera para un programa de un solo hilo.
+No es el caso de las Fig. \ref{fig:two-function-calls-incorrect-1} y \ref{fig:two-function-calls-incorrect-2}.
 
 \begin{figure}[!htbp]
     \centering
     \includesvg[width=\linewidth]{two-function-calls-correct.svg}
-    \caption{A correct Petri net for the code in Listing \ref{lst:two-simple-function-calls} using inlining.}
+    \caption{Una red de Petri correcta para el código del Listado \ref{lst:two-simple-function-calls} utilizando inlining.}
     \label{fig:two-function-calls-correct}
 \end{figure}
 
-A significant advantage of the inlining approach is
-that every function call is unequivocally identified.
-This proves helpful when interpreting the output of the model checker or
-error messages during the translation of a given program.
-The use of an incremental non-negative id is arbitrary but convenient.
-Moreover, the accuracy of deadlock detection is increased because
-certain classes of extraneous states
-such as those in the \acrshort{PN} shown in the previous section
-are not present.
-Minimizing the number of false positives plays an important role
-when considering which approach to implement
-for a tool that aims to be user-friendly and easy to set up.
+Una ventaja significativa del enfoque inlining es que cada llamada a una función se identifica
+de forma inequívoca. Esto resulta útil a la hora de interpretar la salida del verificador de
+modelos o los mensajes de error durante la traducción de un programa determinado. El uso de
+un id incremental no negativo es arbitrario pero conveniente. Además, la precisión de la
+detección del bloqueo se incrementa porque ciertas clases de estados extraños, como los del \acrshort{PN}
+mostrado en la sección anterior, no están presentes. Minimizar el número de falsos positivos
+desempeña un papel importante a la hora de considerar qué enfoque aplicar para una
+herramienta que pretende ser fácil de usar y de configurar.
 
-One disadvantage mentioned earlier is that the size of the resulting net is larger.
-The exact penalty in the number of additional places and transitions depends
-on the frequency with which functions are reused on average in the codebase.
-It is reasonable to assume that functions are called from several places.
-However, certain optimizations can be applied,
-which can reduce the size of the net considerably,
-thus compensating for the effect of using inlining.
-These optimizations are discussed in detail in
-Sec. \ref{sec:future-work-petri-net-reduction} and \ref{sec:future-work-no-cleanup}.
+Una desventaja mencionada anteriormente es que el tamaño de la red resultante es mayor. La
+penalización exacta en el número de lugares y transiciones adicionales depende de la
+frecuencia con la que se reutilizan las funciones por término medio en el código base. Es
+razonable suponer que las funciones se llaman desde varios lugares. Sin embargo, se pueden
+aplicar ciertas optimizaciones que pueden reducir considerablemente el tamaño de la red,
+compensando así el efecto de utilizar inlining. Estas optimizaciones se tratan en detalle en las
+Sec. \ref{sec:future-work-petri-net-reduction} y \ref{sec:future-work-no-cleanup}.
 
-Lastly, an attentive reader may notice that
-the analysis of the \acrshort{PN} in Fig. \ref{fig:two-function-calls-correct}
-leads to the conclusion that
-the program may call \Rustinline{panic!} and terminate abruptly,
-which does not match the execution of the Rust program.
-This is correct but it is a limitation of low-level Petri nets
-that cannot be solved in the framework of the model and
-goes beyond the scope of this work.
-Sec. \ref{sec:future-work-higher-level-models} explores
-the consequences of this restriction and proposes potential remedies.
+Por último, un lector atento puede notar que
+el análisis de la \acrshort{PN} de la Fig. \ref{fig:two-function-calls-correct} lleva a la
+conclusión de que el programa puede llamar a \Rustinline{panic!} y terminar abruptamente,
+lo que no coincide con la ejecución del programa Rust.
+Esto es correcto pero es una limitación de las redes de Petri de bajo nivel
+que no puede resolverse en el marco del modelo y va más allá del
+alcance de este trabajo.
+Sec. \ref{sec:future-work-higher-level-models} explora
+las consecuencias de esta restricción y propone posibles soluciones.
 
-Armed with new insights and knowledge about the design choices,
-we are now able to fully describe the implementation.
+Armados con nuevas ideas y conocimientos sobre las decisiones de diseño,
+ahora estamos en condiciones de describir completamente la implementación.
