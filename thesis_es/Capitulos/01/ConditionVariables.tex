@@ -1,53 +1,45 @@
 \section{Condition variables}
 \label{sec:condition-variables}
 
-Condition variables are a synchronization primitive in concurrent programming
-that allows threads to efficiently wait
-for a specific condition to be met before proceeding.
-They were first introduced by \cite{hoare1974monitors}
-as part of a building block for the concept of monitor developed
-originally by \cite{hansen1973operating}.
+Las variables de condición (\textit{condition variables}) son una primitiva de sincronización en la programación concurrente
+que permite a los hilos esperar eficientemente a que se cumpla una condición específica antes
+de continuar. Fueron introducidas por primera vez por \cite{hoare1974monitors} como parte de un bloque
+de construcción para el concepto de monitor desarrollado originalmente por \cite{hansen1973operating}.
 
-Following the classic definition, two main operations
-can be called on a condition variable:
+Siguiendo la definición clásica, se pueden llamar dos operaciones principales sobre una variable de
+condición:
 
 \begin{itemize}
-      \item \texttt{wait}: Blocks the current thread or process.
-            In some implementations, the associated mutex
-            is released as part of the operation.
-      \item \texttt{signal}: Wakes up one thread or process
-            waiting on the condition variable.
-            In some implementations, the associated mutex lock is immediately
-            acquired by the signaled thread or process.
+      \item \texttt{esperar (wait)}:
+            Bloquea el hilo o proceso actual.
+            En algunas implementaciones, el mutex asociado
+            se libera como parte de la operación.
+      \item \texttt{señal (signal)}:
+            Despierta un hilo o proceso que espera en la condition variable. En algunas
+            implementaciones, el mutex asociado es adquirido inmediatamente por el hilo o
+            proceso sobre el que se aplica la operación.
 \end{itemize}
 
-Condition variables are typically associated
-with a boolean predicate (a condition) and a mutex.
-The boolean predicate is the condition
-on which the threads or processes are waiting for.
-When it is set to a particular value (either true or false),
-the thread or process should continue executing.
-The mutex guarantees that only one thread or process
-may access the condition variable at a time.
+Las condition variables suelen estar asociadas a un predicado booleano (una condición) y a
+un mutex. El predicado booleano es la condición que esperan los hilos o procesos. Cuando se
+establece en un valor determinado (verdadero o falso), el hilo o proceso puede continuar
+ejecutándose. El mutex garantiza que sólo un hilo o proceso pueda acceder a la condition variable a la vez.
 
-Condition variables do not contain an actual value
-accessible to the programmer inside of them.
-Instead, they are implemented using a queue data structure, where
-threads or processes are added to the queue when they enter the wait state.
-When another thread or process signals the condition,
-an element from the queue is selected to resume execution.
-The specific scheduling policy may vary depending on the implementation.
+Las variables de condición no contienen un valor real accesible para el programador en su
+interior. En su lugar, se implementan utilizando una estructura de datos de cola donde los hilos
+o procesos se añaden a la cola cuando entran en el estado de espera. Cuando otro hilo o proceso
+señala el estado, se selecciona un elemento de la cola para reanudar la ejecución. La política de
+\textit{scheduling} específica puede variar en función de la implementación.
 
-Over the years, various implementations and optimizations have been developed
-for condition variables to improve performance and reduce overhead.
-For example, some implementations allow multiple threads to be awakened at once
-(an operation called \emph{broadcast}),
-while others use a priority queue
-to accomplish that the higher-priority threads are awakened first.
+A lo largo de los años, se han desarrollado diversas implementaciones y optimizaciones para
+las condition variables con el fin de mejorar el rendimiento y reducir la sobrecarga. Por
+ejemplo, algunas implementaciones permiten despertar varios hilos a la vez (una operación
+denominada \emph{broadcast}), mientras que otras utilizan una cola de prioridad para lograr que los
+hilos de mayor prioridad se despierten primero.
 
-Condition variables are part of the POSIX standard library for threads \cite{nichols1996pthreads}
-and they are now widely used in concurrent programming languages and systems.
-They are found among others in:
+Las condition variables forman parte de la biblioteca estándar POSIX para hilos \cite{nichols1996pthreads}
+y en la actualidad se utilizan ampliamente en lenguajes y sistemas de programación
+concurrentes. Se encuentran entre otros en:
 
 \begin{itemize}
       \item UNIX\footnote{\url{https://man7.org/linux/man-pages/man3/pthread_cond_init.3p.html}},
@@ -58,26 +50,22 @@ They are found among others in:
                   \url{https://docs.oracle.com/en/java/javase/20/docs/api/java.base/java/util/concurrent/locks/Condition.html}}
 \end{itemize}
 
-Despite their widespread use, condition variables can be tricky to use correctly,
-and incorrect use can lead to subtle and
-hard-to-debug errors such as missed signals or spurious wakeups.
-We will look now at these errors in detail.
+A pesar de su uso generalizado, las variables de condición pueden ser difíciles de utilizar
+correctamente, y un uso incorrecto puede dar lugar a errores sutiles y difíciles de depurar, como
+señales perdidas o despertares espurios. A continuación veremos estos errores en detalle.
 
 \subsection{Señales perdidas}
 
-A missed signal happens when a thread or process waiting on a condition variable
-fails to receive a signal even though it has been emitted.
-This can happen due to a race condition, where the signal is emitted
-before the thread enters the wait state, causing the signal to be missed.
+Una señal perdida ocurre cuando un hilo o proceso que espera en una condition variable no
+recibe una señal aunque haya sido emitida. Esto puede ocurrir debido a una condición de
+carrera en la que la señal se emite antes de que el hilo entre en estado de espera, provocando
+que se pierda la señal.
 
-To illustrate the concept of a missed signal, we will look at an example.
-Suppose we have two threads, T1 and T2,
-and a shared integer variable called \texttt{flag}.
-T1 sets \texttt{flag} to \texttt{true} and signals
-a condition variable \texttt{cv} to wake up T2,
-which is waiting on \texttt{cv} to know when \texttt{flag} has been set.
-T2 waits on \texttt{cv} until it receives a signal from T1.
-Listing \ref{lst:missed-signal-example} shows the corresponding pseudocode.
+Para ilustrar el concepto de señal perdida, veremos un ejemplo. Supongamos que tenemos
+dos hilos, T1 y T2, y una variable entera compartida llamada \texttt{flag}. T1 establece \texttt{flag} en \texttt{true}
+y envía una señal a una variable de condición \texttt{cv} para despertar a T2 que está esperando en
+cv para saber cuándo se ha marcado \texttt{flag}. T2 espera en \texttt{cv} hasta que recibe una señal de
+T1. El listado \ref{lst:missed-signal-example} muestra el pseudocódigo correspondiente.
 
 \begin{listing}[!htb]
       \begin{minted}{C++}
@@ -93,73 +81,62 @@ Listing \ref{lst:missed-signal-example} shows the corresponding pseudocode.
                 cv.wait(lock)
             lock.release()
       \end{minted}
-      \caption{Pseudocode for a missed signal example.}
+      \caption{Pseudocódigo para un ejemplo de señal perdida.}
       \label{lst:missed-signal-example}
 \end{listing}
 
-Now, suppose that T1 sets \texttt{flag} and signals \texttt{cv},
-but T2 has not yet entered the wait state on \texttt{cv} due to some scheduling delay.
-In this case, the signal emitted by T1 could be missed by T2,
-as shown in the following sequence of events:
+Supongamos ahora que T1 activa \texttt{flag} y emite una señal a \texttt{cv} pero T2 aún no ha
+entrado en estado de espera en \texttt{cv} debido a algún retraso en \textit{scheduling}. En este caso, la
+señal emitida por T1 podría ser pasada por alto por T2, como se muestra en la siguiente
+secuencia de acontecimientos:
 
 \begin{enumerate}
-      \item T1 acquires the lock and sets \texttt{flag} to \texttt{true}.
-      \item T1 signals \texttt{cv} to wake up T2.
-      \item T1 releases the lock.
-      \item T2 acquires the lock and checks if \texttt{flag} has changed.
-            Since \texttt{flag} is still \texttt{false},
-            T2 enters the wait state on \texttt{cv}.
-      \item Due to scheduling delays or other factors,
-            T2 does not receive the signal emitted by T1
-            and remains stuck in the wait state forever.
+      \item T1 adquiere el bloqueo y marca \texttt{flag} como \texttt{true}.
+      \item T1 indica a \texttt{cv} que despierte a T2.
+      \item T1 libera el lock.
+      \item T2 adquiere el bloqueo y comprueba si \texttt{flag} ha cambiado. Como \texttt{flag} sigue siendo
+            \texttt{flag}, T2 entra en estado de espera en \texttt{cv}.
+      \item Debido a retrasos en el \textit{scheduling} o a otros factores, T2 no recibe la señal emitida por
+            T1 y permanece atascado en el estado de espera para siempre.
 \end{enumerate}
 
-This scenario illustrates the concept of a missed signal,
-where a thread waiting on a condition variable fails
-to receive a signal even though it has been emitted.
-To prevent missed signals, it is essential to ensure that
-threads waiting on condition variables are properly synchronized
-with the threads emitting signals and
-that there are no race conditions or timing issues
-that could cause signals to be missed.
+Este escenario ilustra el concepto de señal perdida, en el que un hilo que espera en una variable
+de condición no recibe una señal aunque haya sido emitida. Para evitar que se pierdan
+señales, es esencial asegurarse de que los hilos que esperan en variables de condición estén
+correctamente sincronizados con los hilos que emiten señales y de que no existan condiciones
+de carrera o problemas de sincronización que puedan hacer que se pierdan señales.
 
 \subsection{Despertares espurios (\textit{spurious wakeups})}
 
-A spurious wakeup happens when a thread waiting on a condition variable wakes up
-without receiving a signal or notification from another thread.
-Reasons for this are multiple: hardware or operating system interrupts,
-internal implementation details of the condition variable
-or other unpredictable factors.
+Un despertar espurio (\textit{spurious wakeup}) ocurre cuando un hilo
+que espera en una variable de condición se despierta sin recibir una señal o notificación de otro hilo.
+Las razones son múltiples:
+interrupciones del hardware o del sistema operativo, detalles internos de implementación de la
+condition variable u otros factores impredecibles.
 
-Reusing the situation described in the previous section and
-the pseudocode shown in Listing \ref{lst:missed-signal-example},
-suppose now that T1 sets \texttt{flag} to \texttt{true} and signals \texttt{cv},
-but T2 wakes up without receiving the signal emitted by T1.
+Reutilizando la situación descrita en la sección anterior y el pseudocódigo mostrado en el
+Listado \ref{lst:missed-signal-example}, supongamos ahora que T1 pone el \texttt{flag} em \texttt{true} y emite una señal a \texttt{cv},
+pero T2 se despierta sin recibir la señal emitida por T1.
 
-This is precisely the spurious wakeup.
-The following sequence of events leads to this unfortunate outcome:
+Este es precisamente el despertar espurio. La siguiente secuencia de acontecimientos conduce a
+este desafortunado resultado:
 
 \begin{enumerate}
-      \item T1 acquires the lock and sets \texttt{flag} to \texttt{true}.
-      \item T1 signals \texttt{cv} to wake up T2.
-      \item T1 releases the lock.
-      \item T2 acquires the lock and checks if \texttt{flag} is \texttt{true}.
-            Since \texttt{flag} is still \texttt{false},
-            T2 enters the wait state on \texttt{cv}.
-      \item Due to some internal implementation detail
-            of the condition variable or other unpredictable factors,
-            T2 wakes up without receiving the signal emitted by T1
-            and continues executing the next statement in its code.
+      \item T1 adquiere el bloqueo y marca \texttt{flag} como \texttt{true}.
+      \item T1 indica a \texttt{cv} que despierte a T2.
+      \item T1 libera el lock.
+      \item T2 adquiere el lock y comprueba si \texttt{flag} es verdadero. Como \texttt{flag} sigue siendo
+            \texttt{false}, T2 entra en estado de espera en cv.
+      \item Debido a algún detalle de implementación interna de la condition variable o a otros
+            factores impredecibles, T2 se despierta sin recibir la señal emitida por T1 y continúa
+            ejecutando la siguiente sentencia de su código.
 \end{enumerate}
 
-This example demonstrates the idea of a spurious wakeup,
-in which a thread waiting on a condition variable wakes up
-without receiving a signal or notification from another thread.
-To prevent spurious wakeups, it is unavoidable to use a loop
-to recheck the condition after waking up from a wait state,
-as shown in the pseudocode for T2 (line 9).
-This ensures that the thread does not proceed
-until the condition it is waiting for has indeed occurred.
-If the while loop were not there, a spurious wakeup would cause T2 to
-continue executing after the call to \texttt{wait},
-regardless of whether a signal was emitted by T1 or not.
+Este ejemplo demuestra la idea de un despertar espurio en el que un hilo que espera en una
+condition variable se despierta sin recibir una señal o notificación de otro hilo. Para evitar
+los despertares espurios es inevitable utilizar un bucle para volver a comprobar la condición
+después de despertarse de un estado de espera, como se muestra en el pseudocódigo para T2
+(línea 9). Esto garantiza que el hilo no prosiga hasta que la condición que está esperando se
+haya producido realmente. Si no existiera el bucle while, un despertar espurio haría que T2
+continuara ejecutándose después de la llamada a \texttt{wait}, independientemente de si T1 emitió
+una señal o no.
