@@ -1,184 +1,171 @@
-\section{Rust compiler: \emph{rustc}}
+\section{El compilador de Rust: \emph{rustc}}
 \label{sec:rustc}
 
-The Rust compiler, \emph{rustc}, is responsible for translating Rust code into executable code.
-However, \emph{rustc} is not a traditional compiler in the sense
-that it performs multiple passes over the code,
-as described in Sec. \ref{sec:compiler-architecture}.
-Instead, \emph{rustc} is built on a query-based system that supports incremental compilation.
+El compilador de Rust, \emph{rustc}, se encarga de traducir el código Rust en código ejecutable. Sin
+embargo, \emph{rustc} no es un compilador tradicional en el sentido de que realiza múltiples pasadas
+sobre el código, como se describe en la Sec. \ref{sec:compiler-architecture}.
+En su lugar, \emph{rustc} está construido sobre un
+sistema basado en consultas que soporta la compilación incremental.
 
-In \emph{rustc}'s query system, the compiler computes a dependency graph between code artifacts,
-including source files, crates, and intermediate artifacts, such as object files.
-The query system then uses this graph to efficiently recompile
-only those artifacts that have changed since the last
-compilation\footnote{\url{https://rustc-dev-guide.rust-lang.org/queries/incremental-compilation.html}}.
-This incremental compilation can significantly
-reduce the compilation time for large projects,
-making it easier to develop and iterate on Rust code.
+En el sistema de consulta de \emph{rustc}, el compilador calcula un grafo de dependencias entre los
+artefactos de código, incluidos los archivos fuente, los crates y los artefactos intermedios, como
+los archivos objeto. A continuación, el sistema de consulta utiliza este grafo para recompilar
+eficientemente sólo aquellos artefactos que hayan cambiado
+desde la última compilación\footnote{\url{https://rustc-dev-guide.rust-lang.org/queries/incremental-compilation.html}}.
+Esta compilación incremental puede reducir significativamente el tiempo de compilación de grandes
+proyectos, facilitando el desarrollo y la iteración del código Rust.
 
-The query system also enables the Rust compiler to perform other optimizations,
-such as memoization and caching of intermediate results.
-For example, if a function's return value has been computed before,
-the query system can return the cached result instead of recomputing it,
-further reducing compilation time.
+El sistema de consulta también permite al compilador de Rust realizar otras optimizaciones,
+como la memoización y el almacenamiento en caché de resultados intermedios. Por ejemplo, si
+el valor de retorno de una función se ha calculado antes, el sistema de consulta puede devolver
+el resultado almacenado en caché en lugar de volver a calcularlo, lo que reduce aún más el
+tiempo de compilación.
 
-Another important design choice in \emph{rustc} is interning.
-Interning is a technique to store strings and
-other data structures in a memory-efficient way.
-Instead of storing multiple copies of the same string or data structure,
-the Rust compiler stores only one copy in a special allocator called an \emph{arena}.
-References to values stored in the arena are passed around between different parts
-of the compiler and they can be compared cheaply by comparing pointers.
-This can reduce memory usage and speed up operations
-that compare or manipulate strings and data structures.
+Otra elección de diseño importante en \emph{rustc} es el \emph{interning}. \emph{Interning} es una técnica para
+almacenar cadenas de texto y otras estructuras de datos de forma eficiente en memoria. En lugar de
+almacenar varias copias de la misma cadena o estructura de datos, el compilador de Rust
+almacena sólo una copia en un \textit{allocator} especial llamado \emph{arena}.
+Las referencias a los valores almacenados en la arena se pasan
+de una parte a otra del compilador y pueden compararse de forma barata comparando punteros.
+Esto permite reducir el uso de memoria y
+acelerar las operaciones que comparan o manipulan cadenas de texto y estructuras de datos.
 
-\emph{rustc} uses the LLVM compiler infrastructure\footnote{\url{https://llvm.org/}}
-to perform low-level code generation and optimization.
-LLVM provides a flexible framework for compiling code
-to a variety of targets, including native machine code and \acrfull{WASM}.
-The Rust compiler uses LLVM to optimize code for performance and
-to generate high-quality code for a variety of platforms.
-Instead of generating machine code, it only needs
-to generate the source code's LLVM \acrfull{IR}
-and then instruct LLVM to transform this to the compilation target,
-applying the desired optimizations.
+\emph{rustc} utiliza la infraestructura del compilador LLVM\footnote{\url{https://llvm.org/}}
+para realizar la generación de código de bajo nivel y la optimización.
+LLVM proporciona un marco flexible para compilar código a
+una variedad de \emph{targets}, incluyendo código máquina nativo y \acrfull{WASM}.
+El compilador de Rust utiliza LLVM para optimizar el código en términos de rendimiento y
+generar código de alta calidad para una gran variedad de plataformas. En lugar de generar
+código máquina, sólo necesita generar la \acrfull{IR} de LLVM del código
+fuente y luego ordenar a LLVM que lo transforme al objetivo de compilación (\textit{compilation target}),
+aplicando las optimizaciones deseadas.
 
-\emph{rustc} is programmed in Rust.
-In order to compile the newer version of the compiler
-and the newer standard library version that goes with it,
-a slightly older version of \emph{rustc} and the standard library is used.
-This process is called \emph{bootstrapping} and it implies
-that one of the major users of Rust is the Rust compiler itself.
-Considering that a new stable version is released every six weeks,
-bootstrapping involves a substantial amount of complexity and is described in detail
-in the documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html}}
-and in conferences \cite{nelson2022} and tutorials \cite{klock2022} by members of the Rust team.
+\emph{rustc} está programado en Rust. Para compilar la versión más reciente del compilador y la
+versión más reciente de la biblioteca estándar que lo acompaña, se utiliza una versión
+ligeramente más antigua de \emph{rustc} y de la biblioteca estándar. Este proceso se denomina
+\emph{bootstrapping} e implica que uno de los principales usuarios de Rust es el propio compilador de
+Rust. Teniendo en cuenta que cada seis semanas se publica una nueva versión estable, el
+bootstrapping implica una gran complejidad y se describe detalladamente
+en la documentación\footnote{\url{https://rustc-dev-guide.rust-lang.org/building/bootstrapping.html}}
+y en conferencias \cite{nelson2022} y tutoriales \cite{klock2022} hechos por miembros del Rust team.
 
-\subsection{Compilation stages}
+\subsection{Etapas de compilación}
 
-The existence of the query system does not imply
-that \emph{rustc} does not have compilation phases at all.
-On the contrary, several stages of compilation are required
-to transform Rust source code into machine code that can be executed on a computer.
-These stages involve multiple intermediate representations of the program,
-each one optimized for a specific purpose.
-We will now briefly describe these stages.
-A more complete overview is found
-in the documentation\footnote{\url{https://rustc-dev-guide.rust-lang.org/overview.html}}.
+La existencia del sistema de consulta no implica que \emph{rustc} no tenga fases de compilación en
+absoluto. Al contrario, se requieren varias etapas de compilación para transformar el código
+fuente de Rust en código máquina que pueda ejecutarse en una computadora. Estas etapas implican
+múltiples representaciones intermedias del programa, cada una optimizada para un propósito
+específico. A continuación describiremos brevemente estas etapas. Encontrará una descripción
+más completa en la documentación\footnote{\url{https://rustc-dev-guide.rust-lang.org/overview.html}}.
 
-\subsubsection{Lexing and parsing}
+\subsubsection{Lexado y análisis sintáctico}
 
-First, the raw Rust source text is analyzed by a low-level lexer.
-At this stage, the source text is turned
-into a stream of atomic source code units known as tokens.
+En primer lugar, el texto fuente en bruto de Rust es analizado por un \emph{lexer} de bajo nivel.
+En esta etapa, el texto fuente se convierte en un flujo (\textit{stream}) de unidades atómicas de código fuente
+conocidas como tokens.
 
-Then parsing takes place.
-The stream of tokens is converted into an \acrshort{AST}.
-Interning of string values occurs here.
-Macro expansion, \acrshort{AST} validation,
-name resolution, and early linting also take place during this stage.
-The resulting intermediate representation from this step is thus the \acrshort{AST}.
+A continuación se realiza el análisis sintáctico (\textit{parsing}).
+El flujo de tokens se convierte en un \acrshort{AST}.
+Aquí se produce el interning de los valores de cadena. La expansión de macros, la validación del
+\acrshort{AST}, la resolución de nombres y el linting temprano también tienen lugar durante esta e t a p a .
+La representación intermedia resultante de esta etapa es, a fin de cuentas, el \acrshort{AST}.
 
 \subsubsection{HIR lowering}
 
-Next, the \acrshort{AST} is converted to \acrfull{HIR}.
-This process is known as ``lowering''.
-This representation looks like Rust code but with complex constructs desugared
-to simpler versions.
-For instance, all \texttt{while} and \texttt{for} loops are converted into simpler
-\texttt{loop} loops.
+Posteriormente, el \acrshort{AST} se convierte en \acrfull{HIR}. Este
+proceso se conoce como ``rebajar'' (\textit{lowering}).
+Esta representación se parece al código Rust pero con
+construcciones complejas convertidas en versiones más simples.
+Por ejemplo, todos los bucles \texttt{while} y \texttt{for} se convierten en
+versiones más simples con bucles \texttt{loop}.
 
-The \acrshort{HIR} is used to perform some important steps:
+La \acrshort{HIR} se utiliza para realizar algunos pasos importantes:
 
 \begin{enumerate}
-      \item \emph{type inference}: The automatic detection of a type
-            of an expression, e.g., when declaring variables with \texttt{let}.
-      \item \emph{trait solving}: Ensuring that each implementation block (\texttt{impl})
-            refers to a valid, existing trait.
-      \item \emph{type checking}: This process converts the types written by the user
-            into the internal representation used by the compiler.
-            It is, in other words, where types are interned.
-            Then, using this information, the type safety, correctness, and coherence are verified.
+      \item \emph{Inferencia de tipo (type inference)}: La detección automática del tipo de una expresión, por ejemplo, al
+            declarar variables con \texttt{let}.
+      \item \emph{Resolución de traits (trait solving)}: Garantizar que cada bloque de implementación (\texttt{impl}) hace
+            referencia a un trait válido y existente.
+      \item \emph{Comprobación de tipos (type checking)}: Este proceso convierte los tipos escritos por el usuario en la
+            representación interna utilizada por el compilador. Es, en otras palabras, donde se
+            internan los tipos. Después, utilizando esta información, se verifica la seguridad de tipos,
+            la correctitud y la coherencia.
 \end{enumerate}
 
 \subsubsection{MIR lowering}
 
-In this stage, the \acrshort{HIR} is lowered to \acrfull{MIR},
-which is used for \emph{borrow checking}.
-As part of the process, the \acrfull{THIR} is constructed,
-which is a representation that is easier to convert to \acrshort{MIR} than the \acrshort{HIR}.
+En esta etapa, la \acrshort{HIR} se rebaja a \acrfull{MIR}, que se
+utiliza para el \emph{borrow checking}. Como parte del proceso, se construye la
+\acrfull{THIR}, que es una representación más
+fácil de convertir a \acrshort{MIR} que la \acrshort{HIR}.
 
-The \acrshort{THIR} is an even more desugared version of \acrshort{HIR}.
-It is used for pattern and exhaustiveness matching.
-It is similar to the \acrshort{HIR}, but with all types and method calls made explicit.
-Furthermore, implicit dereferences are included where needed.
+La \acrshort{THIR} es una versión aún más ``desugarizada'' (\emph{desugared}) del \acrshort{HIR}.
+Se utiliza para el \textit{pattern matching} y el \textit{exhaustiveness matching}.
+Es similar a la \acrshort{HIR} pero con todos los tipos y llamadas a métodos explícitos.
+Además se incluyen desreferencias implícitas cuando es necesario.
 
-Many optimizations are performed on the \acrshort{MIR}
-as it is still a very generic representation.
-Optimizations are in some cases easier
-to perform on the \acrshort{MIR} than on the subsequent LLVM \acrshort{IR}.
+Muchas optimizaciones se realizan sobre la \acrshort{MIR}
+puesto que sigue siendo una representación muy genérica.
+Las optimizaciones son en algunos casos más fáciles de realizar sobre la \acrshort{MIR} que
+sobre la posterior \acrshort{IR} de LLVM.
 
-\subsubsection{Code generation}
+\subsubsection{Generación de código}
 
-This is the last stage when producing a binary.
-It includes the call to LLVM for code generation
-and the corresponding optimizations.
-To this effect, the \acrshort{MIR} is converted to LLVM \acrshort{IR}.
+Esta es la última etapa en la producción de un binario. Incluye la llamada a LLVM para la
+generación de código y las optimizaciones correspondientes.
+Para ello, la \acrshort{MIR} se convierte en LLVM \acrshort{IR}.
 
-LLVM \acrshort{IR} is the standard form of input for the LLVM compiler
-that all compilers using LLVM, such as the \emph{clang} C compiler, utilize.
-It is a type of assembly language that is well-annotated
-and designed to be easy for other compilers to produce.
-Additionally, it is designed to be rich enough to enable LLVM
-to perform several optimizations on it.
+LLVM \acrshort{IR} es la forma estándar de entrada para el compilador LLVM que utilizan todos los
+compiladores que utilizan LLVM, como el compilador de C \emph{clang}. Es un tipo de lenguaje
+ensamblador bien anotado y diseñado para que otros compiladores puedan producirlo
+fácilmente. Además, está diseñado para ser lo suficientemente rico como para permitir a
+LLVM realizar varias optimizaciones sobre él.
 
-LLVM transforms the LLVM \acrshort{IR} to machine code
-and applies many more optimizations.
-Finally, the object files with assembly code in them may be
-linked together to form the binary.
+LLVM transforma el LLVM \acrshort{IR} a código máquina y aplica muchas más optimizaciones. Por
+último, los archivos objeto que contienen código ensamblador pueden enlazarse (\emph{linking})
+entre sí para formar el binario.
 
 \subsection{Rust nightly}
 \label{sec:rust-nightly}
 
-Understanding the release model of Rust is indispensable
-for the successful implementation of the tool proposed in this work.
-The reason is that to use the crates of \emph{rustc} as a dependency in our project,
-it must be compiled with the \emph{nightly} version.
+Comprender el modelo de lanzamiento de versiones de Rust es
+indispensable para implementar con éxito la herramienta propuesta en este trabajo.
+La razón es que para utilizar las crates de \emph{rustc} como
+dependencia en nuestro proyecto, debe compilarse con la versión \emph{nightly}.
 
-The nightly Rust compiler refers to a specific build of \emph{rustc}
-that is updated every night with the latest changes and improvements
-but also includes experimental or unstable features that are not yet part of the stable release.
-In Rust, the language and its standard library are versioned using a ``release train'' model,
-where there are three main release channels:
-stable, beta, and nightly\footnote{\url{https://forge.rust-lang.org/}}.
+El compilador nightly de Rust se refiere a una compilación específica de \emph{rustc} que se actualiza
+cada noche con los últimos cambios y mejoras pero que también incluye características
+experimentales o inestables que aún no forman parte de la versión estable. En Rust, el lenguaje
+y su biblioteca estándar se versionan utilizando un modelo de ``tren de versiones'' (\textit{release train}),
+en el que existen tres canales de versiones principales: estable, beta y nightly\footnote{\url{https://forge.rust-lang.org/}}.
 
-The stable release of the Rust compiler is
-the most widely used and recommended version for production use.
-It goes through a rigorous testing and stabilization process
-to ensure that it provides a stable and reliable experience for developers.
-The stable release only includes features and improvements
-that have been thoroughly reviewed, tested, and deemed stable enough for production use.
+La versión estable del compilador de Rust es la más utilizada y recomendada para su uso en
+producción. Pasa por un riguroso proceso de pruebas y estabilización para garantizar que
+proporciona una experiencia estable y fiable a los desarrolladores. La versión estable sólo
+incluye características y mejoras que han sido revisadas a fondo, testeadas y consideradas lo
+suficientemente estables para su uso en producción.
 
-On the other hand, the nightly Rust compiler is the most bleeding-edge version,
-where new features, bug fixes, and experimental changes are introduced on a daily basis.
-It is used by Rust language developers and contributors for testing and development purposes
-but it is not recommended for production use
-due to the potential instability and lack of long-term support.
+Por otro lado, el compilador nightly de Rust es la versión más \emph{bleeding-edge},
+en la que se introducen a diario nuevas características,
+correcciones de errores y cambios experimentales.
+Es utilizado por los desarrolladores y colaboradores del lenguaje Rust con fines de prueba y desarrollo, pero
+no se recomienda su uso en producción debido a la inestabilidad potencial y a la falta de
+soporte a largo plazo.
 
-Each feature exclusive to the nightly version is behind a so-called \emph{feature flag}.
-They may only be used when compiling with the nightly toolchain.
-Features flags may enable
+Cada característica exclusiva de la versión nightly está detrás de una \emph{feature flag}.
+Sólo pueden utilizarse al compilar con la \emph{toolchain} nightly. Las
+feature flags pueden habilitar
+
 
 \begin{itemize}
-      \item syntactic constructs that are not available on the stable version,
-      \item library functions exclusive to the nightly version,
-      \item support for specific hardware instructions of a given \acrshort{ISA} or platform,
-      \item additional compiler flags.
+      \item construcciones sintácticas que no están disponibles en la versión estable,
+      \item funciones de biblioteca exclusivas de la versión nocturna,
+      \item soporte para instrucciones de hardware específicas de un \acrshort{ISA} o plataforma determinados,
+      \item flags adicionales del compilador.
 \end{itemize}
 
-The full list of feature flags is found in \cite{unstable-book}
-and contains more than 500 entries in total.
-In a more concise manner, the Rust language used inside of \emph{rustc} is
-a superset of the stable Rust language used outside of it.
-These differences should be taken into account
-when working on the compiler or building software that directly depends on the compiler.
+La lista completa de banderas de características se encuentra en \cite{unstable-book} y
+contiene más de 500 entradas en total. De forma más concisa, el lenguaje Rust utilizado dentro
+de \emph{rustc} es un superconjunto del lenguaje Rust estable utilizado fuera de él.
+Estas diferencias deben tenerse en cuenta cuando se trabaje en el compilador
+o se construya software que dependa directamente del compilador.
