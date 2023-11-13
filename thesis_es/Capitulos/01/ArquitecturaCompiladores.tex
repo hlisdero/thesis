@@ -1,77 +1,71 @@
 \section{Arquitectura del compilador}
 \label{sec:compiler-architecture}
 
-Compilers are programs that transform source code
-written in one language into another language, usually machine code.
-A compiler takes in a program in one language, the \emph{source} language,
-and translates it into an equivalent program in another language,
-the \emph{target} language.
+Los compiladores son programas que transforman el código fuente escrito en un lenguaje en
+otro lenguaje, normalmente código máquina. Un compilador toma un programa en un lenguaje,
+el \emph{lenguaje fuente}, y lo traduce a un programa equivalente en otro lenguaje, el \emph{lenguaje de
+destino}.
 
-To achieve this, compilers typically have a series of phases or passes
-that are executed in sequence.
-The goal of these passes is to translate the high-level code
-into low-level code that the machine can execute.
-In each pass, the code is brought closer and closer to the final representation.
-These phases are nowadays well-defined and
-different compilers implement some form of them \cite[Chap. 1.2]{aho2014compilers}.
+Para lograrlo, los compiladores suelen tener una serie de fases o pases que se ejecutan en
+secuencia. El objetivo de estos pases es traducir el código de alto nivel en código de bajo nivel
+que la máquina pueda ejecutar. Tras cada pasada, el código se acerca cada vez más a la
+representación final. Estas fases están hoy en día bien definidas y diferentes compiladores las
+implementan en alguna forma u otra \cite[Chap. 1.2]{aho2014compilers}.
 
-The first pass of a typical compiler is the \textbf{lexical analysis} phase.
-In this phase, the source code is broken down into a stream of tokens,
-each of which represents a single piece of the code.
-The \emph{lexer} identifies keywords, identifiers, literals, and other tokens
-that form the building blocks of the source code.
+La primera pasada de un compilador típico es la fase de \textbf{análisis léxico (\textit{lexical analysis})}.
+En esta fase, el código fuente se descompone en un flujo de tokens, cada uno de los cuales representa una única pieza
+del código. El analizador léxico (\emph{lexer}) identifica palabras clave, identificadores, literales y otros
+tokens que forman los bloques de construcción del código fuente.
 
-The next pass is the \textbf{syntax analysis} phase, also known as the parser phase.
-In this phase, the tokens produced by the lexer are analyzed
-according to the rules of the programming language's grammar.
-The \emph{parser} constructs a parse tree or an \acrfull{AST}
-that represents the structure of the code.
+La siguiente pasada es la fase de \textbf{análisis sintáctico (\textit{syntax analysis})}, también conocida como fase del
+\textit{parser}. En esta fase, los tokens producidos por el \emph{lexer} se analizan según las
+reglas de la gramática del lenguaje de programación. El analizador sintáctico construye un
+\emph{parse tree} o un árbol sintáctico abstracto (\acrfull{AST}) que representa la estructura del
+código.
 
-The third pass is the \textbf{semantic analysis} phase,
-in which the compiler checks the code for semantic correctness,
-such as checking for type errors, undefined variables, and invalid operations.
-The \emph{semantic analyzer} builds a symbol table that contains information
-about the variables, functions, and other entities defined in the code.
+La tercera pasada es la fase de \textbf{análisis semántico (\textit{semantic analysis})}, en la que el compilador comprueba la
+correctitud semántica del código, como la comprobación de errores de tipo, variables no
+definidas y operaciones no válidas. El analizador semántico (\emph{semantic analyzer}) construye una tabla de símbolos
+que contiene información sobre las variables, funciones y otras entidades definidas en el
+código.
 
-The fourth pass is the \textbf{code generation} phase.
-The compiler takes the \acrshort{AST} and symbol table produced by the previous phases
-and generates low-level code that can be executed by the machine.
-The code generator typically generates code in assembly language or machine code.
-In other cases, it generates bytecode,
-as in Java or when using the Python \acrfull{JIT} compiler.
+La cuarta pasada es la fase de \textbf{generación de código (\textit{code generation})}. El compilador toma el \acrshort{AST} y la tabla de
+símbolos producidos por las fases anteriores y genera código de bajo nivel que puede ser
+ejecutado por la máquina. El generador de código suele generar código en lenguaje
+ensamblador o código máquina. En otros casos, genera bytecode, como en Java o cuando se
+utiliza el compilador \acrfull{JIT} de Python.
 
-Finally, there may be zero or more \textbf{code optimization} phases.
-These are from a theoretical point of view optional,
-but they are usually included by default in modern compilers.
-In this phase, the compiler analyzes the generated code
-and attempts to improve its efficiency by applying various optimization techniques.
-Some examples of optimizations include:
+Finalmente, puede haber cero o más fases de \textbf{optimización del código (\textit{code optimization})}.
+Estas son, desde un punto de vista teórico, opcionales, pero suelen incluirse por defecto en los compiladores
+modernos. En esta fase, el compilador analiza el código generado e intenta mejorar su
+eficiencia aplicando diversas técnicas de optimización. Algunos ejemplos de optimizaciones
+son:
 
 \begin{itemize}
-    \item constant folding \cite[Chap. 8.5.4]{aho2014compilers},
-    \item loop unrolling \cite[Chap. 10.5]{aho2014compilers},
-    \item register allocation \cite[Chap. 8.1.4]{aho2014compilers},
-    \item constant propagation \cite[Chap. 9]{aho2014compilers},
-    \item liveness analysis \cite[Chap. 9]{aho2014compilers},
-    \item and many more\ldots
+    \item plegado de constantes (\textit{constant folding}) \cite[Chap. 8.5.4]{aho2014compilers},
+    \item desenrollado de bucles (\textit{loop unrolling}) \cite[Chap. 10.5]{aho2014compilers},
+    \item asignación de registros (\textit{register allocation}) \cite[Chap. 8.1.4]{aho2014compilers},
+    \item propagación de constantes (\textit{constant propagation}) \cite[Chap. 9]{aho2014compilers},
+    \item análisis de vida útil (\textit{livenes analysis}) \cite[Chap. 9]{aho2014compilers},
+    \item y muchos más\ldots
 \end{itemize}
 
-\emph{Local} code optimizations concern improvements within a basic block,
-whereas \emph{global} code optimization is when improvements take into account
-what happens across basic blocks.
-In Rust, one example of global optimization is \acrfull{LTO} \cite{huss2020}.
+Las optimizaciones \emph{locales} de código se refieren a mejoras dentro de un bloque básico, mientras
+que la optimización \emph{global} de código es cuando las mejoras tienen en cuenta
+lo que ocurre más allá de un bloque básico.
+En Rust, un ejemplo de optimización global es la optimización
+del tiempo de enlace (\acrfull{LTO}) \cite{huss2020}.
 
-Fig. \ref{fig:compiler-phases} taken from \cite{aho2014compilers}
-summarizes the compiler phases described in this section.
+La Fig. \ref{fig:compiler-phases} tomada de \cite{aho2014compilers} visualiza intuitivamente
+las fases del compilador descritas en esta sección.
 
 \begin{figure}[!htb]
     \centering
     \includegraphics[scale=0.40]{compiler-phases.png}
-    \caption{Phases of a compiler.}
+    \caption{Fases de un compilador.}
     \label{fig:compiler-phases}
 \end{figure}
 
-In practice, phases might have unclear boundaries.
-They can overlap and some may be skipped entirely.
-In later sections, we will study the architecture of the Rust compiler \emph{rustc}
-and explain its general architecture.
+En la práctica, las fases pueden tener límites poco claros. Pueden solaparse y algunas pueden
+saltarse por completo. En secciones posteriores estudiaremos la arquitectura del compilador de
+Rust \emph{rustc} y explicaremos su arquitectura en términos generales.
