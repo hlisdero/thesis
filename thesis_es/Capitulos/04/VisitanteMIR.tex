@@ -1,43 +1,40 @@
 \section{MIR visitor}
 
-This section is dedicated to a pivotal component that serves as the backbone of the translator:
-the \acrshort{MIR} Visitor trait\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/visit/trait.Visitor.html}}.
-This trait facilitates straightforward navigation of the \acrshort{MIR} of the Rust source code.
-In other words, it acts as the glue that seamlessly binds the various components of the translator together.
+Esta sección está dedicada a un componente fundamental que sirve de columna vertebral del
+traductor: el trait \acrshort{MIR} Visitor\footnote{\url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/mir/visit/trait.Visitor.html}}.
+Este trait facilita la navegación por la \acrshort{MIR} del código
+fuente de Rust. En otras palabras, actúa como el pegamento que une a la perfección los
+distintos componentes del traductor.
 
-The \acrshort{MIR} Visitor trait plays a fundamental role in the translation process
-by providing a structured approach to traverse and analyze the \acrshort{MIR}.
-It offers a set of methods that can be implemented to perform specific actions
-at different points during the traversal.
-By employing this trait,
-the translator gains the ability to systematically explore the \acrshort{MIR}
-and extract the necessary information for generating the corresponding Petri net.
+El trait \acrshort{MIR} Visitor desempeña un papel fundamental en el proceso de traducción al
+proporcionar un enfoque estructurado para recorrer y analizar el \acrshort{MIR}. Ofrece un conjunto de
+métodos que pueden implementarse para realizar acciones específicas en distintos puntos
+durante el recorrido. Implementando este trait, el traductor adquiere la capacidad de explorar
+sistemáticamente el \acrshort{MIR} y extraer la información necesaria para generar la red de Petri
+correspondiente.
 
-The implemented methods within the \acrshort{MIR} Visitor trait serve
-as entry points for handling different elements encountered during the traversal.
-These methods allow for customized processing of specific \acrshort{MIR} constructs,
-e.g., basic blocks, statements, terminators, assignments, constants, etc.
-By defining appropriate behavior for each method,
-the translator can efficiently extract relevant data and
-make informed decisions based on the encountered \acrshort{MIR} elements.
+Los métodos implementados dentro del traot \texttt{MIRVisitor} sirven como puntos de entrada
+para manejar los diferentes elementos encontrados durante el recorrido. Estos métodos
+permiten el procesamiento personalizado de construcciones \acrshort{MIR} específicas, por ejemplo,
+bloques básicos, sentencias, terminadores, asignaciones, constantes, etc. Al definir el
+comportamiento adecuado para cada método, el traductor puede extraer eficazmente los datos
+relevantes y tomar decisiones correctas en función de los elementos \acrshort{MIR} encontrados.
 
-It was not required to implement all possible methods.
-If not defined, the methods in \acrshort{MIR} Visitor simply call
-the corresponding \Rustinline{super} method and continue the traversal.
-For instance, \Rustinline{visit_statement} calls
-\Rustinline{super_statement} if no custom implementation is present.
-In the case of the translator, the implemented methods are:
+No es necesario implementar todos los métodos posibles. Si no se definen, los métodos de
+\texttt{MIRVisitor} simplemente llaman al método \Rustinline{super} correspondiente y continúan el recorrido. Por
+ejemplo, \Rustinline{visit_statement} llama a \Rustinline{super_statement} si no existe una implementación
+personalizada. En el caso del traductor, los métodos implementados son:
 
 \begin{itemize}
-  \item \Rustinline{visit_basic_block_data} for keeping track of the basic block currently being translated.
-  \item \Rustinline{visit_assign} for keeping track of assignments of synchronization variables
-        (mutexes, mutex guards, join handles, and condition variables).
-  \item \Rustinline{visit_terminator} for processing the terminator statement of each basic block,
-        that is, connecting the basic blocks.
+  \item \Rustinline{visit_basic_block_data} para realizar un seguimiento del bloque básico que se está traduciendo en ese momento.
+  \item \Rustinline{visit_assign} para realizar un seguimiento de las asignaciones de variables de
+        sincronización (mutexes, mutex guards, join handles y condition variables)
+  \item \Rustinline{visit_terminator} para procesar la sentencia terminadora de cada bloque básico, es decir,
+        para conectar los bloques básicos.
 \end{itemize}
 
-To start visiting the MIR, the method \Rustinline{visit_body} must be used.
-Listing \ref{lst:mir-visit-body} shows the corresponding function in the translator.
+Para empezar a visitar el MIR, debe utilizarse el método \Rustinline{visit_body}.
+El Listado \ref{lst:mir-visit-body} muestra la función correspondiente en el traductor.
 
 \begin{listing}[!htb]
   \begin{minted}{Rust}
@@ -57,19 +54,18 @@ Listing \ref{lst:mir-visit-body} shows the corresponding function in the transla
         self.call_stack.pop();
     }    
   \end{minted}
-  \caption{The method in the \Rustinline{Translator} that starts the traversal of the \acrshort{MIR}.}
+  \caption{El método del \Rustinline{Translator} que inicia el recorrido del \acrshort{MIR}.}
   \label{lst:mir-visit-body}
 \end{listing}
 
-In conclusion, the \acrshort{MIR} Visitor trait simplifies remarkably the translation
-as it is not necessary to implement a traversal mechanism thanks to the provided
-compiler interfaces.
-This also makes the translator more robust and resistant to changes in \emph{rustc}.
-If the string representation of the \acrshort{MIR} changes, the translator is left unaffected.
-As long as the internal interfaces for accessing the \acrshort{MIR} stay the same,
-the translator can navigate the \acrshort{MIR} semantically and not based on how it is printed to the user.
+En conclusión, el trait \texttt{MIRVisitor} simplifica notablemente la traducción porque no es
+necesario implementar un mecanismo propio de recorrido gracias a las interfaces de compilador
+proporcionadas. Esto también hace que el traductor sea más robusto y resistente a los cambios
+en \emph{rustc}. Si la representación de cadenas de la \acrshort{MIR} cambia, el traductor no se ve afectado.
+Mientras las interfaces internas para acceder al \acrshort{MIR} sigan siendo las mismas, el traductor
+podrá recorrer el \acrshort{MIR} semánticamente y no en función de cómo se imprime al usuario.
 
-As a last remark, similar traits exist for other intermediate representations:
+Como última observación, existen traits similares para otras representaciones intermedias:
 
 \begin{itemize}
   \item \acrshort{AST}: \url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_ast/visit/trait.Visitor.html}
@@ -77,6 +73,6 @@ As a last remark, similar traits exist for other intermediate representations:
   \item \acrshort{THIR}: \url{https://doc.rust-lang.org/stable/nightly-rustc/rustc_middle/thir/visit/trait.Visitor.html}
 \end{itemize}
 
-Various components in the compiler implement these traits
-to navigate the intermediate representations.
-To put it roughly, they are analogous to iterators for collections.
+Varios componentes del compilador implementan estos traits para navegar por las repre-
+sentaciones intermedias. Por decirlo de forma aproximada, son análogos a los iteradores para
+colecciones.
