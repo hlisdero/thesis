@@ -1,22 +1,18 @@
-This chapter is dedicated to exploring
-the implementation details of the deadlock detection tool.
-Its purpose is to provide a high-level view of the code and the data structures.
-The most important implementation decisions made throughout the development process
-are examined as well.
+Este capítulo está dedicado a explorar los detalles de implementación de la herramienta de
+detección de deadlocks. Su propósito es proporcionar una visión de alto nivel del código y las
+estructuras de datos. También se examinan las decisiones de implementación más
+importantes tomadas a lo largo del proceso de desarrollo.
 
-In the subsequent sections,
-we will describe the central components of the deadlock detection tool,
-including the internal representation of the call stack, the function memory model,
-and the translation of every constituent of a \acrshort{MIR} function.
+En las secciones sucesivas, describiremos los componentes centrales de la herramienta de
+detección de deadlocks, incluida la representación interna de la pila de llamadas, el
+modelo de memoria de funciones y la traducción de cada componente de una función \acrshort{MIR}.
 
-Later on, a significant portion of the discussion is devoted to explaining
-the support of multithreading and the modeling of synchronization primitives as Petri nets.
-Its implementation required careful design considerations
-to ensure correctness and efficiency.
+Más adelante, una parte importante de la discusión se dedica a explicar el soporte del multihilo
+y el modelado de las primitivas de sincronización como redes de Petri. Su implementación
+requirió cuidadosas consideraciones de diseño para garantizar la correctitud y la eficiencia.
 
-The tool currently supports the following structures
-from the Rust standard library to synchronize access to shared resources
-and provide communication among threads:
+La herramienta soporta actualmente las siguientes estructuras de la biblioteca estándar de Rust
+para sincronizar el acceso a los recursos compartidos y proporcionar comunicación entre hilos:
 
 \begin{itemize}
   \item mutexes (\Rustinline{std::sync::Mutex}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Mutex.html}}),
@@ -24,9 +20,9 @@ and provide communication among threads:
   \item atomic reference counters (\Rustinline{std::sync::Arc}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Arc.html}}).
 \end{itemize}
 
-While the main details are covered, this chapter is not intended
-to serve as a substitute for the code documentation.
-The code documentation in the form of comments, unit tests, and integration tests
-provides comprehensive information on the low-level specifics and usage of the tool.
-As stated before, the repository is publicly available on
+Aunque se cubren los detalles principales, este capítulo no pretende sustituir a la
+documentación en el código. La documentación del código en forma de comentarios, pruebas
+unitarias y pruebas de integración proporciona información exhaustiva sobre los detalles de
+bajo nivel y el uso de la herramienta. Como ya se ha indicado, el repositorio está disponible
+públicamente en
 GitHub\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock}}\footnote{\url{https://github.com/hlisdero/netcrab}}.
