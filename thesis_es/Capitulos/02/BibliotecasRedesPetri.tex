@@ -1,45 +1,43 @@
-\section{Petri nets libraries in Rust}
+\section{Bibliotecas de redes de Petri en Rust}
 
-As part of the development of the translation of the source code to a Petri net,
-it is necessary to use a Petri net library for the Rust programming language.
-A quick search of the packages available on
-\emph{crates.io}\footnote{\url{https://crates.io/}}, GitHub, and GitLab
-revealed that there is, unfortunately, no well-maintained library.
+Como parte del desarrollo de la traducción del código fuente a una red de Petri, es necesario
+utilizar una biblioteca de redes de Petri para el lenguaje de programación Rust. Una búsqueda
+rápida de los paquetes disponibles en \emph{crates.io}\footnote{\url{https://crates.io/}},
+GitHub y GitLab reveló que, por desgracia, no existe ninguna biblioteca bien mantenida.
 
-Some Petri net simulators were found such as:
-
-\begin{itemize}
-    \item pns\footnote{\url{https://gitlab.com/porky11/pns}}:
-          Programmed in C. It does not offer the option
-          to export the resulting network to a standard format.
-    \item PetriSim\footnote{\url{https://staff.um.edu.mt/jskl1/petrisim/index.html}}:
-          An old DOS/PC simulator programmed in Bordland Pascal.
-    \item WOLFGANG\footnote{\url{https://github.com/iig-uni-freiburg/WOLFGANG}}:
-          A Petri net editor in Java, maintained by the Department of Computer Science
-          at the University of Freiburg, Germany.
-\end{itemize}
-
-Regrettably, none of them meet the requirements of the task.
-
-Since a Petri net is a graph, the possibility
-of using a graph library and modifying it to suit the objectives of this work was considered.
-Two graph libraries were found in Rust:
+Se encontraron algunos simuladores de redes de Petri como:
 
 \begin{itemize}
-    \item petgraph\footnote{\url{https://docs.rs/petgraph/latest/petgraph/}}:
-          The most widely used library for graphs in \textit{crates.io}.
-          It offers an option to export to the DOT format.
-    \item gamma\footnote{\url{https://github.com/metamolecular/gamma}}:
-          Unstable and unchanged since 2021. It does not offer the ability to export the graph.
+      \item pns\footnote{\url{https://gitlab.com/porky11/pns}}:
+            Programado en C. No ofrece la opción de exportar la red resultante a un formato
+            estándar.
+      \item PetriSim\footnote{\url{https://staff.um.edu.mt/jskl1/petrisim/index.html}}:
+            Un antiguo simulador DOS/PC programado en Bordland Pascal.
+      \item WOLFGANG\footnote{\url{https://github.com/iig-uni-freiburg/WOLFGANG}}:
+            Un editor de redes de Petri en Java, mantenido por el Departamento de
+            Informática de la Universidad de Friburgo, Alemania.
 \end{itemize}
 
-None of the possibilities satisfies the requirement
-to export the resulting network to the \acrshort{PNML} format.
-In addition, if a graph library is used,
-the operations of a Petri net should be implemented as a \emph{wrapper} around a graph,
-which reduces the possibility of optimizations for our use case
-and hinders the long-term extensibility of the project.
+Desafortunadamente ninguno de ellos cumple los requisitos de la tarea.
 
-In conclusion, it is imperative
-to implement a Petri net library in Rust from scratch as a separate project.
-This contributes one more tool to the community that could be reused in the future.
+Considerando que una red de Petri es un grafo, se evaluó la posibilidad de utilizar una biblioteca de
+grafos y modificarla para adaptarla a los objetivos de este trabajo. Se encontraron dos
+bibliotecas de grafos en Rust:
+
+\begin{itemize}
+      \item petgraph\footnote{\url{https://docs.rs/petgraph/latest/petgraph/}}:
+            La biblioteca más utilizada para gráficos en \textit{crates.io}. Ofrece una opción para
+            exportar al formato DOT.
+      \item gamma\footnote{\url{https://github.com/metamolecular/gamma}}:
+            Inestable y sin cambios desde 2021. No ofrece la posibilidad de exportar el gráfico.
+\end{itemize}
+
+Ninguna de las posibilidades satisface el requisito de exportar la red resultante al formato
+\acrshort{PNML}. Además, si se utiliza una biblioteca de grafos, las operaciones de una red de Petri
+deben implementarse como un \emph{wrapper} alrededor de un grafo, lo que reduce la posibilidad
+de optimizaciones para nuestro caso de uso y dificulta la extensibilidad a largo plazo del
+proyecto.
+
+En conclusión, es imperativo implementar una biblioteca de redes de Petri en Rust desde cero
+como un proyecto independiente. Esto aporta una herramienta más a la comunidad que podría
+reutilizarse en el futuro.
