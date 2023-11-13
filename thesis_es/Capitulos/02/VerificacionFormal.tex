@@ -1,45 +1,41 @@
-\section{Formal verification of Rust code}
+\section{Verificación formal de código Rust}
 
-There are numerous automatic verification tools available for Rust code.
-A recommended first approximation to the topic is
-the survey produced by Alastair Reid, a researcher at Intel.
-It explicitly lists that most formal verification tools
-do not support concurrency \cite{reid2021}.
+Existen numerosas herramientas de verificación automática disponibles para el código Rust.
+Una primera aproximación recomendable al tema es la encuesta elaborada por Alastair Reid,
+investigador de Intel. En ella se enumera explícitamente que la mayoría de las herramientas de
+verificación formal no soportan la concurrencia \cite{reid2021}.
 
-The \emph{Miri}\footnote{\url{https://github.com/rust-lang/miri}} interpreter
-developed by the Rust project on GitHub is an experimental interpreter
-for the intermediate representation of the Rust language
-(Mid-level Intermediate Representation, commonly known as ``\acrshort{MIR}'')
-that allows executing standard cargo project binaries
-in a granularized way, instruction by instruction,
-to check for the absence of \acrfull{UB}
-and other errors in memory handling.
-It detects memory leaks, unaligned memory accesses, data races,
-and precondition or invariant violations in code marked as \texttt{unsafe}.
+El intérprete \emph{Miri}\footnote{\url{https://github.com/rust-lang/miri}}
+desarrollado por el proyecto Rust en GitHub es un intérprete experimental
+para la representación intermedia del lenguaje Rust (``Mid-level Intermediate Representation'',
+comúnmente conocida como ``\acrshort{MIR}'') que permite ejecutar binarios estándar de proyectos de
+\emph{cargo} en una forma granularizada, instrucción por instrucción, para comprobar la ausencia de
+Comportamientos Indefinidos (\acrfull{UB}) y otros errores en el manejo de la memoria. Detecta fugas
+de memoria, accesos a memoria no alineados, carreras de datos y violaciones de
+precondiciones o invariantes en el código marcado como inseguro (\texttt{unsafe}).
 
-\cite{toman2015crust} introduces a formal checker for Rust
-that does not require modifications to the source code.
-It was tested on past versions of modules from the Rust standard library.
-As a result, errors were detected in the use of memory in unsafe Rust code
-which in reality took months to be discovered manually by the development team.
-This exemplifies the importance of using automatic verification tools
-to complement manual code reviews.
+\cite{toman2015crust} presenta un verificador formal para Rust que no requiere modificaciones en el
+código fuente. Se probó en versiones anteriores de módulos de la biblioteca estándar de Rust. Como
+resultado se detectaron errores en el uso de la memoria en código Rust \texttt{unsafe} que,
+en circunstancias reales, el equipo de desarrollo tardó meses en descubrir manualmente.
+Esto ejemplifica la importancia de utilizar herramientas
+de verificación automática para complementar las revisiones manuales del código (\textit{code reviews}).
 
-\cite{kani2023} is another well-known tool for the formal verification of Rust code
-aimed at checking the \texttt{unsafe} blocks on a bit level.
-It offers a proof harness analogous to the test harness provided by Rust.
-Additionally, a plugin for cargo and VS Code is available.
+\cite{kani2023} es otra herramienta popular para la verificación formal de código Rust
+destinada a comprobar los bloques inseguros (\texttt{unsafe}) a nivel de bits.
+Ofrece un framework de pruebas análogo al framework de pruebas proporcionado por Rust.
+Además, dispone de un plugin para \emph{cargo} y VS Code.
 
-As the documentation in the repository explains\footnote{\url{https://github.com/model-checking/kani}}, Kani verifies (among others):
+Como explica la documentación del repositorio\footnote{\url{https://github.com/model-checking/kani}}, Kani verifica (entre otros):
 
 \begin{itemize}
-  \item Memory safety, e.g., null pointer dereferences
-  \item User-specified assertions, i.e., \Rustinline{assert!(...)}
-  \item The absence of panics, e.g., \Rustinline{unwrap()} on \Rustinline{None} values
-  \item The absence of some types of unexpected behavior, e.g., arithmetic overflows
+  \item Uso seguro de la memoria, por ejemplo, desreferencias de punteros nulos (\textit{Memory safety, e.g., null pointer dereferences})
+  \item Aserciones especificadas por el usuario (\textit{User-specified assertions, i.e., \Rustinline{assert!(...)}})
+  \item La ausencia de panics, por ejemplo, \Rustinline{unwrap()} en valores \Rustinline{None}
+  \item La ausencia de algunos tipos de comportamiento inesperado, por ejemplo, desbordamientos aritméticos (\textit{arithmetic overflows})
 \end{itemize}
 
-However, concurrent programs are currently out of scope\footnote{\url{https://model-checking.github.io/kani/rust-feature-support.html}}.
-The bottom line is that Kani offers an easy-to-use \acrshort{CLI} and a proof harness
-that seamlessly integrate with the development process.
-It serves as an illustration of the capabilities of model checking in modern software development.
+Sin embargo, los programas concurrentes están actualmente fuera de alcance\footnote{\url{https://model-checking.github.io/kani/rust-feature-support.html}}.
+La conclusión es que Kani ofrece una \acrshort{CLI} fácil de usar y un framework de pruebas que se integran perfectamente en
+el proceso de desarrollo. Sirve como ilustración de las capacidades de la comprobación de
+modelos en el desarrollo de software moderno.
