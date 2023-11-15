@@ -8,7 +8,7 @@ modelo \acrshort{PN} que capture el comportamiento de los hilos en el código Ru
 
 \subsection{Vida útil del hilo en Rust}
 
-La vida (\textit{lifetime}) de un hilo comienza cuando se inicia invocando la función
+La vida (\textit{lifetime}) de un hilo comienza cuando se invoca la función
 \Rustinline{std::thread::spawn}\footnote{\url{https://doc.rust-lang.org/std/thread/fn.spawn.html}}.
 Esta recibe como argumento una closure o función, que representa el
 código que el nuevo hilo ejecutará concurrentemente con los demás hilos del programa. El
