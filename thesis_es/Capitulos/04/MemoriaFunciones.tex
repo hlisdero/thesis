@@ -1,43 +1,39 @@
-\section{Function memory}
+\section{Memoria de las funciones}
 
-We will now proceed to explore the memory characteristics
-of the \acrshort{MIR} function in detail.
-It is important to acknowledge that
-the need to record values being assigned between memory locations in the \acrshort{MIR} arises
-from the requirements of the deadlock and missed signals detection.
-In simpler teams, we are forced to model the memory only
-because the supported synchronization variables need to be tracked
-during the translation process.
+A continuación procederemos a explorar en detalle las características de memoria de la función
+\acrshort{MIR}. Es importante reconocer que la necesidad de registrar los valores que se asignan entre
+lugares de memoria en la \acrshort{MIR} surge de los requisitos de la detección de bloqueos y
+señales perdidas. En términos más sencillos, nos vemos obligados a modelar la memoria
+únicamente porque es necesario realizar un seguimiento de las variables de sincronización
+soportadas por el proceso de traducción.
 
-The translator must track variables of the following types:
+El traductor debe realizar un seguimiento de las variables de los siguientes tipos:
 
 \begin{itemize}
   \item Mutexes (\Rustinline{std::sync::Mutex}).
   \item Mutex guards (\Rustinline{std::sync::MutexGuard}).
   \item Join handles (\Rustinline{std::thread::JoinHandle}).
   \item Condition variables (\Rustinline{std::sync::Condvar}).
-  \item Aggregates, i.e., wrappers such as \Rustinline{std::sync::Arc} or
-        types that contain multiple values like tuples or a structured type (\Rustinline{struct}).
+  \item Agregados (\emph{Aggregates}), es decir, contenedores/wrappers como \Rustinline{std::sync::Arc} o tipos que contienen varios
+        valores como tuplas o un tipo estructurado (\Rustinline{struct}).
 \end{itemize}
 
-Before calling methods on these types of synchronization variables,
-immutable or mutable references to the original memory location are created.
-The translator must somehow know
-which specific synchronization variable is behind a given reference.
-Knowing the type of the memory location is \emph{not} enough,
-the \emph{value} must be readily available to the translator
-to operate on the Petri net model of the specific synchronization variable.
+Antes de llamar a los métodos de estos tipos de variables de sincronización, se crean
+referencias inmutables o mutables a la ubicación de memoria original. El traductor debe saber
+de algún modo qué variable de sincronización específica está detrás de una referencia
+determinada. Conocer el tipo de la ubicación de memoria \emph{no} es suficiente, el \emph{valor} debe ser
+fácilmente accesible para que el traductor modifique el modelo de red de Petri de la variable de
+sincronización específica.
 
-\subsection{A guided example to introduce the challenges}
+\subsection{Un ejemplo guiado para introducir los desafíos}
 
-To illustrate the situation described previously, consider the Rust program
-shown in Listing \ref{lst:double-lock-deadlock}.
-It is again one of the example programs found in the repository.
-As it should be evident to the reader, this program deadlocks when executed.
-The reason is that the \Rustinline{std::sync::Mutex::lock} method is
-being called twice on the same mutex.
-To detect this deadlock, the translator must be able to at the very least
-identify that the invocation of \Rustinline{lock} takes place on the same mutex.
+Para ilustrar la situación descrita anteriormente, considere el programa Rust mostrado en el
+Listado \ref{lst:double-lock-deadlock}. Se trata de nuevo de uno de los programas de ejemplo que se encuentran en el
+repositorio. Como debería ser evidente para el lector, este programa se bloquea cuando se
+ejecuta.
+La razón es que la función \Rustinline{std::sync::Mutex::lock} está siendo invocada dos veces sobre el mismo mutex.
+Para detectar este deadlock, el traductor debe ser capaz, como mínimo, de identificar que la invocación de \Rustinline{lock}
+tiene lugar sobre el mismo mutex.
 
 \begin{listing}[!htb]
   \begin{minted}{Rust}
@@ -47,24 +43,19 @@ identify that the invocation of \Rustinline{lock} takes place on the same mutex.
       let _d2 = data.lock(); // cannot lock, since d1 is still active
     }
   \end{minted}
-  \caption{A deadlock caused by calling \Rustinline{lock} twice on the same mutex.}
+  \caption{Un deadlock causado por llamar a lock dos veces sobre el mismo mutex.}
   \label{lst:double-lock-deadlock}
 \end{listing}
 
-Observe now an excerpt of the \acrshort{MIR}
-of the same erroneous program in Listing \ref{lst:double-lock-deadlock-mir}.
-The comments have been removed for clarity.
-In BB0 the mutex is created through a call to \Rustinline{std::sync::Mutex::new}.
-The new mutex is the return value of the function.
-It is assigned to the local variable \Rustinline{_1}.
-Then the execution continues in BB1.
-Focus on the first statement of BB1:
-An immutable reference to the local variable \Rustinline{_1} is stored in \Rustinline{_3}.
-Next, the reference is moved to the function \Rustinline{std::sync::Mutex::lock}.
-This reference is consumed by lock, that is to say,
-the local variable \Rustinline{_3} is not used anywhere else in the \acrshort{MIR}
-because, from that point on, the ownership of the reference is transferred
-to the \Rustinline{std::sync::Mutex::lock} function.
+Observe ahora un extracto de la \acrshort{MIR} del mismo programa erróneo en el Listado \ref{lst:double-lock-deadlock-mir}.
+Se han eliminado los comentarios para mayor claridad. En BB0 el mutex se crea mediante una llamada
+a \Rustinline{std::sync::Mutex::new}. El nuevo mutex es el valor de retorno de la función. Se asigna a la
+variable local \Rustinline{_1}. A continuación, la ejecución continúa en BB1. Concéntrese en la primera
+sentencia de BB1: Una referencia inmutable a la variable local \Rustinline{_1} se almacena en \Rustinline{_3}. A
+continuación, la referencia se traslada a la función \Rustinline{std::sync::Mutex::lock}. Esta referencia es
+consumida por \emph{lock}, es decir, la variable local \Rustinline{_3} no se utiliza en ningún otro lugar de la \acrshort{MIR}
+porque, a partir de ese momento, la propiedad de la referencia se transfiere a la función
+\Rustinline{std::sync::Mutex::lock}.
 
 \begin{listing}[!htb]
   \begin{minted}{Rust}
@@ -99,78 +90,66 @@ to the \Rustinline{std::sync::Mutex::lock} function.
           _4 = Mutex::<i32>::lock(move _5) -> [return: bb3, unwind: bb6];
       }
   \end{minted}
-  \caption{An except of the MIR of the program from Listing \ref{lst:double-lock-deadlock}.}
+  \caption{Un extracto de la MIR del programa del Listado \ref{lst:double-lock-deadlock}.}
   \label{lst:double-lock-deadlock-mir}
 \end{listing}
 
-Immediately after the statement, the translator encounters the terminator of BB1.
-It contains a call to \Rustinline{std::sync::Mutex::lock}.
-How would the translator know, when translating this call,
-that \Rustinline{_3} is indeed the mutex stored in \Rustinline{_1}?
-This is the problem that the modeling of the function's memory aims to solve.
+Inmediatamente después de la sentencia, el traductor se encuentra con el terminator de BB1.
+Contiene una llamada a \Rustinline{std::sync::Mutex::lock}. ¿Cómo sabría el traductor, al traducir esta
+llamada, que \Rustinline{_3} es efectivamente el mutex almacenado en \Rustinline{_1}? Este es el problema que
+pretende resolver el modelado de la memoria de la función.
 
-The problem goes even further.
-The local variable \Rustinline{_2} contains a mutex guard after the call to lock,
-which should be recorded too.
-Notice how BB2 repeats the same operations as BB1 but uses different local variables,
-\Rustinline{_5} and \Rustinline{_4}.
-The translator should know that \Rustinline{_5} is an alias for \Rustinline{_1} as well.
-Furthermore, the mutex guards in \Rustinline{_2} and \Rustinline{_4} will eventually be dropped,
-which indirectly unlocks the mutex.
-There has to be a link from the mutex guard in \Rustinline{_2} and \Rustinline{_4}
-to the mutex in \Rustinline{_1}.
-More concisely, the translator should monitor which mutex is behind each mutex guard.
+El problema va aún más lejos. La variable local \Rustinline{_2} contiene un mutex guard después de la
+llamada a lock, que también debería registrarse. Observe cómo BB2 repite las mismas
+operaciones que BB1 pero utiliza variables locales diferentes, \Rustinline{_5} y \Rustinline{_4}. El traductor debería
+saber que \Rustinline{_5} es también un alias de \Rustinline{_1}. Además, las guardas del mutex en \Rustinline{_2} y \Rustinline{_4} serán
+eventualmente eliminados, lo que indirectamente desbloquea el mutex. Tiene que haber un
+enlace desde la guarda de mutex en \Rustinline{_2} y \Rustinline{_4} al mutex en
+\Rustinline{_1}. Más concisamente, el traductor debe supervisar qué mutex está detrás de cada guarda de mutex.
 
-To make matters more complex, each \acrshort{MIR} function has its own stack memory,
-with its separate local variables \Rustinline{_0}, \Rustinline{_1},
-\Rustinline{_2}, \Rustinline{_3}, and so on.
-Thus, the mapping of memory locations to synchronization variables
-cannot be a single global structure.
-It is instead dependent on the context of the current function being translated.
-Lastly, a synchronization variable could migrate from one function to another
-and the translator must be able to re-map them correctly.
+Para complejizar más las cosas, cada función MIR tiene su propia memoria de pila, con sus
+variables locales separadas \Rustinline{_0}, \Rustinline{_1},
+\Rustinline{_2}, \Rustinline{_3}, etcétera. Por lo tanto, la asignación de ubicaciones de
+memoria a variables de sincronización no puede ser una única estructura global. En su lugar,
+depende del contexto de la función actual que se esté traduciendo. Por último, una variable de
+sincronización puede migrar de una función a otra y el traductor debe ser capaz de reasignarlas
+correctamente.
 
-This suffices as a brief practical example of the challenges of memory modeling.
-We can now introduce the solution that has been implemented.
+Esto basta como breve ejemplo práctico de los retos que plantea el modelado de la memoria.
+Ahora podemos presentar la solución que se ha aplicado.
 
-\subsection{A mapping of \texttt{rustc\_middle::mir::Place} to shared counted references}
+\subsection{Una asignación de \texttt{rustc\_middle::mir::Place} a un contador de referencias compartido}
 
-The implementation is suitably named
+La implementación se denomina adecuadamente
 \Rustinline{Memory}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_function/memory.rs}}.
-As anticipated in the previous section,
-there is one instance of \Rustinline{Memory} per \Rustinline{MirFunction}.
-The memory is tightly connected to the context of the \acrshort{MIR} function.
+Como se anticipó en la sección anterior,
+La memoria está estrechamente conectada
+al contexto de la función \acrshort{MIR}.
 
-Rather than moving values between different memory locations,
-as observed in the \acrshort{MIR},
-our solution relies on the simpler concept of ``linking''.
-This entails associating a specific \Rustinline{rustc_middle::mir::Place}
-with the corresponding value.
-This association is not removed when moving the variable to a different function.
-It also does not differentiate a shallow copy of the value
-from taking a reference or a mutable reference.
-To put it shortly, it is an all-encompassing mapping between places and values.
+En lugar de mover valores entre distintas ubicaciones de memoria, como se observa en la \acrshort{MIR},
+nuestra solución se basa en el concepto más sencillo de ``vinculación'' o ``enlazado''. Esto implica asociar un
+\Rustinline{rustc_middle::mir::Place} específico con el valor correspondiente. Esta asociación no se elimina
+al trasladar la variable a una función diferente. Tampoco diferencia una copia superficial del
+valor de tomar una referencia o una referencia mutable. En pocas palabras, se trata de un
+mapeo global entre lugares y valores.
 
-To accommodate the possibility of linking the same value to multiple places,
-particularly when multiple memory locations hold an immutable reference to the value,
-it becomes necessary for the stored value to be a reference to the synchronization variable.
-To clarify, this introduces a second level of indirection.
-In order to facilitate the required cloning operations,
-we have opted to utilize \Rustinline{std::rc::Rc},
-which is a smart pointer provided by the Rust standard library.
-The ownership of the referenced value (the synchronization variable) is shared
-and every time that the value is cloned, an internal counter is incremented.
-When the count reaches zero, the value is freed \cite[Chap. 15.4]{rust-book}.
+Para dar cabida a la posibilidad de vincular el mismo valor a varios lugares, en particular
+cuando varias posiciones de memoria mantienen una referencia inmutable al valor, se hace
+necesario que el valor almacenado sea una referencia a la variable de sincronización. Para
+aclararlo, esto introduce un segundo nivel de indirección. Para facilitar las operaciones de
+clonación necesarias, hemos optado por utilizar \Rustinline{std::rc::Rc}, que es un puntero inteligente
+proporcionado por la biblioteca estándar de Rust. La propiedad del valor referenciado (la
+variable de sincronización) es compartida y cada vez que se clona el valor, se incrementa un
+contador interno. Cuando el contador llega a cero, el valor se libera \cite[Chap. 15.4]{rust-book}.
 
-The \Rustinline{Memory} utilizes a \Rustinline{std::collections::HashMap} data structure
-that establishes a mapping between \Rustinline{rustc_middle::mir::Place} instances and
-an enum with 5 variants corresponding to
-the 5 types mentioned previously that the translator tracks.
-4 of these 5 variants enclose a \Rustinline{std::rc::Rc}
-reference to the synchronization variable.
-The aggregate case instead contains a vector of \Rustinline{Value}.
-This renders possible nesting aggregate values inside of each other,
-which is a critical requirement for supporting more complex programs with nested \Rustinline{structs}.
+La \Rustinline{Memory} hace uso de una estructura de datos \Rustinline{std::collections::HashMap} 
+que establece un mapeo entre instancias de \Rustinline{rustc_middle::mir::Place}
+y un enum con 5 variantes correspondientes a
+los 5 tipos mencionados anteriormente que el traductor rastrea. 4 de estas 5 variantes
+encierran una referencia \Rustinline{std::rc::Rc} a la variable de sincronización. El caso de los agregados
+contiene en cambio un vector de \Rustinline{Value}. Esto hace posible anidar valores agregados unos dentro de
+otros, lo que es un requisito crítico para soportar programas más complejos con \Rustinline{structs}
+anidados.
 
 \begin{listing}[!htb]
   \begin{minted}{Rust}
@@ -206,44 +185,39 @@ which is a critical requirement for supporting more complex programs with nested
     /// A thread reference is just a shared pointer to the thread.
     pub type ThreadRef = std::rc::Rc<Thread>;
   \end{minted}
-  \caption{A summary of the type definitions of the \Rustinline{Memory} implementation.}
+  \caption{Resumen de las definiciones de tipos de la implementación de \Rustinline{Memory}.}
   \label{lst:memory-implementation}
 \end{listing}
 
-Using a hash map allows for efficient retrieval
-and management of the associated values during the translation process.
-The \Rustinline{Memory} also takes care of providing typedefs for the different
-references to synchronization variables.
-Listing \ref{lst:memory-implementation} depicts an excerpt of the source file
-with the essential type definitions used in the implementation.
-Improvements to the current implementation are discussed in Sec. \ref{sec:future-work-memory-model}.
+El uso de un hash map permite recuperar y gestionar eficazmente los valores asociados
+durante el proceso de traducción. La \Rustinline{Memory} también se encarga de proporcionar los typedefs
+para las diferentes referencias a las variables de sincronización.
+El Listado \ref{lst:memory-implementation} muestra un
+pedazo del código fuente con las definiciones de tipos esenciales utilizadas en la
+implementación. Las mejoras a la implementación actual se discuten en la Sec. \ref{sec:future-work-memory-model}.
 
-\subsection{Intercepting assigments}
+\subsection{Interceptando asignaciones}
 \label{sec:intercepting-assignments}
 
-The missing piece in the puzzle of the memory model is
-where to link the memory locations exactly.
-There are three separate places in the code in which this takes place.
+La pieza que falta en el rompecabezas del modelo de memoria es dónde enlazar exactamente las
+posiciones de memoria. Hay tres lugares distintos en el código en los que esto tiene lugar.
 
-On the one hand, the translator functions responsible for processing the methods
-of mutexes, condition variables, and threads create new synchronization variables
-that are linked to the return value of the corresponding method.
-This is where the lifetime of each synchronization variable starts.
-The specifics are expanded upon
-in Sec. \ref{sec:mutex-algorithms} and \ref{sec:condvar-algorithms}.
+Por un lado, las funciones traductoras encargadas de procesar los métodos de los mutexes, las
+variables de condición y los hilos crean nuevas variables de sincronización que se vinculan al
+valor de retorno del método correspondiente. Aquí comienza la vida útil de cada variable de
+sincronización. Los detalles específicos se amplían en las Sec. \ref{sec:mutex-algorithms} y \ref{sec:condvar-algorithms}
 
-On the other hand, the synchronization variable may be assigned in any other \acrshort{BB}.
-For this reason, the translator incorporates a custom implementation of the method
-\Rustinline{visit_assign} to intercept every assignment in the \acrshort{MIR}.
-Listing \ref{lst:visit-assign} shows precisely
-that all cases of copying, moving, or referencing the \acrfull{RHS}
-are handled by the same mechanism:
-The \acrfull{LHS} is linked to the \acrfull{RHS}
-if the type of the variable is a supported synchronization variable.
-The listing also shows how the compiler uses nested enums to model its data.
-Inside the variants of a right-hand side value (\Rustinline{rustc_middle::mir::Rvalue}),
-one can find operands (\Rustinline{rustc_middle::mir::Operand}).
-These operands also appear when passing function arguments.
+Por otro lado, la variable de sincronización puede asignarse en cualquier otro \acrshort{BB}. Por esta
+razón, el traductor incorpora una implementación personalizada del método \Rustinline{visit_assign}
+para interceptar cada asignación en la \acrshort{MIR}.
+El Listado \ref{lst:visit-assign} muestra con precisión que todos
+los casos de copia, desplazamiento o referencia al lado derecho (\acrfull{RHS}) se gestionan
+mediante el mismo mecanismo:
+El lado izquierdo (\acrfull{LHS}) está vinculado al lado derecho (\acrfull{RHS}) si el tipo de la variable es una
+variable de sincronización admitida. El listado también muestra cómo el compilador utiliza
+enums anidados para modelar sus datos. Dentro de las variantes de un valor del lado derecho
+(\Rustinline{rustc_middle::mir::Rvalue}), se pueden encontrar operandos (\Rustinline{rustc_middle::mir::Operand}).
+Estos operandos también aparecen al pasar argumentos de función.
 
 \begin{listing}[!htb]
   \begin{minted}{Rust}
@@ -278,31 +252,26 @@ These operands also appear when passing function arguments.
         self.super_assign(place, rvalue, location);
     }
   \end{minted}
-  \caption{The custom implementation of \Rustinline{visit_assign} to track synchronization variables.}
+  \caption{La implementación personalizada de \Rustinline{visit_assign} para rastrear variables de sincronización.}
   \label{lst:visit-assign}
 \end{listing}
 
-The most peculiar case is the aggregate assignment.
-It materializes from assignments in Rust source code
-that create tuples, closures, or \Rustinline{structs}.
-It necessitates special handling as the value to be linked in memory must be assembled
-from the constituents of the aggregated value that are a synchronization variable.
-This implies that the \Rustinline{Memory} solely retains the portion of the aggregated value
-formed by the synchronization variables.
+El caso más peculiar es la asignación agregada. Se materializa a partir de asignaciones en el
+código fuente de Rust que crean tuplas, closures o \Rustinline{structs}. Requiere un manejo especial ya
+que el valor a enlazar en la memoria debe ensamblarse a partir de los constituyentes del valor agregado que
+son una variable de sincronización. Esto implica que la \Rustinline{Memory} sólo conserva la parte del valor
+agregado formada por las variables de sincronización.
 
-Tracking the assignments of synchronization variables
-at the moment they are returned from functions is another crucial mechanism.
-Fortunately, this can be accomplished by implementing a consistent check on all functions,
-regardless of whether they are modeled using
-the simple model (Fig. \ref{fig:simplest-function})
-or the function with cleanup model (Fig. \ref{fig:function-with-cleanup}).
-As a benefit, this uniform design readily supports \Rustinline{std::arc::Arc}
-without requiring any additional effort.
+El seguimiento de las asignaciones de las variables de sincronización en el momento en que
+son devueltas por las funciones es otro mecanismo crucial. Afortunadamente, esto puede
+lograrse implementando una comprobación uniforme en todas las funciones,
+independientemente de si se modelan utilizando el modelo simple (Fig. \ref{fig:simplest-function}) o el modelo de
+función con limpieza (Fig. \ref{fig:function-with-cleanup}). Como ventaja, esta comprobación uniforme
+soporta fácilmente \Rustinline{std::arc::Arc} sin necesidad de ningún esfuerzo adicional.
 
-In every instance, the handling of assignments has no impact on the Petri net.
-No places or transitions are added when intercepting assignments.
+En todos los casos, el manejo de las asignaciones no tiene ningún impacto en la red de Petri.
+No se añaden lugares ni transiciones al interceptar las asignaciones.
 
-Finally, some memory locations are passed to a new thread when
-calling \Rustinline{std::thread::spawn}
-and mapped again to the memory of the thread's function.
-The next section will demonstrate the method used to accomplish this.
+Por último, algunas posiciones de memoria se pasan a un nuevo hilo al llamar a
+\Rustinline{std::thread::spawn} y se mapean de nuevo a la memoria de la función del hilo. La siguiente
+sección demostrará el método utilizado para lograr esto.
