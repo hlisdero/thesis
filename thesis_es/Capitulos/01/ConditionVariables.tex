@@ -65,7 +65,7 @@ Para ilustrar el concepto de señal perdida, veremos un ejemplo. Supongamos que 
 dos hilos, T1 y T2, y una variable entera compartida llamada \texttt{flag}. T1 establece \texttt{flag} en \texttt{true}
 y envía una señal a una variable de condición \texttt{cv} para despertar a T2 que está esperando en
 cv para saber cuándo se ha marcado \texttt{flag}. T2 espera en \texttt{cv} hasta que recibe una señal de
-T1. El listado \ref{lst:missed-signal-example} muestra el pseudocódigo correspondiente.
+T1. El Listado \ref{lst:missed-signal-example} muestra el pseudocódigo correspondiente.
 
 \begin{listing}[!htb]
       \begin{minted}{C++}

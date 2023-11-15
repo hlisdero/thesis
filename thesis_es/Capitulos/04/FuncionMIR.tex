@@ -111,7 +111,7 @@ y su traducción influye directamente en las conexiones entre los bloques básic
 terminadores que no están implementados no están presentes cuando se consulta el
 \Rustinline{optimized_mir}, es decir, sólo se utilizan en pasadas previas del compilador.
 
-La implementación del MIR Visitor\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_visitor.rs}}
+La implementación de la MIR Visitor\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/mir_visitor.rs}}
 incluye el método \Rustinline{visit_terminator} como se ha visto
 antes. Aquí es donde se crean las aristas que conectan un \acrshort{BB} con otro.
 En los párrafos siguientes se discuten los detalles de alto nivel de cada handler.

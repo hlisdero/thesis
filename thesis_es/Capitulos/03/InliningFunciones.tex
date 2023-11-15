@@ -56,7 +56,7 @@ función.
 \end{figure}
 
 Observe ahora una función de este tipo en el contexto de un programa Rust.
-El listado \ref{lst:repeated-function-call} ofrece un ejemplo sencillo
+El Listado \ref{lst:repeated-function-call} ofrece un ejemplo sencillo
 en el que una función es llamada cinco veces consecutivas en un bucle \Rustinline{for}.
 Una posible \acrshort{PN} que modele el programa se encuentra en la Fig. \ref{fig:repeated-function-call}.
 Cabe destacar que esta red y las siguientes de esta sección \emph{no} son el resultado de una traducción de la MIR.
@@ -80,7 +80,7 @@ lugares en el código.
 \begin{figure}[!htb]
     \centering
     \includesvg[width=0.7\linewidth]{repeated-function-call.svg}
-    \caption{Una posible red de Petri para el código del listado \ref{lst:repeated-function-call}
+    \caption{Una posible red de Petri para el código del Listado \ref{lst:repeated-function-call}
         aplicando el modelo de la Fig. \ref{fig:simplest-function}.}
     \label{fig:repeated-function-call}
 \end{figure}
@@ -90,7 +90,7 @@ lugares en el código.
 El escenario problemático no ha surgido hasta ahora. Sólo se manifiesta cuando se llama a una
 función en al menos dos lugares distintos del código o, en términos más sencillos, cuando la
 expresión \Rustinline{simple_function()} aparece dos veces o más.
-El listado \ref{lst:two-simple-function-calls} satisface esta condición y
+El Listado \ref{lst:two-simple-function-calls} satisface esta condición y
 está diseñado para mostrar el comportamiento extráneo descrito al principio de la sección.
 
 \begin{listing}[!htb]
@@ -117,7 +117,7 @@ modelo de función para ambas llamadas. Esto se muestra en la Fig. \ref{fig:two-
 \begin{figure}[!htbp]
     \centering
     \includesvg[width=0.88\linewidth]{two-function-calls-incorrect-1.svg}
-    \caption{Una primera red de Petri (incorrecta) para el código del listado \ref{lst:two-simple-function-calls}.}
+    \caption{Una primera red de Petri (incorrecta) para el código del Listado \ref{lst:two-simple-function-calls}.}
     \label{fig:two-function-calls-incorrect-1}
 \end{figure}
 

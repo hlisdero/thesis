@@ -74,7 +74,7 @@ y la estructura de grafos subyacente.
 \end{longlisting}
 
 Considere el código de ejemplo que aparece en el Listado \ref{lst:rust-code-example},
-el \acrshort{MIR}\footnote{Los comentarios del MIR se han modificado ligeramente para mejorar el resultado}
+el \acrshort{MIR}\footnote{Los comentarios de la MIR se han modificado ligeramente para mejorar el resultado}
 correspondiente se muestra en el Listado \ref{lst:mir-output-debug-example}.
 Observe la advertencia explícita en la parte superior de la salida generada. Se omitirá en los
 listados posteriores por simplicidad.
@@ -86,13 +86,13 @@ Además, la salida depende de los siguientes factores:
           \emph{debug build}, mientras que \texttt{cargo build --release} produce un \emph{release build}.
 \end{itemize}
 
-Para ilustrar esta variabilidad, el listado \ref{lst:mir-output-release-example}
+Para ilustrar esta variabilidad, el Listado \ref{lst:mir-output-release-example}
 muestra la salida al compilar el mismo programa en modo \emph{release}.
 La característica distintiva que se encuentra en las compilaciones \emph{release} es la
 presencia de las sentencias \Rustinline{StorageLive} y \Rustinline{StorageDead}.
 Por otro lado, las compilaciones de depuración (\emph{debug}) generan \acrshort{MIR} más cortos y claros
 que se acercan más a lo que escribió el usuario.
-Por esta razón, a menos que se indique lo contrario, los listados de este trabajo contienen \acrshort{MIR}
+Por esta razón, a menos que se indique lo contrario, los Listados de este trabajo contienen \acrshort{MIR}
 generados en \emph{debug builds}.
 
 \begin{longlisting}
@@ -190,12 +190,12 @@ se han añadido anotaciones adicionales como en \texttt{CALL:} o \texttt{DROP:}.
 \begin{figure}[!htb]
     \centering
     \includesvg[width=0.55\linewidth]{mir-cfg-example.svg}
-    \caption{Representación gráfica del flujo de control de la MIR mostrada en el listado \ref{lst:mir-output-debug-example}.}
+    \caption{Representación gráfica del flujo de control de la MIR mostrada en el Listado \ref{lst:mir-output-debug-example}.}
     \label{fig:mir-cfg-example}
 \end{figure}
 
 Debe tenerse en cuenta que la llamada a la función \Rustinline{std::env::args().len()}
-en la línea 2 del listado \ref{lst:rust-code-example} puede retornar con éxito o fallar.
+en la línea 2 del Listado \ref{lst:rust-code-example} puede retornar con éxito o fallar.
 Un fallo desencadena un desenrollado de la pila (\emph{stack unwinding}),
 finalizando el programa e informando de un error.
 Esto está representado por la bifurcación al final de BB1, donde la
@@ -288,7 +288,7 @@ construcciones de nivel superior que se encuentran a menudo al programar en Rust
     \item La función retorna.
           El valor de retorno (local \Rustinline{_0}) es de tipo ``unit''\footnote{\url{https://doc.rust-lang.org/std/primitive.unit.html}}
           que es similar a una función \texttt{void} en C, es decir, no devuelve nada.
-          Así es como se definió \Rustinline{main()} en el listado \ref{lst:rust-code-example}.
+          Así es como se definió \Rustinline{main()} en el Listado \ref{lst:rust-code-example}.
 \end{itemize}
 
 \subsubsection{BB4}
