@@ -1,122 +1,108 @@
-\section{Multithreading}
+\section{Multihilo}
 
-Multithreading support is a prerequisite for deadlock and missed signal detection.
-In order to support real-world programs
-where deadlocks or missed signals are possible in the first place,
-it becomes essential to support having several threads that share resources.
-First, the basics will be presented to later devise a \acrshort{PN} model that captures
-the behavior of threads in Rust code.
+El soporte multihilo es un requisito previo para la detección de puntos muertos y señales
+perdidas. Para soportar programas del mundo real en los que los bloqueos o las señales
+perdidas son posibles en primer lugar, resulta esencial soportar la existencia de varios hilos que
+compartan recursos. En primer lugar, se presentarán los fundamentos para después idear un
+modelo \acrshort{PN} que capture el comportamiento de los hilos en el código Rust.
 
-\subsection{Thread lifetime in Rust}
+\subsection{Vida útil del hilo en Rust}
 
-The lifetime of a thread begins when it is started by invoking the
-\Rustinline{std::thread::spawn}\footnote{\url{https://doc.rust-lang.org/std/thread/fn.spawn.html}}
-function.
-It receives a closure or function as an argument,
-representing the code that the new thread will execute concurrently
-with the other threads of the program.
-The spawned thread may start running immediately after it is spawned
-but there is no guarantee that it will do so.
+La vida (\textit{lifetime}) de un hilo comienza cuando se inicia invocando la función
+\Rustinline{std::thread::spawn}\footnote{\url{https://doc.rust-lang.org/std/thread/fn.spawn.html}}.
+Esta recibe como argumento una closure o función, que representa el
+código que el nuevo hilo ejecutará concurrentemente con los demás hilos del programa. El
+nuevo hilo puede empezar a ejecutarse inmediatamente después de ser \emph{spawned},
+pero no hay garantía de que lo haga.
 
-Contrary to other programming languages like C, C++, or Java,
-Rust does not have the notion of a thread variable
-initialized previously to the start of the thread.
-Instead, the function \Rustinline{std::thread::spawn} returns
-a \Rustinline{std::thread::JoinHandle},
-which is, as the name suggests, a handle to call \Rustinline{join}
-at the end of the thread's lifetime.
+A diferencia de otros lenguajes de programación como C, C++ o Java, en Rust no existe la
+no- ción de una variable de hilo inicializada previamente al inicio del hilo. En su lugar, la
+función \Rustinline{std::thread::spawn} devuelve un \Rustinline{std::thread::JoinHandle}, que es, como su nombre
+indica, un handle para llamar a \Rustinline{join} al final de la vida del hilo.
 
-During its existence, a thread can independently execute its designated code
-and perform various operations concurrently with other threads.
-It can access shared resources and communicate with other threads
-through synchronization mechanisms like
-mutexes, condition variables, channels, or atomic operations.
-This enables concurrent processing and parallelism in Rust programs.
+Durante su existencia, un hilo puede ejecutar de forma independiente su código designado y
+realizar diversas operaciones concurrentemente con otros hilos. Puede acceder a recursos
+compartidos y comunicarse con otros hilos a través de mecanismos de sincronización como
+mutexes, variables de condición, canales u operaciones atómicas. Esto permite el
+procesamiento concurrente y el paralelismo en los programas Rust.
 
-To ensure proper coordination between threads,
-Rust provides a mechanism to join threads.
-The \Rustinline{std::thread::JoinHandle::join}\footnote{\url{https://doc.rust-lang.org/std/thread/struct.JoinHandle.html\#method.join}} method
-allows the main thread or another thread
-to wait for the completion of a different thread.
-By calling join on a join handle,
-the calling thread blocks until the spawned thread finishes its execution.
-Once a thread completes its execution and is joined by another thread,
-its lifetime ends, and the corresponding system resources are released.
-Otherwise, threads that were not joined correctly may potentially leak resources.
+Para garantizar una coordinación adecuada entre hilos, Rust proporciona un mecanismo
+para unir hilos.
+El método \Rustinline{std::thread::JoinHandle::join}\footnote{\url{https://doc.rust-lang.org/std/thread/struct.JoinHandle.html\#method.join}}
+permite al hilo principal o a otro hilo
+esperar hasta la finalización de otro hilo. Al llamar a join sobre un join handle, el hilo
+llamante se bloquea hasta que el hilo iniciado previamente finaliza su ejecución. Una vez que un hilo
+finaliza su ejecución y es unido por otro hilo, finaliza su vida útil y se liberan los recursos
+correspondientes del sistema. De lo contrario, los hilos que no se unieron correctamente
+pueden potencialmente perder recursos.
 
-If the join handle is dropped, the thread may no longer be joined and it implicitly becomes \emph{detached}.
-A detached thread refers to a thread without a valid join handle.
-It will continue its execution independently until it completes or the program terminates.
-They are useful in scenarios where the spawning thread
-does not need to wait for the thread to complete its task.
-For example, in long-running background tasks or
-when the main thread terminates independently of the detached thread's progress.
-However, it's important to stress that
-the execution of detached threads may continue \emph{even} after the main thread exited.
+Si se libera el join handle, el hilo ya no puede unirse y se convierte implícitamente en
+\emph{desacoplado} (\emph{detached}).
+Un hilo \emph{detached} se refiere a un hilo sin un join handle válido.
+Continuará su ejecución de forma independiente hasta que finalice o el programa termine.
+Son útiles en escenarios en los que el hilo generador no necesita esperar a que este complete su tarea.
+Por ejemplo, en tareas en segundo plano de larga duración o cuando el hilo principal termina
+independientemente del progreso del hilo desprendido. Sin embargo, es importante destacar
+que la ejecución de los hilos desvinculados puede continuar \emph{incluso} después de que el hilo
+principal haya terminado.
 
-\subsection{Petri net model for a thread}
+\subsection{Modelo de red de Petri para un hilo}
 
-To incorporate additional threads into the \acrshort{PN} model,
-a distinct subnet is appended to the main net to represent each thread.
-This subnet encapsulates the execution path of the newly spawned thread
-and operates as an isolated context.
-It establishes precise interfaces that connect back to the main net.
-The closure provided to the \Rustinline{spawn} function, being a MIR function,
-can invoke other functions that in turn require translation.
-Therefore, processing a thread's function follows
-a similar approach to the usual translation logic.
+Para incorporar hilos adicionales al modelo \acrshort{PN}, se añade una subred distinta a la red principal
+para representar cada hilo. Esta subred encapsula la ruta de ejecución del nuevo hilo generado y
+funciona como un contexto aislado. Establece interfaces precisas que conectan de nuevo con la
+red principal. La \emph{closure} proporcionada a la función \Rustinline{spawn}, al ser una función MIR, puede
+invocar otras funciones que a su vez requieren traducción. Por lo tanto, el procesamiento de la
+función de un hilo sigue un enfoque similar al de la lógica de traducción habitual.
 
-The concurrency aspect of the execution of the new thread is modeled by the generation
-of a new token at the transition that represents the call to \Rustinline{spawn}.
-This token can be interpreted, in the same manner as the token in \Rustinline{PROGRAM_START},
-as the instruction counter of the new thread.
-Essentially, the spawn operation constitutes a ``fork'' in the token flow:
-One token enters the transition and two tokens exit from it.
-The first proceeds along the main thread's path to execute the subsequent statement,
-while the second is directed to the first \acrshort{BB} of the function passed to the thread.
+El aspecto de concurrencia de la ejecución del nuevo hilo se modela mediante la generación de
+un nuevo token en la transición que representa la llamada a \Rustinline{spawn}. Este token puede
+interpretarse, del mismo modo que el token en \Rustinline{PROGRAM_START}, como el contador de
+instrucciones del nuevo hilo. Esencialmente, la operación spawn constituye una ``bifurcación''
+en el flujo de tokens: Un token entra en la transición y dos tokens salen de ella. El primero
+avanza por el camino del hilo principal para ejecutar la sentencia posterior, mientras que el
+segundo se dirige al primer \acrshort{BB} de la función pasada al hilo
 
-Each thread identified in the source code possesses designated start and end places
-labeled \Rustinline{THREAD_<index>_START} and \Rustinline{THREAD_<index>_END}, respectively.
-The index is mandatory to preserve the label uniqueness property across the entire program.
-It should be emphasized that
-this mimics the basic places for the program detailed in Sec. \ref{sec:basic-places}.
+Cada hilo identificado en el código fuente posee unos lugares designados de inicio y fin
+etiquetados como \Rustinline{THREAD_<index>_START} y \Rustinline{THREAD_<index>_END}, respectivamente. El índice
+es obligatorio para prever la propiedad de unicidad de la etiqueta en todo el programa. Cabe
+destacar que esto sigue el patrón de los lugares básicos del programa detallados en la Sec. \ref{sec:basic-places}.
 
-Threads lack a separate panic place
-as invoking \Rustinline{panic!} inside a thread
-only terminates that specific thread's execution.
-We are not interested in differentiating between thread end states;
-the main requirement is to determine whether a thread has finished or not.
-A single end place for both cases suffices here.
+Los hilos carecen de un lugar de pánico separado, ya que invocar \Rustinline{panic!} dentro de un hilo sólo
+termina la ejecución de ese hilo específico. No nos interesa diferenciar entre los estados finales
+de los hilos; el requisito principal es determinar si un hilo ha terminado o no. Aquí basta con un
+único lugar de finalización para ambos casos.
 
-The joining behavior serves as the inverse operation of the spawn.
-The transition corresponding to the \Rustinline{join} call consumes two tokens
-but generates only one token.
-As a result, the waiting condition is modeled straightforwardly:
-The main thread can continue, i.e, the \Rustinline{join} transition can fire,
-if and only if the thread to be joined has finished execution,
-reaching its respective \Rustinline{THREAD_END} place.
+El comportamiento de unión sirve como operación inversa de la generación. La transición
+correspondiente a la llamada \Rustinline{join} consume dos tokens pero genera sólo un token.
+Como resultado, la condición de espera se modela de forma directa:
+El hilo principal puede continuar, o sea, la
+transición \Rustinline{join} puede dispararse, si y sólo si el hilo a unir ha finalizado la ejecución, alcanzando
+su respectivo lugar \Rustinline{THREAD_END}.
 
-To recapitulate, the thread is translated to a separate subnet
-that interfaces with the main net only at three places:
+
+Recapitulando, el hilo se traslada a una subred separada que interactúa con la red principal
+sólo en tres lugares:
 
 \begin{itemize}
-      \item The \Rustinline{spawn} transition where the thread starts.
-      \item The (optional) \Rustinline{join} transition where the join handle is utilized.
-      \item The connections due to synchronization variables,
-            analyzed later in the dedicated sections of this chapter.
+      \item La transición de \Rustinline{spawn} donde comienza el hilo.
+      \item La transición de \Rustinline{join} (opcional) en la que se utiliza el join handle.
+      \item Las conexiones debidas a variables de sincronización, analizadas más adelante en las
+            secciones dedicadas de este capítulo.
 \end{itemize}
 
-\subsection{A practical example}
+\subsection{Un ejemplo práctico}
 
-Observe Listing \ref{lst:multithreading-example}
-and its corresponding \acrshort{PN} model in Fig. \ref{fig:multithreading-example}.
-This is one of the test programs found in the repository.
-Note the ``fork'' at the spawn transition described in the previous subsection.
-The left branch is the thread, while the right branch is the main thread.
-It is clear that the paths split at the \Rustinline{spawn} and merge
-at the \Rustinline{join}.
-Notice also that there is no separate panic place for the thread,
-indicating that a failure in one thread does not impact the other threads.
+Observe el Listado \ref{lst:multithreading-example}
+y su correspondiente modelo de red de Petri en la Fig. \ref{fig:multithreading-example}.
+Se trata de uno de los programas de prueba que se encuentran en el repositorio.
+Observe la ``bifurcación'' en la
+transición de spawn descrita en la subsección previa.
+La rama izquierda es el nuevo hilo,
+mientras que la rama derecha es el hilo principal.
+Está claro que las rutas se dividen en el \Rustinline{spawn}
+y se fusionan en el \Rustinline{join}. Observe también que no hay un lugar de pánico separado para el hilo,
+lo que indica que un fallo en un hilo no afecta a los demás hilos.
 
 \begin{listing}[!htb]
       \begin{minted}{Rust}
@@ -128,82 +114,79 @@ indicating that a failure in one thread does not impact the other threads.
         let _res = thread_join_handle.join();
       }  
       \end{minted}
-      \caption{A basic program with two threads to demonstrate multithreading support.}
+      \caption{Un programa básico con dos hilos para demostrar el soporte multihilo.}
       \label{lst:multithreading-example}
 \end{listing}
 
 \begin{figure}[!htbp]
       \centering
       \includesvg[width=0.5\linewidth]{multithreading-example.svg}
-      \caption{The Petri net model for the program in Listing \ref{lst:multithreading-example}.}
+      \caption{El modelo de red de Petri para el programa del Listado \ref{lst:multithreading-example}.}
       \label{fig:multithreading-example}
 \end{figure}
 
-\subsection{Algorithms for thread translation}
+\subsection{Algoritmos para la traducción de hilos}
 
-To close this section, we will briefly describe the algorithms used for translating threads.
-Initially, it is worth mentioning that since the translation is carried out by a single thread
-(the tool does not support multiple threads translating the source code),
-a decision has to be made concerning when to translate spawned threads:
+Para terminar esta sección, describiremos brevemente los algoritmos utilizados para traducir los
+hilos. Inicialmente, cabe mencionar que, dado que la traducción la realiza un único hilo (la
+herramienta no admite múltiples hilos traduciendo el código fuente), hay que tomar una
+decisión sobre cuándo traducir los hilos generados:
 
 \begin{itemize}
-      \item Immediate translation: Translate the thread as soon as it is encountered.
-            The translator ``switches'' to the spawned thread.
-      \item Delayed translation: Store all the relevant information about the new thread
-            and translate it after the main thread.
+      \item Traducción inmediata: Traduce el hilo en cuanto lo encuentra. El traductor ``cambia'' al
+            hilo generado.
+      \item Traducción diferida: Almacena toda la información relevante sobre el nuevo hilo y lo
+            traduce después del hilo principal.
 \end{itemize}
 
-The current solution takes the latter approach.
+La solución actual adopta este último enfoque.
 
-When a call to \Rustinline{std::thread::spawn} is encountered:
-
-\begin{enumerate}
-      \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
-      \item Retrieve the first argument passed to the function:
-            An aggregate value that holds the variables captured by the closure
-            and the function to be executed by the thread.
-      \item Extract the ID of the function to be executed by the thread.
-      \item Extract the values captured by the closure.
-      \item Create a new \Rustinline{Thread}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/thread.rs}}
-            to store the information required for the delayed translation.
-      \item Link the return value of \Rustinline{std::thread::spawn},
-            the new join handle, to the \Rustinline{Thread}.
-      \item Push the thread to a queue of detected threads in the \Rustinline{Translator}.
-\end{enumerate}
-
-When a call to \Rustinline{std::thread::JoinHandle::join} is encountered:
+Cuando se encuentra una llamada a \Rustinline{std::thread::spawn}:
 
 \begin{enumerate}
-      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
-            Ignore the cleanup place since we must force the \acrshort{PN}
-            to ``wait'' for the thread to exit.
-            This is equivalent to assuming that the \Rustinline{join} function never fails.
-      \item Retrieve the first argument passed to the function: The join handle.
-            The memory location is linked to the corresponding thread
-            thanks to the assignment interception explained in Sec. \ref{sec:intercepting-assignments}.
-      \item Set the join transition of the underlying \Rustinline{Thread} behind the join handle.
+      \item Traducir la llamada a la función utilizando el modelo visto en la Fig. \ref{fig:function-with-cleanup}.
+      \item Recuperar el primer argumento pasado a la función: Un valor agregado que contiene las
+            variables capturadas por la clausura y la función que ejecutará el hilo.
+      \item Extraer el ID de la función que debe ejecutar el hilo.
+      \item Extraer los valores capturados por la clausura.
+      \item Crear un nuevo \Rustinline{Thread}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/thread.rs}}
+            para almacenar la información necesaria para la traducción retardada.
+      \item Vincular el valor de retorno de \Rustinline{std::thread::spawn},
+            el nuevo join handle, al \Rustinline{Thread}.
+      \item Agregar el hilo a una cola de hilos detectados en el \Rustinline{Translator}.
 \end{enumerate}
 
-When the main thread finishes translating, that is,
-when the \Rustinline{main} function has already been processed,
-the \Rustinline{Translator} enters a loop
-to translate the threads discovered so far in order.
+Cuando se encuentra una llamada a \Rustinline{std::thread::JoinHandle::join}:
 
 \begin{enumerate}
-      \item Create a new start and end place for the thread.
-      \item Connect the spawn transition to the start place.
-      \item If a join transition was found, connect the end place to it.
-      \item Replace the place \Rustinline{PROGRAM_PANIC} with the place \Rustinline{THREAD_<index>_END}
-            to translate terminators like \Rustinline{Unwind} correctly (Sec. \ref{sec:terminators}).
-      \item Push the thread function to the call stack.
-      \item Move the synchronization variables to the memory of the thread function, i.e.,
-            map the aggregate value and its fields to the memory of the thread function.
-      \item Translate the top of the call stack.
+      \item Traducir la llamada a la función utilizando el modelo visto en la Fig. \ref{fig:simplest-function}.
+            Ignorar el lugar de limpieza ya que debemos obligar a la \acrshort{PN} a ``esperar'' a que el hilo salga. Esto
+            equivale a suponer que la función \Rustinline{join} nunca falla.
+      \item Recuperar el primer argumento pasado a la función: El join handle. La posición de
+            memoria está vinculada al hilo correspondiente gracias a la interceptación de
+            asignaciones explicada en la Sec. \ref{sec:intercepting-assignments}.
+      \item Establecer la transición de join del \Rustinline{Thread} referenciado por el join handle.
 \end{enumerate}
 
-As anticipated before, the algorithm exhibits resemblances
-to the overall procedure for function calls outlined in Sec. \ref{sec:function-calls}.
-Lastly, the implementation is capable of handling programs
-where threads spawn their own threads in a nested manner.
-The threads are simply added to the queue and as the loop advances,
-the nested threads are translated too.
+Cuando el hilo principal termina de traducir, es decir, cuando la función \Rustinline{main} ya ha
+sido procesada, el \Rustinline{Translator} entra en un bucle para traducir los hilos descubiertos hasta el
+momento en orden.
+
+\begin{enumerate}
+      \item Crear un nuevo lugar de inicio y final para el hilo.
+      \item Conectar la transición de spawn al lugar de inicio.
+      \item Si se ha encontrado una transición de join, conectar el lugar final a ella.
+      \item Sustituir el lugar \Rustinline{PROGRAM_PANIC} por el lugar \Rustinline{THREAD_<index>_END} para traducir
+            correctamente las sentencias terminadoras como \Rustinline{Unwind} (Sec. \ref{sec:terminators}).
+      \item Agregar la función del hilo a la pila de llamadas.
+      \item Mover las variables de sincronización a la memoria de la función del hilo, es decir, asigne
+            el agregado (tuple, \Rustinline{struct}, etc.) y sus campos a la memoria de la función del hilo.
+      \item Traducir el elemento superior de la pila de llamadas.
+\end{enumerate}
+
+Como se anticipó antes, el algoritmo muestra semejanzas con el procedimiento general para las
+llamadas a funciones esbozado en la Sec. \ref{sec:function-calls}.
+Por último, la implementación es capaz de manejar programas
+en los que los hilos engendran sus propios hilos de forma anidada.
+Los hilos simplemente se añaden a la cola y, a medida que avanza el bucle,
+los hilos anidados también se trasladan.

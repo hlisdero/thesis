@@ -142,7 +142,7 @@ proporcionado por la biblioteca estándar de Rust. La propiedad del valor refere
 variable de sincronización) es compartida y cada vez que se clona el valor, se incrementa un
 contador interno. Cuando el contador llega a cero, el valor se libera \cite[Chap. 15.4]{rust-book}.
 
-La \Rustinline{Memory} hace uso de una estructura de datos \Rustinline{std::collections::HashMap} 
+La \Rustinline{Memory} hace uso de una estructura de datos \Rustinline{std::collections::HashMap}
 que establece un mapeo entre instancias de \Rustinline{rustc_middle::mir::Place}
 y un enum con 5 variantes correspondientes a
 los 5 tipos mencionados anteriormente que el traductor rastrea. 4 de estas 5 variantes
