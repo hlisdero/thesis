@@ -1,51 +1,52 @@
-\section{Unit tests}
+\section{Pruebas unitarias}
 
-The unit tests form the base of the test suite.
-The \acrshort{PN} library and the data structures
-used in the translator rely on them extensively.
-By testing the underlying data structures meticulously,
-potential issues can be identified and resolved early in the development cycle
-before continuing work on the higher-level components of the translator.
+Las pruebas unitarias constituyen la base del conjunto de pruebas. La biblioteca de \acrshort{PN} y las
+estructuras de datos utilizadas en el traductor dependen en gran medida de ellas. Al probar
+meticulosamente las estructuras de datos subyacentes, se pueden identificar y resolver posibles
+problemas en una fase temprana del ciclo de desarrollo, antes de seguir trabajando en los
+componentes de nivel superior del traductor.
 
-\subsection{Petri net library}
 
-The \acrshort{PN} library \Rustinline{netcrab} uses unit tests to verify that
-adding places, transitions, and arcs to a net behaves as expected.
-The translator performs these operations often so it is important to verify them.
-The iterators on which the export formats are built are tested as well.
+\subsection{Biblioteca de redes de Petri}
 
-On the other hand, each one of the three export formats
-(DOT, \acrshort{PNML} and \acrshort{LoLA}) comes with unit tests
-to check that the output is generated correctly for the following simple cases:
+La biblioteca de \acrshort{PN} \Rustinline{netcrab} utiliza pruebas unitarias para verificar que
+la adición de lugares, transiciones y arcos a una red se comporta como se espera.
+El traductor realiza estas operaciones con frecuencia, por lo que es importante verificarlas.
+Asimismo se comprueban los iteradores sobre los que se construyen los formatos de exportación.
+
+Por otra parte, cada uno de los tres formatos de exportación (DOT, \acrshort{PNML} and \acrshort{LoLA})
+está acompañado por pruebas unitarias para comprobar que la salida es generada correctamente para los siguientes
+casos sencillos:
 
 \begin{itemize}
-  \item Empty net.
-  \item A \acrshort{PN} with 5 places and 0 transitions.
-  \item A \acrshort{PN} with 0 places and 5 transitions.
-  \item A \acrshort{PN} with 5 places marked with different numbers of tokens.
-  \item A \acrshort{PN} with a chain topology.
-  \item A \acrshort{PN} with 1 place and 1 transition connected in a loop.
+  \item Red vacía.
+  \item Un red con 5 lugares y 0 transiciones.
+  \item Un red con 5 lugares y 0 transiciones.
+  \item Un red con 5 lugares marcados con diferentes números de fichas.
+  \item Un red con topología en cadena.
+  \item Un red con 1 lugar y 1 transición conectados en bucle.
 \end{itemize}
 
-These tests helped to troubleshoot bugs related to the \acrshort{LoLA}
-format.
-For concrete examples,
-see this commit\footnote{\url{https://github.com/hlisdero/netcrab/commit/5745e0da5d27bd709ef479f45a6d2e75974d3745}}
-or this other commit\footnote{\url{https://github.com/hlisdero/netcrab/commit/dbce3f8999ece32e6731527c303a7b59858991f9}}.
+Estas pruebas ayudaron a solucionar errores relacionados con el formato LoLA. Para ver
+ejemplos concretos, consulte este
+commit\footnote{\url{https://github.com/hlisdero/netcrab/commit/5745e0da5d27bd709ef479f45a6d2e75974d3745}}
+o este otro\footnote{\url{https://github.com/hlisdero/netcrab/commit/dbce3f8999ece32e6731527c303a7b59858991f9}}.
 
-\subsection{Stack}
+\subsection{Pila (\textit{Stack})}
 
-The simple
+La sencilla estructura de datos
 \Rustinline{Stack}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/data_structures/stack.rs}}
-data structure is employed to implement the call stack in the \Rustinline{Translator},
-as seen in Sec. \ref{sec:function-calls}.
-Unit tests demonstrate the supported methods and check some simple use cases.
+se emplea para implementar la pila de llamadas en el \Rustinline{Translator}, como se
+vio en la Sec. \ref{sec:function-calls}.
+Las pruebas unitarias demuestran los métodos admitidos y testean algunos casos de uso sencillos.
 
-\subsection{Hash map counter}
+\subsection{Contador de mapa hash}
 
-Analogous to the stack,
-the \Rustinline{HashMapCounter}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/data_structures/hash_map_counter.rs}}
-contains some unit tests to verify that the methods work as intended.
-This data structure forms the basis for the function counter in the \Rustinline{Translator}
-that keeps track of how many times each function was called
-to generate a unique incremental index for the transition labels.
+De forma análoga a la pila,
+el \Rustinline{HashMapCounter}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/data_structures/hash_map_counter.rs}}
+contiene algunas pruebas unitarias para
+verificar que los métodos funcionan según lo previsto.
+Esta estructura de datos constituye la
+base del contador de funciones del \Rustinline{Translator}
+que lleva la cuenta de cuántas veces se ha llamado a cada función para generar un índice
+incremental unívoco para las etiquetas de las transiciones.

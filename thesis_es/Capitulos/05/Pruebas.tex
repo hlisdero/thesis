@@ -1,37 +1,30 @@
-The inclusion of a dedicated chapter on testing in the thesis underscores
-the significance of this indispensable aspect of the development process.
-Tests play a fundamental role in ensuring
-the reliability and correctness of the software implementation.
-A comprehensive test suite has been developed
-to cover the extensive functionality and behavior
-of the translator and the \acrshort{PN} library.
+La inclusión de un capítulo dedicado a las pruebas en la tesis subraya la importancia de este
+aspecto indispensable del proceso de desarrollo. Las pruebas desempeñan un papel
+fundamental para garantizar la fiabilidad y correctitud de la implementación del software. Se ha
+desarrollado un completo conjunto de pruebas para cubrir la extensa funcionalidad y
+comportamiento del traductor y la biblioteca de redes de Petri.
 
-The tests encompass multiple levels
-that will be elucidated in the subsequent sections.
-At the lowest level, unit tests are conducted
-to verify the correctness of the data structures
-employed within the translator and the \acrshort{PN} library.
-These tests target individual components,
-thoroughly examining their functionality in isolation.
+Las pruebas abarcan múltiples niveles que se dilucidarán en las secciones siguientes. En el
+nivel más bajo, se realizan pruebas unitarias para verificar la corrección de las estructuras de
+datos empleadas en el traductor y la biblioteca de redes de Petri. Estas pruebas se dirigen a componentes
+individuales, examinando a fondo su funcionalidad de forma aislada.
 
-In addition to unit tests,
-a suite of integration tests has been constructed incrementally
-to evaluate the translator's adherence to expected behavior.
-These tests consist of test programs that simulate simple scenarios where
-the resulting file output is compared against the expected results.
-This testing methodology helps to uncover any regressions in the compiler
-and confirms that the translator functions reliably in the supported use cases.
+Además de las pruebas unitarias, se ha desarrollado de forma incremental un conjunto de pruebas
+de integración para evaluar la conformidad del traductor al comportamiento esperado. Estas
+pruebas consisten en programas de prueba que simulan escenarios sencillos en los que se
+compara el archivo de salida con los resultados esperados. Esta metodología de
+pruebas ayuda a descubrir cualquier regresión en el compilador y confirma que el traductor
+funciona de forma fiable en los casos de uso soportados.
 
-Furthermore, we incorporated a description of how to generate the \acrshort{MIR} and
-visualize the result of the translation to aid in the debugging process.
-The tooling enables exposing the internal details in an accessible and understandable manner.
+Adicionalmente incorporamos una descripción de cómo generar el \acrshort{MIR} y visualizar el resultado de la
+traducción para asistir en el proceso de depuración. Las herramientas permiten exponer los
+detalles internos de forma accesible y comprensible.
 
-Later in this chapter, the usage of the model checker \acrshort{LoLA}
-and its integration within the translator is explained.
-The model checker provides more features than the minimal set
-that was integrated into the translator to answer the deadlock detection problem.
-Hence, it is beneficial to explore
-which features the model checker provides for debugging the \acrshort{PN} translation.
+Más adelante en este capítulo se explica el uso del verificador de modelos \acrshort{LoLA} y su
+integración en el traductor. El verificador de modelos proporciona más características que el
+conjunto mínimo que se integró en el traductor para responder al mero problema de la detección de
+deadlocks. Por lo tanto, es beneficioso explorar qué características proporciona el verificador de
+modelos para depurar la traducción a una \acrshort{PN}.
 
-Finally, the capabilities of the tool are demonstrated by means of two test programs
-that model classical problems in concurrent programming.
+Para finalizar se demuestran las capacidades de la herramienta mediante dos programas de prueba
+que modelan problemas clásicos de la programación concurrente.
