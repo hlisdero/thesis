@@ -140,7 +140,7 @@ On the one hand, it consumes the token from \Rustinline{notify}
 if \Rustinline{wait_start} was not fired.
 This is the archetypical missed signal case that we would like to detect.
 On the other hand, the token in \Rustinline{wait_enabled}
-is consumed when \Rustinline{wait_start} fires,
+is consumed when \Rustinline{wait_start} fires.
 This prevents the condition variable from ``accepting'' other threads (Assumption 2)
 and preserves the token in \Rustinline{notify}, ensuring that the missed signal cannot occur.
 
