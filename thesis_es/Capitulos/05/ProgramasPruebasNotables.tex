@@ -1,22 +1,21 @@
-\section{Notable test programs}
+\section{Programas de pruebas notables}
 
-To wrap up this chapter, we introduce two noteworthy test programs that
-illustrate the current capabilities of the tool developed in this thesis.
-Our intention is to inspire others to contribute to this project or,
-at the very least, generate interest in the field of model checking.
+Para concluir este capítulo, presentamos dos programas de prueba notables que ilustran las
+capacidades actuales de la herramienta desarrollada en esta tesis.
+Nuestra intención es inspirar a otros para que contribuyan a este proyecto o, por lo menos,
+generar interés en el campo de la verificación de modelos.
 
-First, Listing \ref{lst:dating-philosophers} showcases
-a simple version of the famous Dining Philosophers Problem proposed by Dijkstra.
-This version, affectionately nicknamed ``Dating Philosophers'',
-has only two philosophers and two forks on the table.
-A mutex needs to be locked to access each fork.
-When the philosophers try to grab both forks to eat, the program deadlocks,
-which is easy to verify by inspection.
-This deadlock is successfully detected by the tool.
-Moreover, a more complex version with 5 philosophers,
-for which the deadlock is also detected, is included in the
-repository\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/examples/programs/thread/dining\_philosophers.rs}}.
-It was omitted here due to the space constraints.
+En primer lugar, el Listado \ref{lst:dating-philosophers} muestra
+una versión sencilla del famoso Problema de los Filósofos Comensales propuesto por Dijkstra.
+Esta versión, cariñosamente apodada ``La cita de los filósofos'',
+tiene sólo dos filósofos y dos tenedores en la mesa. Es necesario bloquear un mutex
+para acceder a cada tenedor. Cuando los filósofos intentan tomar ambos tenedores para comer,
+el programa se bloquea, lo que es fácil de comprobar por inspección. Este deadlock es
+detectado con éxito por la herramienta.
+Además en el repositorio\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/examples/programs/thread/dining\_philosophers.rs}}
+se incluye una versión más
+compleja con 5 filósofos para la que también se detecta el deadlock.
+Omite aquí debido a las limitaciones de espacio.
 
 \begin{listing}[!htbp]
     \begin{minted}{Rust}
@@ -50,17 +49,16 @@ It was omitted here due to the space constraints.
       philosopher1.join().unwrap();
   }    
   \end{minted}
-    \caption{A reduced version of the dining philosophers problem that deadlocks.}
+    \caption{Una versión reducida del problema de la cena de los filósofos que se bloquea.}
     \label{lst:dating-philosophers}
 \end{listing}
 
-Second, observe the program in Listing \ref{lst:producer-consumer}.
-It models the classical producer-consumer problem.
-It uses a condition variable and a buffer with capacity for a single element.
-The access to the buffer is protected by a mutex.
-The producer generates 10 elements sequentially and
-the consumer processes them as they become available.
-The tool successfully verifies the absence of deadlock in the program.
+En segundo lugar, observe el programa del Listado \ref{lst:producer-consumer}.
+Modela el problema clásico de productor-consumidor.
+Utiliza una condition variable y un búfer con capacidad para un solo elemento.
+El acceso al búfer está protegido por un mutex. El productor genera 10 elementos
+secuencialmente y el consumidor los procesa a medida que están disponibles. La herramienta
+verifica con éxito la ausencia de deadlock en el programa.
 
 \begin{listing}[!htbp]
     \begin{minted}{Rust}
@@ -105,6 +103,6 @@ The tool successfully verifies the absence of deadlock in the program.
       });
   }
   \end{minted}
-    \caption{A solution to the producer-consumer problem.}
+    \caption{Una solución al problema del productor-consumidor.}
     \label{lst:producer-consumer}
 \end{listing}
