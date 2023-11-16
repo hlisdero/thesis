@@ -1,227 +1,209 @@
-\section{Reducing the size of the Petri net in postprocessing}
+\section{Reducción del tamaño de la red de Petri en el postprocesado}
 \label{sec:future-work-petri-net-reduction}
 
-\cite{murata1989} describes in a Section titled ``Simple Reduction Rules for Analysis''
-six operations that preserve the properties of safeness, liveness, and boundedness of \acrshort{PN}.
-See Definitions \ref{definition:safeness}, \ref{definition:liveness} and \ref{definition:boundedness}
-respectively for a refresher of what these properties mean.
+\cite{murata1989} describe en una sección titulada ``Simple Reduction Rules for Analysis''
+seis operaciones que preservan las propiedades de seguridad, liveness y acotamiento de las redes de Petri.
+Consulte las Definiciones \ref{definition:safeness}, \ref{definition:liveness} y \ref{definition:boundedness}
+respectivamente para refrescar el significado de estas propiedades.
 
-The six operations involve simplifications that reduce the number of places or transitions
-in the Petri net. Next, we reproduce the names used for the reduction rules in the paper and
-Fig. \ref{fig:petri-net-reduction-rules} depicts the transformation that takes place in each case.
+Las seis operaciones implican simplificaciones que reducen el número de lugares o transiciones
+en la red de Petri. A continuación reproducimos los nombres utilizados para las reglas de
+reducción en el documento y la Fig. \ref{fig:petri-net-reduction-rules}
+representa la transformación que tiene lugar en cada caso.
 
 \begin{enumerate}[label={\alph*)}]
-  \item Fusion of Series Places.
-  \item Fusion of Series Transitions.
-  \item Fusion of Parallel Places.
-  \item Fusion of Parallel Transitions.
-  \item Elimination of Self-Loop Places.
-  \item Elimination of Self-Loop Transitions.
+  \item Fusión de lugares en serie.
+  \item Fusión de transiciones en serie.
+  \item Fusión de lugares paralelos.
+  \item Fusión de transiciones paralelas.
+  \item Eliminación de lugares de bucle.
+  \item Eliminación de transiciones de bucle.
 \end{enumerate}
 
 \begin{figure}[!htb]
   \centering
   \includegraphics[width=0.9\linewidth]{petri-net-reduction-rules.png}
-  \caption{The reduction rules presented in Murata's paper.}
+  \caption{Las reglas de reducción presentadas en el paper de Murata.}
   \label{fig:petri-net-reduction-rules}
 \end{figure}
 
-As these operations do not impact the liveness property,
-the outcome of the deadlock detection remains unchanged.
-Consequently, it might be advantageous to reduce the size of the \acrshort{PN}
-after the translation process using specific methods available in the \Rustinline{netcrab} library.
-This step should be performed after translating all threads but before invoking the model checker.
+Como estas operaciones no afectan la propiedad de liveness, el resultado de la detección del
+deadlock permanece inalterado. En consecuencia, puede resultar ventajoso reducir el tamaño de
+la red de Petri tras el proceso de traducción utilizando métodos específicos disponibles en la biblioteca
+\Rustinline{netcrab}. Este paso debe realizarse después de traducir todos los hilos pero antes de invocar al
+verificador de modelos.
 
-Incorporating this functionality into the \acrshort{PN} library itself would be more suitable,
-as it would allow other applications to benefit from this feature.
-It would be interesting to investigate whether
-this approach proves helpful when translating larger programs
-that contain hundreds or thousands of places and transitions.
+Incorporar esta funcionalidad a la propia biblioteca de redes de Petri sería más adecuado porque permitiría
+que otras aplicaciones se beneficiaran de esta feature. Sería interesante investigar si este
+enfoque resulta útil cuando se traducen programas más grandes que contienen cientos o miles
+de lugares y transiciones.
 
-One notable drawback of applying these operations is
-that it could obscure the source of the deadlock.
-It is valuable for the user to have precise information
-about the line in the source code where the deadlock occurs.
-If the corresponding transitions or places representing this line are merged,
-this information is lost.
-However, this disadvantage may be deemed acceptable when dealing with extensive models,
-and the feature could be enabled or disabled at the discretion of the user.
+Un inconveniente notable de la aplicación de estas operaciones es que podría ocultar el origen
+del deadlock. Es valioso para el usuario disponer de información precisa sobre la línea del
+código fuente donde se produce el bloqueo. Si las transiciones o lugares correspondientes que
+representan esta línea se fusionan, esta información se pierde. No obstante, esta desventaja
+puede considerarse aceptable cuando se trata de modelos extensos y la función podría activarse
+o desactivarse a discreción del usuario.
 
-\section{Eliminating the cleanup paths from the translation}
+\section{Eliminación de las rutas de limpieza de la traducción}
 \label{sec:future-work-no-cleanup}
 
-The error handling mechanism in the \acrshort{MIR}
-must account for every possible scenario of failure during runtime.
-The aim of the \emph{rustc} compiler is to ensure
-that compiled code fails gracefully,
-even in the most extreme circumstances,
-e.g., when the program is running out of memory or system calls fail unexpectedly
-due to hard limits on the resources available or other causes.
-However, the majority of this safeguarding cleanup code is never executed in practice.
-\acrshort{OOM} errors and \acrshort{OS} failures are uncommon
-and if they indeed emerge, a deadlock in user code is the least of our problems.
+El mecanismo de gestión de errores de la \acrshort{MIR} debe tener en cuenta todos los escenarios
+posibles de fallo durante el tiempo de ejecución. El objetivo del compilador \emph{rustc} es garantizar
+que el código compilado falle con gracia, incluso en las circunstancias más extremas, por
+ejemplo, cuando el programa se queda sin memoria o las llamadas al sistema fallan
+inesperadamente debido a límites ``duros'' en los recursos disponibles u otras causas. Sin
+embargo, la mayor parte de este código de limpieza de salvaguarda nunca se ejecuta en la
+práctica. Los errores \acrshort{OOM} y los fallos del sistema operativo son poco frecuentes y, si llegan a
+producirse, un deadlock en el código de usuario es el menor de nuestros problemas.
 
-\cite{meyer2020} argues that
-the program will always terminate in a panic end-state
-once a single function call or assertion fails.
-Instead of translating the alternative path that the execution follows in the MIR,
-he proposes to set a token in the place \Rustinline{PROGRAM_PANIC} directly.
-This is equivalent to ignoring the specific cleanup target \acrshort{BB}
-during the translation process
-and connecting the \acrshort{BB} to the \Rustinline{PROGRAM_PANIC} place
-as if it were an \Rustinline{Unwind} terminator (Sec. \ref{sec:terminators}).
+\cite{meyer2020} argumenta que el programa siempre terminará en un estado final de pánico una vez
+que falle una sola llamada a función o aserción. En lugar de traducir el camino alternativo que sigue
+la ejecución en la MIR, propone establecer un token en el lugar \Rustinline{PROGRAM_PANIC}
+directamente. Esto equivale a ignorar el \acrshort{BB} de limpieza específico durante el proceso de
+traducción y conectar el \acrshort{BB} al lugar \Rustinline{PROGRAM_PANIC}
+como si fuera un terminador \Rustinline{Unwind} (Sec. \ref{sec:terminators}).
 
-This reduces the size of the Petri net model substantially.
-It comes with the disadvantage that cleanup \acrshort{BB} are visited but never connected
-to other \acrshort{BB}.
-These must be removed in a postprocessing step to not clutter the final model.
-Meyer's implementation does not seem to have performed this crucial step.
-It is unclear whether the implementation matches what the thesis proposed because
-the source code cannot be compiled anymore and no output examples are present in the
-repository\footnote{\url{https://github.com/Skasselbard/Granite}}.
+Esto reduce sustancialmente el tamaño del modelo de red de Petri. Tiene el inconveniente de
+que se visitan \acrshort{BB} de limpieza pero nunca se conectan a otros \acrshort{BB}.
+Estos deben eliminarse en un paso de postprocesamiento para no agrandar innecesariamente el modelo final.
+La implementación de Meyer no parece haber realizado este paso crucial.
+No está claro si la implementación se ajusta a lo
+propuesto en la tesis porque el código fuente ya no puede compilarse y no hay ejemplos de
+salida en el repositorio\footnote{\url{https://github.com/Skasselbard/Granite}}.
 
-The claim that the panic state is unrecoverable necessitates thorough examination,
-as we have previously observed in the introduction to Rust
-that the programmer has the option to utilize \Rustinline{std::panic::catch_unwind}.
-Furthermore, this intuitive reasoning might overlook situations
-in which a deadlock arises following a panic.
-This need not be a catastrophic failure.
-Consider for instance a thread that deadlocks while waiting on a message
-from another thread that panicked due to incorrect user input.
+La afirmación de que el estado de pánico es irrecuperable requiere un examen exhaustivo, puesto
+que hemos observado anteriormente en la introducción a Rust que el programador tiene la
+opción de utilizar \Rustinline{std::panic::catch_unwind}. Por otra parte, este razonamiento intuitivo podría pasar
+por alto situaciones en las que se produce un bloqueo tras un pánico. Esto no tiene por qué ser
+un fallo catastrófico. Considere, a modo de ejemplo, un hilo que se bloquea mientras espera un
+mensaje de otro hilo que entró en pánico debido a una entrada incorrecta del usuario.
 
-In conclusion, this modification of the translation logic looks promising
-to significantly reduce the number of places and transitions in the \acrshort{PN},
-especially in larger models, but more research is needed.
+En conclusión, esta modificación de la lógica de traducción parece prometedora para reducir
+significativamente el número de lugares y transiciones en la red de Petri, especialmente en los modelos
+más grandes, pero es necesario seguir investigando.
 
-\section{Translated function cache}
+\section{Caché de funciones traducidas}
 \label{sec:future-work-function-cache}
 
-A cache that stores functions after translating them is
-an interesting optimization to explore.
-The goal is to avoid redundant translations of the same function
-when it is called multiple times within the program.
-This idea was already briefly mentioned (but not implemented) in \cite{meyer2020}.
-The current implementation does not incorporate such caching mechanisms.
+Una caché que almacene funciones después de traducirlas
+es una optimización interesante para explorar.
+El objetivo es evitar traducciones redundantes de la misma función cuando se la llama
+varias veces dentro del programa. Esta idea ya se mencionó brevemente (pero no se
+implementó) en \cite{meyer2020}.
+La implementación actual no incorpora tales mecanismos de almacenamiento en caché.
 
-This cache would have to store a separate \acrshort{PN} for each function.
-It could be realized as a \Rustinline{HashMap<rustc_hir::def_id::DefId, PetriNet>},
-analogous to the function counter already present in the implementation.
-Furthermore, the translation process would need to merge/connect
-the Petri nets resulting from each translated function.
-This merging step requires support from the \acrshort{PN} library \texttt{netcrab}
-to combine the multiple subnets into a cohesive whole.
+Esta caché tendría que almacenar una red de Petri distinta para cada función.
+Podría llevarse a la práctica como un
+\Rustinline{HashMap<rustc_hir::def_id::DefId, PetriNet>},
+análogo al contador de funciones ya presente en la implementación.
+El proceso de traducción necesitaría entonces fusionar/conectar las redes Petri
+resultantes de cada función traducida.
+Este paso de fusión requiere el apoyo de la biblioteca
+\texttt{netcrab} para combinar las múltiples subredes en un todo cohesivo.
 
-However, connecting the individual Petri nets is not a trivial task,
-as a function may call an arbitrary number of other functions.
-Consequently, determining the appropriate ``contact points''
-where the subnet should be connected becomes a challenging endeavor.
-The potential existence of numerous contact points,
-arising from the varying function call patterns, thus complicates the merging process.
+No obstante, conectar las redes de Petri individuales no es una tarea trivial,
+ya que una función puede llamar a un número arbitrario de otras funciones.
+En consecuencia, determinar los ``puntos de contacto'' apropiados
+en los que debe conectarse la subred se convierte en una tarea ardua.
+La existencia potencial de numerosos puntos de contacto, derivados de los distintos
+patrones de llamada a funciones, complica así el proceso de fusión.
 
-Additionally, the Petri nets for each function should have labels that are unequivocal
-across the whole program or at least when exporting them to the format for the model checker.
-This requires generating slightly different versions of the same function for every call,
-which partly neglects the benefits of having a cache in the first place.
+Además, las redes de Petri para cada función deben tener etiquetas que sean inequívocas en
+todo el programa o al menos al exportarlas al formato para el comprobador de modelos. Esto
+requiere generar versiones ligeramente diferentes de la misma función para cada llamada, lo
+que en parte anula las ventajas de tener una caché en primer lugar.
 
-Lastly, some functions may not be cached at all in the case that special side effects exist.
-This happens for instance for all synchronization primitives currently supported.
-Their translation must be handled individually.
+Por último, algunas funciones pueden no almacenarse en caché en absoluto en caso de que
+existan efectos secundarios especiales. Esto ocurre, por ejemplo, con todas las primitivas de
+sincronización soportadas actualmente. Su traducción debe gestionarse individualmente.
 
-\section{Recursion}
+\section{Recursividad}
 \label{sec:future-work-recursion}
 
-Recursion in function calls poses a challenge in \acrshort{PN}
-when defined as in Definition \ref{definition:petri-net} due to the inability
-to properly map the data values to the model.
-\acrshort{PN} lack the necessary expressive power to represent this compactly.
+La recursividad en las llamadas a funciones plantea un reto en las redes de Petri cuando se definen como
+en la Definición \ref{definition:petri-net} debido a la incapacidad de mapear adecuadamente los valores de los datos al
+modelo. La red de Petri carece del poder expresivo necesario para representar esto de forma compacta.
 
-The number of times a recursive function is called ultimately depends
-on the data it is called with and cannot be determined at compile time.
-In normal program execution,
-a recursive function is pushed onto a new stack frame repeatedly
-until the base case is reached or the stack overflows.
-However, in \acrshort{PN}, the function call where the base case is reached
-cannot be distinguished from the others,
-unless somehow the tokens representing recursion levels are distinct.
+El número de veces que se llama a una función recursiva depende en última instancia de los
+datos con los que se la llama y no puede determinarse en tiempo de compilación. En la ejecución
+normal de un programa, una función recursiva es agregada a la pila
+repetidamente hasta que se alcanza el caso base o la pila se desborda.
+Sin embargo, en el lenguaje de las redes de Petri, la
+llamada a la función en la que se alcanza el caso base no puede distinguirse de las demás, a
+menos que de algún modo los tokens que representan los niveles de recursividad sean distintos.
 
-\cite[Sec. 3.4.2]{meyer2020} discusses this problem
-and proposes using high-level Petri nets, i.e., \acrfull{CPN} to solve it.
-High-level Petri nets provide a possible solution by allowing the distinction
-between tokens and the annotation of tokens with corresponding recursion levels.
-Nevertheless, this necessitates a serious reconsideration of the entire translation logic
-owing to the different formalism.
-When using \acrshort{CPN} each transition becomes a generalized function of
-input tokens of a specific type that generates tokens of the same or a different type.
-The resulting Petri net is substantially more complex
-and not all model checkers support \acrshort{CPN}.
+\cite[Sec. 3.4.2]{meyer2020} analiza este problema
+y propone utilizar redes de Petri de alto nivel,
+es decir, \acrfull{CPN} para resolverlo.
+Las redes de Petri de alto nivel ofrecen una posible solución al permitir la distinción
+entre tokens y la anotación de tokens con los niveles de recursión correspondientes.
+Sin embargo, esto requiere una reconsideración seria de toda la lógica de traducción
+debido al formalismo diferente.
+Al utilizar \acrshort{CPN} cada transición se convierte en una función
+generalizada de fichas de entrada de un tipo específico que genera fichas del mismo tipo o de
+un tipo diferente. La red de Petri que resulta es sustancialmente más compleja y no todos los
+verificadores de modelos soportan \acrshort{CPN}.
 
-Mitigation strategies provide no comfort in this case either.
-On one hand, one could try to detect recursion and stop the translation,
-but recursion may exhibit unusual patterns that are not trivial to detect.
-For instance, consider a function A that calls a function B
-that calls a function C which finally calls A again.
-This recursion cycle may be arbitrarily long
-and adding this capability to the translator
-does not add much value compared to
-simply ignoring the problem and reaching a stack overflow.
+Las estrategias de mitigación tampoco traen consuelo en este caso. Por un lado, se
+podría intentar detectar la recursividad y detener la traducción pero la recursividad puede
+mostrar patrones inusuales que no son triviales de detectar. Por ejemplo, considere una función
+A que llama a una función B que llama a una función C que finalmente vuelve a llamar a A.
+Este ciclo de recursión puede ser arbitrariamente largo y añadir esta feature al traductor no
+agrega mucho valor en comparación con simplemente ignorar el problema y llegar a un
+desbordamiento de pila.
 
-On the other hand, \cite{meyer2020} suggests
-modeling each recursion level up to a maximum fixed depth,
-but this would impact verification results,
-as the properties of programs could vary with different maximum recursion depths.
-For every maximum recursion depth $N$, a counterexample program can be constructed that exhibits
-a different behavior, e.g., a deadlock, at recursion depth $N+1$, hence avoiding detection.
+Por otro lado, \cite{meyer2020} sugiere modelar cada nivel de recursión hasta una profundidad
+máxima fija pero esto afectaría a los resultados de la verificación puesto que las propiedades de
+los programas podrían variar con diferentes profundidades máximas de recursión. Para cada
+profundidad de recursión máxima $N$, se puede construir un programa contraejemplo que
+muestre un comportamiento diferente, por ejemplo, un deadlock, en la profundidad de recursión
+$N+1$, evadiendo así la detección.
 
-\section{Improvements to the memory model}
+\section{Mejoras al modelo de memoria}
 \label{sec:future-work-memory-model}
 
-Despite the seemingly straightforward implementation,
-devising a memory model that works in all cases is a challenging task.
-That being said, the current model is primarily a good first approximation
-and the solution has its drawbacks too.
+A pesar de la implementación aparentemente sencilla, idear un modelo de memoria que
+funcione en todos los casos es una tarea desafiante. Dicho esto, el modelo actual es ante todo una
+buena primera aproximación y la solución también tiene sus inconvenientes.
 
-Passing variables between \acrshort{MIR} functions is not supported yet.
-This is a major drawback since it needs to be solved to support calling methods
-in \Rustinline{impl} blocks that receive synchronization variables.
-For this thesis, it was sufficient to write the programs in a simplified way to
-avoid this limitation but in a real case, this is not feasible.
+Aún no se admite el paso de variables entre funciones \acrshort{MIR}. Se trata de un inconveniente
+importante, ya que debe resolverse para admitir la llamada a métodos en bloques \Rustinline{impl} que
+reciban variables de sincronización. Para esta tesis, bastó con escribir los programas de forma
+simplificada para evitar esta limitación. pero en un caso real esto no es factible.
 
-There is significant coupling between the functions that handle the calls to
-functions in the \Rustinline{std::sync} module of the standard library and the \Rustinline{Memory}.
-A more generalized interface could be useful to add support for external libraries.
+Existe un acoplamiento significativo entre las funciones que gestionan las llamadas a
+funciones del módulo \Rustinline{std::sync} de la biblioteca estándar y la \Rustinline{Memory}.
+Una interfaz más generalizada podría ser útil para añadir compatibilidad con bibliotecas externas.
 
-The idea of ``linking'' works well but does not match the semantics of Rust programs.
-In the long run, it would be preferable to delete the mapping
-if the variable gets moved to a different function.
-Taking references should also be treated as a distinct case
-from simply copying or using the variable.
+La idea de la ``vinculación'' funciona bien, pero no se ajusta a la semántica de los programas
+Rust. A la larga, sería preferible borrar el mapeo si la variable se traslada a una función
+diferente. Tomar referencias también debería tratarse como un caso distinto al de simplemente
+copiar o utilizar la variable.
 
-The initial size of the \Rustinline{std::collections::HashMap} could be optimized
-for the average number of local variables in a typical \acrshort{MIR} function.
-This could be a configuration parameter for the tool.
+El tamaño inicial del \Rustinline{std::collections::HashMap} podría optimizarse para el número medio de
+variables locales en una función \acrshort{MIR} promedio. Esto podría ser un parámetro de configuración de
+la herramienta.
 
-\section{Higher-level models}
+\section{Modelos de nivel superior}
 \label{sec:future-work-higher-level-models}
 
-The field of higher-level Petri net models is vast
-and encompasses numerous branches and potential methodologies.
-Exploring this domain offers a wide range of possibilities for advancing the modeling capabilities.
+El campo de los modelos de redes de Petri de nivel superior es vasto y abarca numerosas ramas y
+metodologías potenciales. Explorar este dominio ofrece un amplio abanico de posibilidades para
+mejorar las capacidades de modelado, esto es, la expresividad de los modelos generados.
 
-One notable advancement lies in the utilization of \acrfull{CPN}.
-Data values could then be modeled as tokens of different types,
-thereby enhancing the expressiveness and accuracy of the Petri net representation.
-A related paper in this regard is presented in the next chapter.
-\cite{meyer2020} also mentioned higher-level models
-when discussing improvements to his Petri net semantics for Rust.
-For an introduction to higher-level Petri nets, see \cite{murata1989}
+Un avance digno de mención yace en la utilización de redes de Petri coloreadas (\acrfull{CPN}).
+Los valores de los datos podrían entonces modelarse como fichas de distintos tipos, mejorando así la
+expresividad y la precisión de la representación de la red de Petri. En el capítulo siguiente se
+presenta un artículo relacionado con este tema.
+\cite{meyer2020} también mencionó los modelos
+de nivel superior al hablar de las mejoras de su semántica de redes de Petri para Rust.
+Para una introducción a las redes de Petri de nivel superior, véase \cite{murata1989}.
 
-Another intriguing addition to the current Petri net model
-involves the incorporation of inhibitor arcs.
-These arcs provide a means to model conditions in the source code
-where the presence of a zero value is checked.
-By introducing inhibitor arcs,
-Petri nets can effectively capture situations
-where the absence of a specific token is required for a transition to occur.
-For example, when checking a boolean flag used as a condition for a condition variable.
-Inhibitor arcs raise the expressive power of Petri nets
-to the level of Turing machines \cite{peterson1981}.
+Otra intrigante adición al actual modelo de red de Petri implica la incorporación de arcos
+inhibidores. Estos arcos proporcionan un medio para modelar condiciones en el código fuente
+en las que se comprueba la presencia de un valor cero. Al introducir arcos inhibidores, las redes
+de Petri pueden capturar eficazmente situaciones en las que se requiere la ausencia de un token
+específico para que se produzca una transición. Por ejemplo, al comprobar una flag
+booleana utilizada como condición para una condition variable. Los arcos inhibidores
+elevan el poder expresivo de las redes de Petri al nivel de las máquinas de Turing\cite{peterson1981}.
