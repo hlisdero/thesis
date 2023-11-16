@@ -1,66 +1,60 @@
 \section{Integration tests}
 \label{sec:integration-tests}
 
-We will now examine the integration tests,
-which serve as the backbone for the translator's testing framework.
-Two types of tests exist currently:
+A continuación examinaremos las pruebas de integración que constituyen la columna vertebral
+del marco de pruebas del traductor. Actualmente existen dos tipos de pruebas:
 
 \begin{itemize}
-  \item Translation tests.
-  \item Deadlock detection tests.
+  \item Pruebas de traducción.
+  \item Pruebas de detección de bloqueo.
 \end{itemize}
 
-The testing process has proven invaluable throughout the development of the translator,
-enabling early detection of bugs and regressions in \emph{rustc}.
-By relying on the previous tests and building features incrementally,
-the implementation progressed with confidence and a firm step forward.
-The testing capabilities offered by Rust,
-including its support for unit tests and integration tests,
-have been instrumental in ensuring the quality and reliability of the translator.
+El proceso de pruebas ha resultado inestimable a lo largo del desarrollo del traductor,
+permitiendo la detección temprana de errores y regresiones en \emph{rustc}. Apoyándose en las
+pruebas anteriores y construyendo características de forma incremental, la implementación
+avanzó con confianza y paso firme hacia adelante. Las capacidades de prueba que ofrece
+Rust, incluido su soporte para pruebas unitarias y de integración, han sido valiosas para
+garantizar la calidad y fiabilidad del traductor.
 
-\subsection{Translation tests}
+\subsection{Pruebas de traducción}
 
-In translation tests, a given program is processed
-\emph{without} performing the deadlock analysis.
-As a result, three text files containing the model
-in DOT, \acrshort{PNML}, and \acrshort{LoLA} formats are generated.
-These files are then compared to the expected output,
-which is stored in the repository and serves as documentation as well.
+En las pruebas de traducción, se procesa un programa dado \emph{sin} realizar el análisis de bloqueo.
+Como resultado, se generan tres archivos de texto que contienen el modelo
+en formatos DOT, \acrshort{PNML} y \acrshort{LoLA}.
+Posteriormente estos archivos se comparan con la salida esperada, que se
+almacena en el repositorio y sirve también como documentación.
 
-The expected output was verified manually
-using the tools presented in Sec. \ref{sec:visualizing-results}.
-It was committed to the repository
-when the translator was first able to pass the test.
-If a regression in \emph{rustc} occurs,
-then the expected output files are updated accordingly.
-This has happened some times in the past.
-See for instance
-this commit\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/881a3873a3b060e70bc727f670f9426d14327fa2}}
-or this one\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/b032fa3cc13e631950a802dcd3f755c548afde86}}.
+El resultado esperado se verificó manualmente
+con la ayuda de las herramientas presentadas en la Sec. \ref{sec:visualizing-results}.
+Se committeó en el repositorio cuando el traductor pudo superar la prueba por primera
+vez. Si se produce una regresión en \emph{rustc}, los archivos de salida esperada se actualizan en
+consecuencia.
+Esto ha ocurrido algunas veces en el pasado.
+Véase, por ejemplo,
+este commit\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/881a3873a3b060e70bc727f670f9426d14327fa2}}
+o este\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/commit/b032fa3cc13e631950a802dcd3f755c548afde86}}.
 
-\subsection{Deadlock detection tests}
+\subsection{Pruebas de detección de bloqueo}
 
-Deadlock detection tests are closer to an end-to-end test of the translator.
-They generate the file in \acrshort{LoLA} format for the test program
-and instruct the translator to perform the deadlock analysis.
-The output is then contrasted to the known behavior of the test program, i.e.,
-it deadlocks or it does not deadlock.
-If \acrshort{LoLA} produces an incorrect result, then the test fails.
-In such a case, the \acrshort{PN} model should be analyzed
-to find the source of the error.
-See Sec. \ref{sec:debugging} for details on how to approach this.
+Las pruebas de detección de deadlock se acercan más a una prueba \emph{end-to-end}
+del traductor. Generan el archivo en formato \acrshort{LoLA} para el programa de prueba y ordenan al
+traductor que realice el análisis de deadlock. El resultado se contrasta entonces con el
+comportamiento conocido del programa de prueba, es decir, si se bloquea o no se bloquea. Si
+\acrshort{LoLA} produce un resultado incorrecto, entonces la prueba falla. En tal caso, debe analizarse el
+modelo \acrshort{PN} para encontrar la fuente del error.
+Consulte la sección \ref{sec:debugging} para obtener más
+detalles sobre cómo abordar esta cuestión.
 
-Observe Listing \ref{lst:double-lock-deadlock-lola}, which contains
-the contents of the \Rustinline{.lola} file
-for the program depicted in Listing \ref{lst:double-lock-deadlock}.
-This is the file format that the model checker requires.
-It is relatively simpler than \acrshort{PNML}, which is XML-based.
+Observe el Listado \ref{lst:double-lock-deadlock-lola}
+que contiene el contenido del archivo \Rustinline{.lola} para el programa
+representado en el Listado \ref{lst:double-lock-deadlock}.
+Este es el formato de archivo que requiere el verificador de
+modelos. Es relativamente más sencillo que \acrshort{PNML}, el cual está basado en XML.
 
-Due to the considerable length of the output,
-it is the sole instance of the \acrshort{LoLA} format in this thesis.
-It is included here for completeness.
-The repository contains several other examples,
-all of which are used in the integration tests.
+Debido a su considerable longitud, es el único ejemplo del formato \acrshort{LoLA} en esta tesis.
+Se lo incluye aquí por razones de completitud.
+El repositorio contiene varios ejemplos más,
+todos de los cuales se utilizan en las pruebas de integración.
 
 \begin{longlisting}
   \begin{minted}{Rust}
@@ -142,52 +136,54 @@ all of which are used in the integration tests.
     PRODUCE
       main_BB1 : 1;    
   \end{minted}
-  \caption{The LoLA output for the program in Listing \ref{lst:double-lock-deadlock}.}
+  \caption{La salida LoLA para el programa del Listado \ref{lst:double-lock-deadlock}.}
   \label{lst:double-lock-deadlock-lola}
 \end{longlisting}
 
-\subsection{Test structure}
+\subsection{Estructura de ficheros de las pruebas}
 
-The test programs are in the folder \Rustinline{examples/programs}.
-For each test program, there is a folder in \Rustinline{examples/results}
-that contains the three files
-\Rustinline{net.dot}, \Rustinline{net.pnml}, and \Rustinline{net.lola}.
+Los programas de prueba se encuentran en la carpeta \Rustinline{examples/programs}.
+Para cada programa de prueba, hay una carpeta en \Rustinline{examples/results}
+que contiene los tres archivos \Rustinline{net.dot}, \Rustinline{net.pnml} y \Rustinline{net.lola}.
 
-The tests are grouped into categories:
+Los tests se agrupan en categorías:
 
 \begin{itemize}
-  \item Basic: For basic programs like ``Hello, World!'' and a simple arithmetic calculator.
-  \item Condvar: For programs concerning condition variables.
-  \item Function call: For programs that test different types
-        of function calls seen in Sec. \ref{sec:function-calls}.
-  \item Mutex: For programs that use mutexes.
-  \item Statement: For programs that test specific constructs such as a \Rustinline{match},
-        an infinite loop, an \Rustinline{Option}, a call to \Rustinline{panic!},
-        or \Rustinline{std::process::abort}.
-  \item Thread: For programs involving multiple threads.
+  \item Basic: Para programas básicos como "¡Hola, mundo!" y una simple calculadora aritmética.
+  \item Condvar: Para programas relativos a condition variables.
+  \item Function call: Para los programas que prueban los diferentes tipos de llamadas de función
+        vistos en la Sec. \ref{sec:function-calls}.
+  \item Mutex: Para programas hacen uso de mutexes.
+  \item Statement: Para programas que comprueban construcciones específicas como una \Rustinline{match},
+        un bucle infinito, una \Rustinline{Option}, una llamada a \Rustinline{panic!},
+        o \Rustinline{std::process::abort}.
+  \item Thread: Para programas en los que intervienen varios hilos.
 \end{itemize}
 
-The structure of the folders in \Rustinline{examples/} mimics the file structure
-of the integration tests in \Rustinline{tests/}.
-As usual, the whole test suite can be run with the \Rustinline{cargo test} command.
+La estructura de las carpetas en \Rustinline{examples/} imita la estructura de archivos
+de las pruebas de integración en \Rustinline{tests/}.
+Como de costumbre, todo el conjunto de pruebas puede ejecutarse con el comando \Rustinline{cargo test}.
 
-\subsection{Test implementation}
+\subsection{Implementación de las pruebas}
 
-The integration tests rely on the crates \texttt{assert\_cmd}, \texttt{assert\_fs},
-and \texttt{predicates}.
-The idea to verify the output of the program by invoking the binary directly was
-taken from a specialized book for building \acrshort{CLI} applications in Rust \cite[Chap. 1.6]{rust-cli-book}.
-It was a useful resource for experimenting with \texttt{clap} to parse arguments as well.
+Las pruebas de integración se basan en los crates \texttt{assert\_cmd},
+\texttt{assert\_fs} y \texttt{predicates}.
+La idea de verificar la salida del programa invocando directamente al binario se tomó de un
+libro especializado en la construcción de aplicaciones \acrshort{CLI} en Rust \cite[Chap. 1.6]{rust-cli-book}.
+Fue un recurso útil también para experimentar con \texttt{clap} para parsear los argumentos.
 
-Additionally, the integration tests use a shared submodule \cite[Chap. 11.3]{rust-book}
-that contains two convenient macros that save us from writing nearly all of the boilerplate code.
-These macros were defined using \cite{rust-macros} as a primary reference
-and with inspiration provided by \cite{oaten2023}.
+Además, las pruebas de integración utilizan un submódulo compartido \cite[Chap. 11.3]{rust-book}
+que contiene dos cómodas macros que nos ahorran escribir casi todo el código
+boilerplate. Estas macros se definieron utilizando \cite{rust-macros} como referencia
+principal y con la inspiración proporcionada por \cite{oaten2023}.
 
-Listing \ref{lst:macro-test-generation} shows the macro responsible for generating the translation tests,
-while Listing \ref{lst:macro-test-generation-example} provides an example of how it is applied
-in the repository. For the sake of completeness, Listing \ref{lst:assert-output-files}
-depicts the function used for the translation tests.
+El Listado \ref{lst:macro-test-generation} muestra la macro
+responsable de generar las pruebas de traducción,
+mientras que el Listado \ref{lst:macro-test-generation-example}
+ofrece un ejemplo de cómo se aplica en el repositorio.
+En aras de la completitud, el Listado
+\ref{lst:assert-output-files} representa la función utilizada para las pruebas de traducción.
+
 
 \begin{listing}[!htbp]
   \begin{minted}{Rust}
@@ -200,7 +196,7 @@ depicts the function used for the translation tests.
       };
   }        
   \end{minted}
-  \caption{The macro that generates the translation tests.}
+  \caption{La macro que genera las pruebas de traducción.}
   \label{lst:macro-test-generation}
 \end{listing}
 
@@ -230,7 +226,8 @@ depicts the function used for the translation tests.
       );
   }    
   \end{minted}
-  \caption{The contents of the file \Rustinline{basic.rs} listing all translation tests in the basic category.}
+  \caption{El contenido del archivo \Rustinline{basic.rs} que enumera
+    todas las pruebas de traducción de la categoría básica.}
   \label{lst:macro-test-generation-example}
 \end{listing}
 
@@ -272,7 +269,7 @@ depicts the function used for the translation tests.
       }
   }
   \end{minted}
-  \caption{The function that verifies the contents of the output files.}
+  \caption{La función que verifica el contenido de los archivos de salida.}
   \label{lst:assert-output-files}
 \end{listing}
 
