@@ -16,7 +16,7 @@ nuevo hilo puede empezar a ejecutarse inmediatamente después de ser \emph{spawn
 pero no hay garantía de que lo haga.
 
 A diferencia de otros lenguajes de programación como C, C++ o Java, en Rust no existe la
-no- ción de una variable de hilo inicializada previamente al inicio del hilo. En su lugar, la
+noción de una variable de hilo inicializada previamente al inicio del hilo. En su lugar, la
 función \Rustinline{std::thread::spawn} devuelve un \Rustinline{std::thread::JoinHandle}, que es, como su nombre
 indica, un handle para llamar a \Rustinline{join} al final de la vida del hilo.
 
