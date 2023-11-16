@@ -1,176 +1,175 @@
 \section{Condition variable (\texttt{std::sync::Condvar})}
 
-A condition variable is a synchronization primitive used in concurrent programming
-to enable threads to wait for a certain condition before proceeding with their execution.
-Threads wait until they are notified by another thread
-that the desired condition has been met.
+Una condition variable es una primitiva de sincronización que
+permite que uno o más hilos esperen una determinada condición antes de proceder con
+su ejecución. Los hilos esperan hasta que otro hilo les notifica que se ha cumplido la
+condición deseada.
 
-Condition variables are typically associated with a mutex,
-which ensures exclusive access to the shared data that the condition depends on.
-When a thread waits on a condition variable, it releases the associated mutex,
-allowing other threads to make progress.
-When the condition becomes true or some event occurs,
-a notifying thread signals the condition variable,
-allowing one or more waiting threads to resume their execution.
+Las variables de condición suelen estar asociadas a un mutex que garantiza el acceso exclusivo
+a los datos compartidos de los que depende la condición.
+Cuando un hilo espera en una condition variable,
+libera el mutex asociado, permitiendo que otros hilos avancen.
+Cuando la condición se convierte en verdadera o se produce algún evento,
+un hilo notificador señala la variable de condición,
+permitiendo que uno o más hilos en espera reanuden su ejecución.
 
-The semantics of condition variables, as well as examples in pseudocode,
-were introduced in Sec. \ref{sec:condition-variables}.
-The understanding of the precise behavior of condition variables in all circumstances
-is a prerequisite for this section.
+La semántica de las variables de condición, así como ejemplos en pseudocódigo, se
+introdujeron en la Sec. \ref{sec:condition-variables}.
+La comprensión del comportamiento preciso de las condition variables
+en todas las circunstancias es un requisito previo para esta sección.
 
-This section provides an elaborate explanation of the \acrshort{PN} model
-used to represent condition variables from the Rust standard library.
-It is followed by a practical example that aims to enhance the clarity of the concepts.
-Finally, the algorithms for the translation of condition variable functions are outlined.
+Esta sección ofrece una explicación detallada del modelo de red de Petri utilizado para representar las
+condition variable de la biblioteca estándar de Rust. Le sigue un ejemplo práctico que
+pretende aumentar la claridad de los conceptos. Por último, se esbozan los algoritmos para la
+traducción de funciones de variables de condición.
 
-\subsection{Petri net model}
+\subsection{Modelo de red de Petri}
 
-In this particular case, the \acrshort{PN} model must be examined carefully,
-as it involves not only the condition variable itself
-but also the variable that holds the condition
-on which the blocked thread is waiting \emph{and} the mutex
-that synchronizes access to that condition.
+En este caso concreto, el modelo de red de Petri debe examinarse detenidamente
+puesto que implica no sólo a
+la propia variable de condición,
+sino también a la variable que mantiene la condición sobre la
+que espera el hilo bloqueado \emph{y} al mutex que sincroniza el acceso a dicha condición.
 
-This interaction can be extremely complex in general.
-For instance, the same condition variable could be used
-to signal an arbitrary number of distinct conditions.
-Accordingly, different mutexes may be passed
-as an argument to the \Rustinline{wait} call.
-Furthermore, an arbitrary number of threads may block on a condition variable and
-Rust supports the broadcast operation to awaken all waiting threads at once
-through the method \Rustinline{notify_all}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html\#method.notify_all}}
-(see Sec. \ref{sec:condition-variables}).
-Most importantly, the condition itself could be of any type
-and could take a long sequence of values during the execution,
-depending on which the waiting threads could act in diverse ways for every scenario.
+En general, esta interacción puede ser extremadamente compleja.
+La misma variable de condición podría utilizarse
+para señalar o rastrear un número arbitrario de condiciones distintas.
+En consecuencia, pueden pasarse diferentes mutexes como argumento a la llamada de
+\Rustinline{wait}.
+Además, un número arbitrario de hilos puede bloquearse en una variable de condición y
+Rust admite la operación de \emph{broadcast} para despertar a todos los hilos en espera a la vez
+mediante el método \Rustinline{notify_all}\footnote{\url{https://doc.rust-lang.org/std/sync/struct.Condvar.html\#method.notify_all}}
+(véase la Sec. \ref{sec:condition-variables}).
+Y lo que es más importante, la condición
+en sí puede ser de cualquier tipo y tomar una larga secuencia de valores durante la ejecución,
+en función de los cuales los hilos en espera podrían actuar de diversas maneras en cada
+escenario.
 
-For the above reasons, it is unavoidable to make assumptions
-regarding the supported use cases of condition variables
-in order to reduce the complexity of the task.
-Embracing and dealing with every possibility is beyond the scope of this thesis.
+Por todo ello, es inevitable hacer suposiciones sobre los casos de uso soportados
+para variables de condición reducir la complejidad de la tarea.
+Abarcar y manejar todas las posibilidades queda fuera del alcance de esta tesis.
 
-\subsubsection{Assumptions}
+\subsubsection{Supuestos}
 
 \begin{enumerate}
-      \item \emph{Single call}: There is only one call to \Rustinline{wait} per condition variable, i.e.,
-            \Rustinline{condvar.wait()} appears in a single place in the source code for a given \Rustinline{condvar}.
-            For example, it can be inside of a loop but it cannot be in two different functions.
-      \item \emph{Single-element queue}: There is at most one waiting thread per condition variable.
-      \item \emph{Boolean condition}: The condition is a boolean flag. It is either set or not set.
-            Waiting on a condition that may take 3 or more values is \emph{not} supported by this model.
-      \item \emph{Mandatory set-condition / No ``false notify''}: If a thread locks the mutex and accesses the shared condition mutably,
-            then it always sets it to a different value.
-            In simpler terms, threads that look at the value, do not change it
-            and immediately notify the condition variable are \emph{not} supported.
-      \item \emph{Broadcast exclusion}: The method \Rustinline{std::sync::Condvar::notify_all} is out of scope.
+      \item \emph{Llamada única}:
+            Sólo hay una llamada a esperar (\Rustinline{wait}) por variable de condición. Equivalentemente,
+            \Rustinline{condvar.wait()} aparece en un único lugar del código fuente para una \Rustinline{condvar} determinada.
+            Por ejemplo, puede estar dentro de un bucle pero no puede estar en dos funciones
+            diferentes.
+      \item \emph{Cola de un solo elemento}: Hay como máximo un hilo de espera por condition variable.
+      \item \emph{Condición booleana}: La condición es un flag booleano.
+            Está activo o no, dos valores posibles en total.
+            Esperar en una condición que puede tomar 3 o más valores \emph{no} es soportado por este modelo.
+      \item \emph{Establecimiento obligatorio de la condición / Sin ``notificación falsa''}:
+            Si un hilo bloquea el mutex y accede mutablemente a la condición compartida,
+            entonces siempre almacena un valor diferente.
+            En términos más sencillos, los hilos que miran el valor, no lo cambian
+            e inmediatamente llaman \Rustinline{signal} sobre la condition variable no están permitidos.
+      \item \emph{Exclusión de broadcast}: El método \Rustinline{std::sync::Condvar::notify_all} está fuera de alcance.
 \end{enumerate}
 
-Support for multiple calls to \Rustinline{wait} and multiple waiting threads could be implemented
-but a considerable implementation effort is required.
-Therefore, assumptions 1 and 2 can be overcome with the proposed model.
+Podría implementarse el soporte para múltiples llamadas a \Rustinline{wait} y múltiples hilos de espera,
+pero se requiere un considerable esfuerzo de implementación.
+Por lo tanto, los Supuestos 1 y 2 pueden superarse con el modelo propuesto.
 
-Supporting non-boolean conditions
-and detecting which value is set
-necessitates a thorough reconsideration of the modeling approach
-for representing concrete data values in simple Petri nets.
-Consequently, assumptions 3 and 4 are particularly challenging and
-could be the subject of future research into higher-lever models.
-See Sec. \ref{sec:future-work-higher-level-models} for some thoughts to this effect.
+Admitir condiciones no booleanas y detectar qué valor toma la condición después de cada acceso
+exige reconsiderar a fondo el enfoque de modelado
+para representar valores de datos concretos en redes de Petri simples.
+En consecuencia, los Supuestos 3 y 4 son especialmente desafiantes y podrían ser objeto de
+futuras investigaciones sobre modelos en redes de Petri de nivel superior.
+Véase la Sec. \ref{sec:future-work-higher-level-models} para algunas reflexiones en este sentido.
 
-\subsubsection{Analysis of the proposed model}
+\subsubsection{Análisis del modelo propuesto}
 
-Fig. \ref{fig:condition-variable-model} depicts
-the \acrshort{PN} model used in the implementation.
-The same diagram in DOT, PNG, and SVG format
-can be found in the repository as documentation.
+La Fig. \ref{fig:condition-variable-model} muestra el modelo de red de Petri utilizado en la implementación.
+El mismo diagrama en formato DOT, PNG y SVG puede encontrarse en el repositorio como documentación.
 
 \begin{figure}[!htbp]
       \centering
       \includesvg[width=\linewidth]{condition-variable-model.svg}
-      \caption{The Petri net model for condition variables.}
+      \caption{El modelo de red de Petri para las condition variables.}
       \label{fig:condition-variable-model}
 \end{figure}
 
-The input places are:
+Los lugares de entrada son:
 
 \begin{itemize}
-      \item \Rustinline{input}: The start place of the wait function.
-            The model supports the methods from the standard library \Rustinline{std::sync::Condvar::wait}
-            and its variation \Rustinline{std::sync::Condvar::wait_while}.
-      \item \Rustinline{condition_not_set}: The place is marked when the condition is \Rustinline{false}.
-      \item \Rustinline{condition_set}: The place is marked when the condition is \Rustinline{true}.
-      \item \Rustinline{notify}: The place where the notifying thread places a token to wake up the waiting thread.
+      \item \Rustinline{input}: El lugar de inicio de la función wait.
+            El modelo admite los métodos de la biblioteca estándar \Rustinline{std::sync::Condvar::wait}
+            y su variación \Rustinline{std::sync::Condvar::wait_while}.
+      \item \Rustinline{condition_not_set}: El lugar está marcado cuando la condición es \Rustinline{false}.
+      \item \Rustinline{condition_set}: El lugar está marcado cuando la condición es \Rustinline{true}.
+      \item \Rustinline{notify}: El lugar donde el hilo notificador coloca un token para despertar al hilo en espera.
 \end{itemize}
 
-The \Rustinline{output} place is the end place
-of the function call to \Rustinline{wait} or \Rustinline{wait_while}.
-The execution of the thread continues from there.
+El lugar de salida (\Rustinline{output}) es
+el lugar de finalización de la llamada
+a la función \Rustinline{wait} o \Rustinline{wait_while}.
+La ejecución del hilo continúa a partir de ahí.
 
-Two possible ways exist to go
-from \Rustinline{input} to \Rustinline{output}, represented by two transitions:
+Existen dos formas posibles de pasar de \Rustinline{input} a \Rustinline{output}, representadas por dos transiciones:
 
 \begin{itemize}
-      \item \Rustinline{wait_start}: This is the ``common case'', the thread blocks and waits for the signal.
-      \item \Rustinline{wait_skip}: This is the alternative path that the token takes when the condition was already set.
-            The thread does not wait, instead, it skips the wait and reaches \Rustinline{output} in a single jump.
+      \item \Rustinline{wait_start}: Este es el ``caso común'', el hilo se bloquea y espera la señal.
+      \item \Rustinline{wait_skip}: Este es el camino alternativo que toma el hilo cuando la condición ya se ha cumplido.
+            El hilo no espera, en su lugar, se salta la espera y alcanza la salida \Rustinline{output} en un solo salto.
 \end{itemize}
 
-It is essential to notice that the greyed-out part
-on the left of Fig. \ref{fig:condition-variable-model}
-controls which transition is enabled and which transition is disabled.
-As soon as a token is set in \Rustinline{condition_set}, \Rustinline{wait_start} is disabled.
-Before that, the opposite is true: \Rustinline{wait_start} may fire but \Rustinline{wait_skip} may not.
+Es esencial observar que la parte en gris
+de la izquierda de la Fig. \ref{fig:condition-variable-model}
+controla qué transición se activa y qué transición se desactiva.
+En cuanto se establece un testigo en \Rustinline{condition_set}, \Rustinline{wait_start} se desactiva.
+Antes de eso, ocurre lo contrario: \Rustinline{wait_start} puede dispararse pero \Rustinline{wait_skip} no.
 
-Note the arcs between \Rustinline{condition_not_set} and \Rustinline{wait_start}.
-The token is regenerated every time that \Rustinline{wait_start} fires.
-The same is true for \Rustinline{condition_set} and \Rustinline{wait_skip}.
-These arcs restore the condition places to their previous state.
-Modeling more than 2 values as a \acrshort{PN} would entail a more convoluted net,
-Besides, it would be impossible to know at compile time,
-how many possible values the condition takes to generate the correct number of places.
-This limitation is the justification for Assumptions 3 and 4.
+Nótese los arcos entre \Rustinline{condition_not_set} y \Rustinline{wait_start}.
+La ficha se regenera cada vez que se dispara \Rustinline{wait_start}.
+Lo mismo ocurre con \Rustinline{condition_set} y \Rustinline{wait_skip}.
+Estos arcos restauran los lugares de condición a su estado anterior.
+Modelar más de 2 valores como una \acrshort{PN} implicaría
+una red más enrevesada, Además, sería imposible saber en tiempo de compilación cuántos
+valores posibles toma la condición para generar el número correcto de lugares.
+Esta limitación es la justificación de los Supuestos 3 y 4.
 
-Now focus on the right side of Fig. \ref{fig:condition-variable-model}.
-In the middle of the condition variable, we find the place for the mutex.
-As expected, it is unlocked when the wait starts
-and it is locked when the notify is received.
+Ahora concéntrese en el lado derecho de la Fig. \ref{fig:condition-variable-model}.
+En el centro de la variable de condición,
+encontramos el lugar para el mutex.
+Como era de esperar, se desbloquea cuando comienza la
+espera y se bloquea cuando se recibe la notificación.
 
-The place labeled \Rustinline{wait_enabled} plays an important role.
-On the one hand, it consumes the token from \Rustinline{notify}
-if \Rustinline{wait_start} was not fired.
-This is the archetypical missed signal case that we would like to detect.
-On the other hand, the token in \Rustinline{wait_enabled}
-is consumed when \Rustinline{wait_start} fires,
-This prevents the condition variable from ``accepting'' other threads (Assumption 2)
-and preserves the token in \Rustinline{notify}, ensuring that the missed signal cannot occur.
+El lugar etiquetado \Rustinline{wait_enabled} desempeña un papel central.
+Por un lado, consume el testigo de \Rustinline{notify} si \Rustinline{wait_start} no se disparó.
+Este es el caso arquetípico de señal perdida que nos gustaría detectar.
+Por otro lado, el token en \Rustinline{wait_enabled} se consume cuando \Rustinline{wait_start} se dispara.
+Esto evita que la condition variable ``acepte'' otros hilos (Supuesto 2) y
+conserva el token en \Rustinline{notify}, asegurando que la señal perdida no pueda ocurrir.
 
-Finally, the \Rustinline{notify_received} transition combines the requisites
-for the thread to leave the wait: The mutex must be unlocked and \Rustinline{notify_one} was called.
-To restore the initial state of the condition variable,
-it regenerates the token in \Rustinline{wait_enabled}.
+Por último, la transición \Rustinline{notify_received} combina los requisitos para que el hilo abandone la
+espera: El mutex debe estar desbloqueado y \Rustinline{notify_one} ha sido llamado. Para restaurar el estado
+inicial de la condition variable, regenera el testigo en \Rustinline{wait_enabled}.
 
-\subsubsection{Global translation requirements of the Petri net model}
+\subsubsection{Requisitos de traducción a nivel global del modelo de red de Petri}
 
-A fundamental challenge that surfaces
-during the implementation of the model in Fig. \ref{fig:condition-variable-model}
-is that connections across the blue frontier in the diagram cannot be established
-in general when processing the call to \Rustinline{wait}.
-We will analyze the problem and explain how the solution copes with it.
+Un desafío fundamental que surge
+durante la implementación del modelo de la Fig. \ref{fig:condition-variable-model}
+es que las conexiones a través de la frontera azul del diagrama no pueden establecerse
+en el caso general cuando se procesa la llamada a \Rustinline{wait}.
+Analizaremos el problema y explicaremos cómo lo afronta la solución.
 
-The transition where the condition is set, named \Rustinline{set_condition} on the diagram,
-is the next candidate.
-In the current implementation, the transition selected to fulfill this role
-is the call to \Rustinline{std::ops::DerefMut::deref_mut}
-when a mutex or mutex guard is being dereferenced.
+La transición en la que se establece la condición, denominada \Rustinline{set_condition} en el diagrama,
+es la siguiente candidata. En la implementación actual, la transición seleccionada para cumplir este
+papel es la llamada a \Rustinline{std::ops::DerefMut::deref_mut} cuando se está desreferenciando un mutex o
+una guarda de mutex.
 
-Consider Listing \ref{lst:set-condition-example},
-yet another test program from the repository.
-In line 9, the mutex guard is dereferenced to write the value \Rustinline{true} to it,
-setting the condition for the condition variable.
-In the \acrshort{MIR}, this maps to a call to \Rustinline{std::ops::DerefMut::deref_mut}.
-Although it is not the exact place where the value is written
-(which would actually be a statement in \acrshort{BB}),
-it is close enough and it satisfies our needs.
+Considere el Listado \ref{lst:set-condition-example},
+otro programa de prueba del repositorio.
+En la línea 9, la guarda de mutex es dereferenciada para escribirle el valor \Rustinline{true},
+cumpliendo la condición para la condition variable.
+En la \acrshort{MIR}, esto se corresponde con una llamada a
+\Rustinline{std::ops::DerefMut::deref_mut}.
+Aunque no es el lugar exacto donde se escribe el valor (que en
+realidad sería una sentencia dentro de un \acrshort{BB}),
+se aproxima lo suficiente y satisface nuestras necesidades.
 
 \begin{listing}[!htbp]
       \begin{minted}{Rust}
@@ -195,47 +194,43 @@ it is close enough and it satisfies our needs.
             }
       }              
       \end{minted}
-      \caption{A program that requires global Petri net information to be translated.}
+      \caption{Un programa que requiere información global de la red de Petri para ser traducido.}
       \label{lst:set-condition-example}
 \end{listing}
 
-Unfortunately, the connections to the condition variable cannot be established
-when processing the call to \Rustinline{deref_mut} either.
-The reason is that there is no guarantee that the condition variable was already seen.
-It could still be ahead in the translation path.
-In Listing \ref{lst:set-condition-example}, the main thread is translated first,
-so the condition variable is discovered first.
-But if the roles of the threads are swapped, then the translation cannot be performed.
+Lamentablemente, las conexiones con la variable de condición tampoco pueden establecerse al
+procesar la llamada a \Rustinline{deref_mut}.
+La razón es que no hay ninguna garantía de que la condition variable ya se haya visto.
+Todavía podría estar por delante en el camino que sigue la traducción.
+En el Listado \ref{lst:set-condition-example}, el hilo principal se traduce primero,
+por lo que la variable de condición se descubre primero.
+Pero si los papeles de los hilos s e intercambian, entonces la traducción no puede realizarse.
 
-We reach thus an unpleasing conclusion.
-In order to connect the model of the condition variable
-to the places that model the condition and the transitions where it is set,
-we need the whole \acrshort{PN}, i.e., we need \emph{global} information
-to translate the synchronization primitive effectively.
+Llegamos así a una conclusión desalentadora. Para conectar el modelo de la variable de
+condición con los lugares que modelan la condición y las transiciones en las que se establece,
+necesitamos toda la red de Petri o en otras palabras, necesitamos información \emph{global} para traducir eficazmente la
+primitiva de sincronización.
 
-As a result, it is unavoidable to incorporate some sort of postprocessing step
-to the translation.
-The tasks must also be performed in a specific order.
-The mutex must have been discovered first.
-Later it may be linked to a condition variable
-if such a condition variable is found (the source code may as well not use any).
-Hence, it is advisable to introduce a notion of ``priority'' to the postprocessing tasks.
+Como resultado, es inevitable incorporar algún clase de etapa de postprocesamiento a la
+traducción. Las tareas también deben realizarse en un orden específico. Primero debe
+descubrirse el mutex. Después puede vinculárselo a una variable de condición si se encuentra tal
+condition variable (el código fuente podría no utilizar ninguna).
+De ahí que sea aconsejable introducir una noción de ``prioridad'' en las tareas de postprocesamiento.
 
-The \Rustinline{Translator} relies on a \Rustinline{std::collections::BinaryHeap} to
-implement a priority queue of
+El \Rustinline{Translator} se basa en un \Rustinline{std::collections::BinaryHeap}
+para implementar una cola de prioridad de
 \Rustinline{PostprocessingTask}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/function.rs\#L92}}.
-The tasks are returned by the methods that translate synchronization primitives if needed.
-After all the threads are translated, the \Rustinline{Translator}
-addresses the postprocessing tasks.
-By completing them according to their priority,
-we guarantee that the information is available in the required order.
+Las tareas son devueltas por los métodos que traducen
+primitivas de sincronización si es necesario. Una vez traducidos todos los hilos, el \Rustinline{Translator}
+aborda las tareas de postprocesamiento. Al completarlas según su prioridad,
+garantizamos que la información esté disponible en el orden requerido.
 
 \subsubsection{Table of possible inputs and expected outputs}
 
-As a complement to the explanation in the previous subsections,
-here is a table summarizing the expected output for a given input.
-The reader may compare Fig. \ref{fig:condition-variable-model} to verify that
-the model produces the correct output for each scenario.
+Como complemento a la explicación de los apartados anteriores, he aquí una tabla que
+resume la salida esperada para una entrada determinada.
+El lector puede comparar la Fig. \ref{fig:condition-variable-model}
+para comprobar que el modelo produce la salida correcta para cada escenario.
 
 \begin{table}[!htb]
       \centering
@@ -255,48 +250,51 @@ the model produces the correct output for each scenario.
             R8     & True                        & True                      & True                & \Rustinline{output} (skip the wait, with lost signal)           \\
             \hline
       \end{tabular}
-      \caption{A summary of the possible states of the Petri net model for condition variables.}
+      \caption{Resumen de los posibles estados del modelo de red de Petri para las condition variables.}
       \label{table:condition-variable-model-states}
 \end{table}
 
-\subsection{A practical example}
+\subsection{Un ejemplo práctico}
 
-Due to the size constraints of the resulting \acrshort{PN},
-we are compelled to select a small-scale program for demonstration purposes.
-It would be unfeasible to embed within a single page
-the complete \acrshort{PN} of a realistic program with condition variables and multiple threads.
-For more comprehensive examples, readers are encouraged to explore the repository,
-which contains a collection of more intricate programs included as part of the integration tests.
+Debido a las limitaciones de tamaño de la red de Petri, nos vemos obligados a seleccionar un
+programa a pequeña escala con fines de demostración.
+Sería inviable incluir en una sola página
+la red de Petri completa de un programa realista con condition variables y múltiples hilos.
+Para obtener ejemplos más completos, se anima a los lectores a explorar el repositorio,
+el cual contiene una colección de programas más intrincados incluidos como parte de las pruebas de integración.
 
-Despite the space limitations, the example in Listing \ref{lst:condition-variable-example}
-comprises the core elements of the model presented before.
-The complete \acrshort{PN} can be seen in Fig. \ref{fig:condition-variable-example}.
+A pesar de las limitaciones de espacio,
+el ejemplo del Listado \ref{lst:condition-variable-example} comprende los elementos
+centrales del modelo presentado anteriormente.
+La red de Petri completa puede verse en la Fig. \ref{fig:condition-variable-example}.
 
-Observe the following sequence of transitions:
+Observe la siguiente secuencia de transiciones:
 
 \begin{enumerate}
-      \item The mutex is locked in \Rustinline{std_sync_Mutex_T_lock_0_CALL}.
-      \item \Rustinline{std_sync_Condvar_notify_one_0_CALL} sets a token in \Rustinline{CONDVAR_0_NOTIFY}.
-      \item The token flow continues to \Rustinline{main_BB5} right before \Rustinline{CONDVAR_0_WAIT_START}.
+      \item El mutex se bloquea en \Rustinline{std_sync_Mutex_T_lock_0_CALL}.
+      \item \Rustinline{std_sync_Condvar_notify_one_0_CALL} coloca un token en \Rustinline{CONDVAR_0_NOTIFY}.
+      \item El flujo del token continúa a \Rustinline{main_BB5} justo antes de \Rustinline{CONDVAR_0_WAIT_START}.
 \end{enumerate}
 
-It should be emphasized that no deadlock arises
-if the transition \Rustinline{CONDVAR_0_WAIT_START} fires
-\emph{before} \Rustinline{CONDVAR_0_LOST_SIGNAL}.
-In short, a conflict exists between \Rustinline{CONDVAR_0_WAIT_START}
-and \Rustinline{CONDVAR_0_LOST_SIGNAL} for the token in \Rustinline{CONDVAR_0_NOTIFY}.
-Nevertheless, the model checker verifies \emph{all} possible firings
-and it will uncover the missed signal case without difficulties.
+Cabe destacar que no se produce ningún deadlock si la transición \Rustinline{CONDVAR_0_WAIT_START}
+se dispara \emph{antes} de \Rustinline{CONDVAR_0_LOST_SIGNAL}.
+Dicho brevemente, existe un conflicto entre las transiciones
+\Rustinline{CONDVAR_0_WAIT_START} y \Rustinline{CONDVAR_0_LOST_SIGNAL}
+por el token en \Rustinline{CONDVAR_0_NOTIFY}.
+No obstante, el verificador de modelos comprueba \emph{todos} los posibles disparos
+y descubrirá el caso de la señal perdida sin dificultades.
 
-Another noteworthy observation is that this program illustrates
-the effect that the cleanup paths would have on missed signal detection.
-If there were a second transition
-at the same level as \Rustinline{CONDVAR_0_WAIT_START} or \Rustinline{std_sync_Condvar_notify_one_0_CALL},
-the token could ``escape'' to the \Rustinline{PROGRAM_PANIC} place and the deadlock would remain undetected.
+Otra observación digna de mención es que este programa ilustra
+el efecto que tendrían los caminos alternativos
+de limpieza en la detección de señales perdidas.
+Si hubiera una segunda transición al mismo nivel
+que \Rustinline{CONDVAR_0_WAIT_START} o \Rustinline{std_sync_Condvar_notify_one_0_CALL},
+la señal podría ``escapar'' al lugar \Rustinline{PROGRAM_PANIC} y
+el deadlock sería indetectable para el verificador de modelos.
 
-It is indispensable for the translation to ``force'' the Petri net to stay blocked
-and not open alternative paths that could be used by the model checker
-to come to the conclusion that the \acrshort{PN} never deadlocks.
+Es indispensable que la traducción ``obligue'' a la red de Petri a permanecer bloqueada y a no
+abrir caminos alternativos que podrían ser utilizados por el verificador de modelos para llegar a
+la conclusión de que la red nunca se bloquea.
 
 \begin{listing}[!htbp]
       \begin{minted}{Rust}
@@ -308,152 +306,139 @@ to come to the conclusion that the \acrshort{PN} never deadlocks.
             let _result = cvar.wait(mutex_guard);
       }     
       \end{minted}
-      \caption{A basic program to showcase condition variable translation.}
+      \caption{Un programa básico para mostrar la traducción de variables de condición.}
       \label{lst:condition-variable-example}
 \end{listing}
 
 \begin{figure}[!htbp]
       \centering
       \includesvg[width=\linewidth]{condition-variable-example.svg}
-      \caption{The Petri net model for the program in Listing \ref{lst:condition-variable-example}.}
+      \caption{El modelo de red de Petri para el programa del Listado \ref{lst:condition-variable-example}.}
       \label{fig:condition-variable-example}
 \end{figure}
 
-\subsection{Algorithms for condition variable translation}
+\subsection{Algoritmos para la traducción de condition variables}
 \label{sec:condvar-algorithms}
 
-To wrap up this section, we will present a concise summary
-of the algorithms utilized in the translation of condition variables.
-The additions required to the mutex algorithms are included afterward as well.
+Para concluir esta sección, presentaremos un resumen conciso de los algoritmos utilizados en la
+traducción de condition variables.
+Posteriormente se detallan también las adiciones necesarias a los algoritmos mutex.
 
-When a call to \Rustinline{std::sync::Condvar::new} is encountered:
-
-\begin{enumerate}
-      \item Translate the function call using the model seen in Fig. \ref{fig:function-with-cleanup}.
-      \item Create a new \Rustinline{Condvar}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/condvar.rs}}
-            structure with an index to identify it unequivocally across the \acrshort{PN}.
-      \item Link the return value of \Rustinline{std::sync::Condvar::new},
-            the new condition variable, to the \Rustinline{Condvar} structure.
-\end{enumerate}
-
-When a call to \Rustinline{std::sync::Condvar::notify_one} is encountered:
+Cuando se encuentra una llamada a \Rustinline{std::sync::Condvar::new}:
 
 \begin{enumerate}
-      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
-            Ignore the cleanup place because, otherwise, any call may fail,
-            which amounts to the notify operation not being present in the program,
-            leading to a false lost signal.
-            This is equivalent to assuming that the \Rustinline{notify_one} function never fails.
-      \item Retrieve the \Rustinline{self} reference to the condition variable
-            on which the function is called.
-      \item Add an arc from the transition representing the function call
-            to the \Rustinline{notify} place of the underlying condition variable.
+      \item Traducir la llamada a la función utilizando el modelo visto en la Fig. \ref{fig:function-with-cleanup}.
+      \item Crear una nueva estructura \Rustinline{Condvar}\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/translator/sync/condvar.rs}}
+            con un índice para identificarla inequívocamente en toda la red.
+      \item Vincular el valor de retorno de \Rustinline{std::sync::Condvar::new},
+            la nueva condition variable, a la estructura \Rustinline{Condvar}.
 \end{enumerate}
 
-When a call to \Rustinline{std::sync::Condvar::wait}
-or \Rustinline{std::sync::Condvar::wait_while} is encountered:
+Cuando se encuentra una llamada a \Rustinline{std::sync::Condvar::notify_one}:
 
 \begin{enumerate}
-      \item Ignore the cleanup place because, otherwise, any call may fail,
-            which amounts to the wait operation not being present in the program,
-            leading to an incorrect result.
-            We must force the \acrshort{PN}
-            to ``wait'' for the notifying signal to be sent.
-            This is equivalent to assuming that the \Rustinline{wait}
-            or \Rustinline{wait_while} function never fails.
-      \item Retrieve the \Rustinline{self} reference to the condition variable
-            on which the function is called.
-      \item Extract the mutex guard passed into the function.
-      \item If the condition variable was already connected to a function call,
-            then the translation fails.
-            This enforces Assumptions 1 and 2 seen at the beginning of the section.
-      \item Otherwise, connect the start and end places to the
-            \Rustinline{wait_start} and \Rustinline{notify_received} transitions respectively.
-      \item Link the return value, the same mutex guard that was passed as an argument,
-            to the \Rustinline{MutexGuard} structure.
-      \item Notify the translator that the mutex received must be linked to this \Rustinline{Condvar}.
-            For this purpose, use the enum variant \Rustinline{PostprocessingTask::LinkMutexToCondvar}.
-            This task will be processed after translating all the threads.
+      \item Traducir la llamada a la función utilizando el modelo visto en la Fig. \ref{fig:simplest-function}.
+            Ignorar el lugar de limpieza porque, de lo contrario, cualquier llamada podría fallar, lo que equivaldría a
+            que la operación notificar no estuviera presente en el programa, dando lugar a una falsa
+            señal perdida. Esto equivale a suponer que la función \Rustinline{notify_one} nunca falla.
+      \item Recuperar la auto-referencia \Rustinline{self} a la condition variable sobre la que se llama a la función.
+      \item Añadir un arco desde la transición que representa la llamada a la función hasta el lugar de
+            notificación de la condition variable referenciada por \Rustinline{self}.
 \end{enumerate}
 
-When all the threads finished translating, that is,
-when the queue of threads to process is empty,
-the \Rustinline{Translator} enters a loop
-to complete the postprocessing tasks by priority order:
+Cuando se encuentra una llamada a \Rustinline{std::sync::Condvar::wait}
+o \Rustinline{std::sync::Condvar::wait_while}:
 
 \begin{enumerate}
-      \item Create at the beginning of the loop an empty vector of mutex references.
-      \item Pop from the \Rustinline{std::collections::BinaryHeap} the task with the lowest priority.
-            This will be by design a \Rustinline{PostprocessingTask::NewMutex}.
-            Add the mutex reference to the vector.
-      \item After processing all the lower priority tasks,
-            the \Rustinline{Translator} has references to all the mutexes in the code.
-            Continue popping tasks from the priority queue.
-      \item Eventually, a \Rustinline{PostprocessingTask::LinkMutexToCondvar} is extracted.
-            Link each mutex to the condition variable,
-            which creates the places \Rustinline{condition_set}
-            and \Rustinline{condition_not_set} for the condition.
-            It also connects the \Rustinline{deref_mut} transitions
-            to these places to set the condition.
-            Lastly, it connects the condition places to the condition variable transitions
-            to disable the \Rustinline{wait}.
+      \item Ignorar el lugar de limpieza porque, de lo contrario, cualquier llamada puede fallar, lo que
+            equivale a que la operación de espera no está presente en el programa, lo que conduce a
+            un resultado incorrecto. Debemos obligar a la red a ``esperar'' a que se envíe la señal de
+            notificación. Esto equivale a suponer que las funciones \Rustinline{wait} o \Rustinline{wait_while} nunca fallan.
+      \item Recuperar la auto-referencia \Rustinline{self} a la condition variable sobre la que se llama a la función.
+      \item Extraer la guarda de mutex pasada como argumento a la función.
+      \item Si la condition variable ya está conectada a una llamada a wait, la traducción falla.
+            Esto hace cumplir los Supuestos 1 y 2 vistos al principio de la sección.
+      \item En caso contrario, conectar los lugares de inicio y fin a las transiciones \Rustinline{wait_start}
+            y \Rustinline{notify_received} respectivamente.
+      \item Vincular el valor de retorno, la misma guarda de mutex que se pasó como argumento, a la \Rustinline{MutexGuard}.
+      \item Notificar al traductor que el mutex recibido debe vincularse a este \Rustinline{Condvar}.
+            Para este propósito utilizar la variante enum \Rustinline{PostprocessingTask::LinkMutexToCondvar}.
+            Esta tarea se procesará después de traducir todos los hilos.
 \end{enumerate}
 
-\subsubsection{Modifications to the mutex algorithms}
-
-As stated before, the mutex algorithms require some additions to successfully
-perform missed signal detection.
-
-Add the following to the handler of the \Rustinline{std::sync::Mutex::new} function:
+Cuando todos los hilos han terminado de traducir, es decir, cuando la cola de hilos por procesar
+está vacía, el \Rustinline{Translator} entra en un loop para completar las tareas de postprocesamiento por
+orden de prioridad:
 
 \begin{enumerate}
-      \item Notify the translator that a new mutex has been created.
-            For this purpose, use the enum variant \Rustinline{PostprocessingTask::NewMutex}.
-            This task will be processed after translating all the threads.
+      \item Crear al principio del loop un vector vacío de referencias a mutex.
+      \item Saca del \Rustinline{std::collections::BinaryHeap} la tarea con la prioridad más baja.
+            Esta será por diseño una \Rustinline{PostprocessingTask::NewMutex}.
+            Añadir la referencia a mutex al vector.
+      \item Después de procesar todas las tareas de menor prioridad,
+            el \Rustinline{Translator} tiene referencias a
+            todos los mutex del código. Continuar sacando tareas de la cola de prioridad.
+      \item Eventualmente, una \Rustinline{PostprocessingTask::LinkMutexToCondvar} es extraída.
+            Vincular cada mutex a la condition variable,
+            lo que crea los lugares \Rustinline{condition_set}
+            y \Rustinline{condition_not_set} para la condición en sí.
+            También conectar las transiciones \Rustinline{deref_mut}
+            a estos lugares para modificar el valor de la condición.
+            Por último, conectar los lugares de la condición a las transiciones de la variable de
+            condición para desactivar el \Rustinline{wait}.
 \end{enumerate}
 
-When a call to \Rustinline{std::result::Result::<T, E>::unwrap} is encountered:
+\subsubsection{Modificaciones en los algoritmos para el mutex}
+
+Como ya se ha dicho, los algoritmos mutex requieren algunas adiciones para realizar con éxito
+la detección de señales perdidas.
+
+Agregar lo siguiente al manejador de la función \Rustinline{std::sync::Mutex::new}:
 
 \begin{enumerate}
-      \item Check that the \Rustinline{self} reference is a mutex or a mutex guard.
-      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
-            Ignore the cleanup place because, otherwise, any call may fail,
-            as if the mutex lock operation
-            were not present in the program, leading to a false lost signal.
-            This is equivalent to assuming that the \Rustinline{unwrap} function never fails
-            when applied to a variable linked to a mutex or a mutex guard.
+      \item Notificar al traductor que se ha creado un nuevo mutex.
+            Para este propósito utilizar la variante enum \Rustinline{PostprocessingTask::NewMutex}.
+            Esta tarea se procesará después de traducir todos los hilos.
 \end{enumerate}
 
-When a call to \Rustinline{std::ops::Deref::deref}
-or \Rustinline{std::ops::DerefMut::deref_mut} is encountered:
+Cuando se encuentra una llamada a \Rustinline{std::result::Result::<T, E>::unwrap}:
 
 \begin{enumerate}
-      \item Check that the \Rustinline{self} reference is a mutex or a mutex guard.
-      \item Translate the function call using the model seen in Fig. \ref{fig:simplest-function}.
-            Ignore the cleanup place because, otherwise, any call may fail,
-            as if the mutex lock operation
-            were not present in the program, leading to a false lost signal.
-            This is equivalent to assuming that the \Rustinline{deref}
-            and \Rustinline{deref_mut} functions never fail
-            when dereferencing a variable linked to a mutex or a mutex guard.
-      \item If the value is being dereferenced mutably (\Rustinline{deref_mut}),
-            extract the first argument passed to the function: The mutex or mutex guard.
-            Add the \Rustinline{deref_mut} transition to the mutex
-            to set the condition for a condition variable in the postprocessing step.
-      \item Otherwise do nothing.
-            The immutable case does not need to be added to the mutex.
+      \item Comprobar si la auto-referencia \Rustinline{self} es un mutex o un mutex guard.
+      \item Traducir la llamada a la función utilizando el modelo visto en la Fig. \ref{fig:simplest-function}.
+            Ignorar el lugar de limpieza porque, de lo contrario, cualquier llamada puede fallar, como si la operación
+            de bloqueo del mutex no estuviera presente en el programa, lo que daría lugar a una falsa
+            señal perdida. Esto equivale a suponer que la función \Rustinline{unwrap} nunca falla cuando se
+            aplica a una variable vinculada a un mutex o a una guarda de mutex.
 \end{enumerate}
 
-It should now be clear to the reader that the algorithms for missed signal detection are
-fundamentally of higher complexity and ought to handle more border cases than
-those for detecting simple deadlocks caused by incorrect usage of mutexes or
-calling \Rustinline{join} on threads that never terminate.
+Cuando se encuentra una llamada a \Rustinline{std::ops::Deref::deref}
+o \Rustinline{std::ops::DerefMut::deref_mut}:
 
-It is worth mentioning that some border cases arise
-due to the inclusion of the cleanup logic
-from the \acrshort{MIR} in the \acrshort{PN} model.
-If the implementation instead skipped this,
-under the hypothesis that Rust standard library functions may never panic,
-then the algorithms would become simpler.
-Sec. \ref{sec:future-work-no-cleanup} is concerned with
-the question of not modeling the cleanup paths.
+\begin{enumerate}
+      \item Comprobar si la auto-referencia \Rustinline{self} es un mutex o un mutex guard.
+      \item Traducir la llamada a la función utilizando el modelo visto en la Fig. \ref{fig:simplest-function}.
+            Ignorar el lugar de limpieza porque, de lo contrario, cualquier llamada puede fallar, como si la operación
+            de bloqueo del mutex no estuviera presente en el programa, lo que daría lugar a una falsa
+            señal perdida. Esto equivale a suponer que las funciones \Rustinline{deref} y \Rustinline{deref_mut} nunca fallan
+            cuando se realiza una desreferencia a una variable vinculada a un mutex o a una guarda
+            mutex.
+      \item Si el valor está siendo dereferenciado mutablemente (\Rustinline{deref_mut}),
+            extraer el primer argumento pasado a la función: El mutex o el mutex guard.
+            Añadir la transición \Rustinline{deref_mut} al mutex
+            para conectar la condición con una condition variable específica en la etapa de postprocesamiento.
+      \item En caso contrario no haga nada. El caso inmutable no necesita ser añadido al mutex.
+\end{enumerate}
+
+Ahora debería estar claro para el lector que los algoritmos para la detección de señales
+perdidas son fundamentalmente de mayor complejidad y deben manejar más casos borde
+que los de detección de simples deadlocks causados por un uso incorrecto de los mutexes o
+por llamar a \Rustinline{join} para hilos que nunca terminan.
+
+Cabe mencionar que algunos casos borde surgen debido a la inclusión de la lógica de limpieza
+de la \acrshort{MIR} en el modelo \acrshort{PN}.
+Si en su lugar la implementación omitiera esto, bajo la hipótesis de
+que las funciones de la biblioteca estándar Rust nunca pueden entrar en pánico,
+entonces los algoritmos se volverían más sencillos.
+La Sec. \ref{sec:future-work-no-cleanup} se ocupa
+de la cuestión de no modelar los flujos alternativos de limpieza.
