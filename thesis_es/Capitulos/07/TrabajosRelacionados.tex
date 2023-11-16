@@ -1,45 +1,39 @@
-In \cite{rawson2022petri}, the authors propose a generalized model
-based on colored Petri nets and implement an open-source middleware framework
-in Rust\footnote{\url{https://github.com/MarshallRawson/nt-petri-net}}
-to build, design, simulate and analyze the resulting Petri nets.
+En \cite{rawson2022petri} los autores proponen un modelo generalizado basado en redes
+de Petri coloreadas e implementan un framework middleware de código abierto
+en Rust\footnote{\url{https://github.com/MarshallRawson/nt-petri-net}}
+para construir, diseñar, simular y analizar las redes de Petri resultantes.
 
-\acrfull{CPN} are a type of Petri net that can represent
-more complex systems than traditional Petri nets.
-In a \acrshort{CPN}, tokens have a specific value associated with them,
-which can represent various attributes or properties of the system being modeled.
-This allows for more detailed and accurate modeling of real-world systems,
-including those with complex data structures and behaviors.
-In the visual representation, each token has a color
-(analogous to a type in programming languages)
-and the transitions expect tokens from a particular
-color (type) and can generate tokens
-of the same color or tokens of a different color.
-As a short example, consider a transition
-with two input places and one output place
-representing the mixing of primary colors.
-If the input token colors are red and blue, then the output token color is purple.
-If the input token colors are yellow and blue, then the output token color is green.
+Las redes de Petri coloreadas (\acrfull{CPN}) son un tipo de red de Petri que puede representar sistemas
+más complejos que las redes de Petri tradicionales. En una CPN, las fichas tienen asociado un
+valor específico, que puede representar diversos atributos o propiedades del sistema que se está
+modelando. Esto permite un modelado más detallado y preciso de los sistemas del mundo real,
+incluidos aquellos con estructuras de datos y comportamientos complejos. En la representación
+visual, cada token tiene un color (análogo a un tipo en los lenguajes de programación) y las
+transiciones esperan tokens de un determinado color (tipo) y pueden generar tokens del mismo
+color o tokens de un color diferente. Como ejemplo breve, considere una transición con dos
+lugares de entrada y uno de salida que representa la mezcla de colores primarios. Si los colores
+de las fichas de entrada son rojo y azul, entonces el color de la ficha de salida es morado. Si los
+colores de las fichas de entrada son amarillo y azul, entonces el color de la ficha de salida es
+verde.
 
-The model proposed by the authors is an even more general type of Petri net,
-named \acrfull{NT-PN}, which allows transitions to fire
-without having all their input places marked with tokens,
-while also allowing each transition to define
-which output places should be marked depending on the input.
-In other words, each transition defines arbitrary rules for its firing to take place.
-They explain briefly how the Petri net could be analyzed
-to solve for the maximal number of useful threads to execute the task modeled therein.
-They also mention the modeling step as a tool for checking for erroneous states
-before deploying an electronic or computer system.
+El modelo propuesto por los autores es un tipo de red de Petri aún más general, denominado
+Redes de Petri de transición no determinista (\acrfull{NT-PN}) que permite que las transiciones se
+disparen sin que todos sus lugares de entrada estén marcados con fichas, al tiempo que permite
+que cada transición defina qué lugares de salida deben marcarse en función de la entrada. En
+otras palabras, cada transición define reglas arbitrarias para que se produzca su disparo.
+Explican brevemente cómo podría analizarse la red de Petri para resolver el número máximo de
+hilos útiles para ejecutar la tarea modelada en ella. También mencionan el paso de modelado
+como herramienta para comprobar si hay estados erróneos antes de desplegar un sistema
+electrónico o informático.
 
-In \cite{deboer2013petri}, a translation from a formal language to Petri nets
-for deadlock detection in the context of active objects and futures is presented.
-The formal language chosen is \acrfull{Creol}.
-It is an object-oriented modeling language designed for specifying distributed systems.
-In this paper, the program is made of asynchronously communicating active objects
-where futures are used to handle return values,
-which can be retrieved via a lock detaining \texttt{get} primitive (blocking)
-or a lock releasing \texttt{claim} primitive (non-blocking).
-After translating the program to a Petri net,
-reachability analysis is applied to detect deadlocks.
-This paper shows that a translation of asynchronous communication strategies
-to Petri nets with the goal of detecting deadlocks is also possible.
+En \cite{deboer2013petri} se presenta una traducción de un lenguaje formal a redes de Petri para
+la detección de bloqueos en el contexto de objetos activos y futuros. El lenguaje formal
+elegido es \acrfull{Creol}. Se trata de un lenguaje
+orientado a objetos diseñado para especificar sistemas distribuidos.
+En este trabajo, el programa está
+formado por objetos activos que se comunican asíncronamente y en el que se utilizan futuros
+para manejar los valores de retorno, que pueden recuperarse mediante una primitiva \texttt{get} que
+retiene el lock (bloqueante) o una primitiva \texttt{claim} que libera el lock (no bloqueante).
+Tras traducir el programa a una red de Petri, se aplica el análisis de alcanzabilidad para detectar
+los bloqueos. Este artículo muestra que también es posible una traducción de estrategias de
+comunicación asíncrona a redes de Petri con el objetivo de detectar los bloqueos.
