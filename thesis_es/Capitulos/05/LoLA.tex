@@ -1,37 +1,40 @@
-\section{Integrating LoLA to the solution}
+\section{Integrando LoLA a la solución}
 
-As stated in Sec. \ref{sec:lola-format},
-\acrshort{LoLA} is the chosen model checker for this thesis.
-It acts as a backend that is responsible for verifying the absence of deadlocks.
-Integrating it was unfortunately not trivial.
+Como se indica en la Sec. \ref{sec:lola-format},
+\acrshort{LoLA}  es el verificador de modelos elegido para esta tesis.
+Actúa como un backend que se encarga de verificar la ausencia de deadlocks.
+Integrarlo no fue, por desgracia, trivial, como se detallará en los siguientes párrafos.
 
-\subsection{Compilation}
+\subsection{Compilación}
 
-First, the compilation from the source code did not work on the hardware at our disposal.
-Changes to the code were necessary as newer versions of the C++ compiler tend to be more strict
-and reject or generate warnings for code that was previously accepted.
-Besides, one of the dependencies, kimwitu++\footnote{\url{https://www.nongnu.org/kimwitu-pp/}},
-must be compiled from the source code too
-since it is not packaged for Linux distributions.
+En primer lugar, la compilación a partir del código fuente no funcionaba en el hardware del que
+se disponía. Fue necesario realizar cambios en el código, ya que las versiones más recientes
+del compilador de C++ tienden a ser más estrictas y rechazan o generan advertencias para el
+código que antes se aceptaba. Además, una de las dependencias, kimwitu++\footnote{\url{https://www.nongnu.org/kimwitu-pp/}},
+debe compilarse también a partir del código fuente ya que no está empaquetado para las distribuciones de Linux.
 
-To preserve a working copy of the model checker for the future,
-indispensable for performing the deadlock analysis,
-a mirror\footnote{\url{https://github.com/hlisdero/lola}}
-was created on GitHub where detailed instructions are provided for users.
-This aims to make the installation from source as straightforward as possible.
+Para conservar en el futuro una copia funcional del verificador de modelos, indispensable
+para realizar el análisis de deadlocks, se ha creado
+una réplica\footnote{\url{https://github.com/hlisdero/lola}} en GitHub
+en la que se ofrecen instrucciones detalladas a los usuarios.
+Con ello se pretende que la instalación desde el código fuente sea lo más sencilla posible.
 
-\subsection{Invoking the model checker}
+\subsection{Invocación del verificador de modelos}
 
-The second difficulty is that \acrshort{LoLA} is compiled to an executable,
-not as a library, so our tool could not link to it.
-Instead, we are compelled to execute the binary
-from our \Rustinline{cargo-check-deadlock} binary
-to run the model checker passing the correct
-arguments\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/model_checker/lola.rs}}.
-The \acrshort{LoLA} executable is part of the repository because it is needed
-to run the integration tests in the CI/CD pipeline using GitHub Actions.
-A user may also copy this executable to install \acrshort{LoLA}
-in lieu of compiling it from scratch.
+La segunda dificultad es que \acrshort{LoLA} se compila como un ejecutable, no como una biblioteca,
+por lo que nuestra herramienta no podía enlazar con él. En su lugar, nos vemos obligados a
+ejecutar el binario desde \Rustinline{cargo-check-deadlock} para ejecutar el comprobador de modelos
+pasando los argumentos correctos\footnote{\url{https://github.com/hlisdero/cargo-check-deadlock/blob/main/src/model_checker/lola.rs}}.
+El ejecutable de \acrshort{LoLA} forma parte del repositorio porque es
+necesario para ejecutar las pruebas de integración en la pipeline CI/CD implementada en GitHub Actions.
+Un usuario también puede copiar este ejecutable para instalar \acrshort{LoLA} en lugar de compilarlo desde cero.
+
+A fin de cuentas el usuario es responsable de instalar el comprobador de modelos por separado para
+permitir que nuestra herramienta lo invoque.
+Un script \Rustinline{copy_lola_executable_to_cargo_home.sh}
+incluido en el repositorio facilita la tarea de copiar el archivo
+a una carpeta que ya esté en el \Rustinline{\$PATH}.
+También consideramos otras posibilidades, pero ninguna resultó viable:
 
 In the end, the user is responsible for installing the model checker separately
 to allow our tool to invoke it.
@@ -40,57 +43,58 @@ facilitates the task of copying the file to a folder that is already in the \Rus
 We also considered other possibilities but none were feasible:
 
 \begin{enumerate}
-  \item Using build scripts (\Rustinline{build.rs}) as described in the Cargo Book \cite[Chap. 3.8]{cargo-book}.
-  \item Modifying \acrshort{LoLA} to turn it into a library.
-  \item Move a pre-compiled executable to the installation folder when running \Rustinline{cargo install}.
-  \item Define \acrshort{LoLA} as a binary in the \Rustinline{Cargo.toml} \cite[Chap 3.2.1]{cargo-book}
-        and, hopefully, it gets moved to the cargo bin directory.
-  \item Define \acrshort{LoLA} as an example in the \Rustinline{Cargo.toml} \cite[Chap 3.2.1]{cargo-book}
-        and, hopefully, it gets moved to the cargo bin directory.
-  \item Use a general-purpose build tool like \Rustinline{make}.
+  \item Usar build scripts (\Rustinline{build.rs}) como se describe en el Cargo Book \cite[Chap. 3.8]{cargo-book}.
+  \item Modificar \acrshort{LoLA} para convertirlo en una biblioteca.
+  \item Mover un ejecutable precompilado a la carpeta de instalación cuando se ejecute \Rustinline{cargo install}.
+  \item Definir \acrshort{LoLA} como un binario en el \Rustinline{Cargo.toml} \cite[Chap 3.2.1]{cargo-book}
+        y que, con un poco de suerte, sea movido al directorio cargo bin.
+  \item Definir \acrshort{LoLA} como un \emph{example} en el \Rustinline{Cargo.toml} \cite[Chap 3.2.1]{cargo-book}
+        y que, con un poco de suerte, sea movido al directorio cargo bin.
+  \item Utilizar una herramienta de build de uso general como \Rustinline{make}.
 \end{enumerate}
 
-In the process of solving this second problem,
-we learned that cargo is mainly suited to dealing with dependencies
-expressed as Rust crates, which should be compiled when installed, not with arbitrary assets.
-In short, it is \emph{not} meant to be a general-purpose build tool like \Rustinline{make}.
+En el proceso de resolución de este segundo problema, aprendimos que cargo es adecuado
+principalmente para tratar con dependencias expresadas como crates de Rust, que deben
+compilarse cuando se instalan, no con archivos/artefactos arbitrarios.
+En resumen, no está pensada para ser una herramienta de compilación de uso general como \Rustinline{make}.
 
-\subsection{Expressing the property to check}
+\subsection{Expresar la propiedad a comprobar}
 
-The third challenge is finding a \acrfull{CTL*} formula to instruct \acrshort{LoLA}
-to search for deadlocks.
-Luckily, we can reuse the formula found in \cite{meyer2020}:
+El tercer reto es encontrar una fórmula de \acrfull{CTL*} para ordenar
+a \acrshort{LoLA} que busque los deadlocks.
+Afortunadamente, podemos reutilizar la fórmula encontrada
+en \cite{meyer2020}:
 
 \begin{center}
   EF (DEADLOCK AND (PROGRAM\_END = 0 AND PROGRAM\_PANIC = 0))
 \end{center}
 
-The formula represents the property to check for.
-It should be emphasized that not all deadlocks are interesting for our analysis.
-Our objective is to identify instances of deadlocks
-where the program execution is \emph{unexpectedly} blocked.
-This scenario aligns with a dead \acrshort{PN} as seen in Definition \ref{definition:liveness},
-where no transition is enabled, and the \acrshort{PN} reaches a final state.
-However, we must exercise caution as there are cases where the \acrshort{PN} is \emph{expectedly} dead,
-such as when the program terminates or panics.
-These are states where execution normally halts.
-Thus, if we reach either the \Rustinline{PROGRAM_END} or the \Rustinline{PROGRAM_PANIC} place,
-the execution was successful, not a deadlock in the sense of Sec. \ref{sec:coffman-conditions}.
-In conclusion, we exclude the \Rustinline{PROGRAM_END} and the \Rustinline{PROGRAM_PANIC} places
-by requiring them to be \emph{unmarked} for the deadlock condition to hold.
-This is expressed by the ``= 0'' in the \acrshort{CTL*} formula.
+La fórmula representa la propiedad a comprobar.
+Cabe destacar que no todos los deadlocks son interesantes para nuestro análisis.
+Nuestro objetivo es identificar los casos de deadlocks en
+los que la ejecución del programa se bloquea \emph{inesperadamente}.
+Este escenario se alinea con una red de Petri
+muerta como se ve en la Definición \ref{definition:liveness} en la que no está habilitada ninguna transición
+y la red alcanza un estado final.
+Sin embargo, debemos actuar con cautela, ya que hay casos en los que se \emph{espera}
+que la \acrshort{PN} esté muerta, como cuando el programa termina o entra en pánico.
+Estos son estados normales en los que la ejecución se detiene.
+Por lo tanto, si llegamos al lugar \Rustinline{PROGRAM_END}
+o \Rustinline{PROGRAM_PANIC}, la ejecución ha sido satisfactoria, no se trata de un deadlock en el sentido
+de la Sec. \ref{sec:coffman-conditions}.
+En conclusión, excluimos los lugares \Rustinline{PROGRAM_END} y \Rustinline{PROGRAM_PANIC}
+exigiendo que \emph{no estén marcados} para que se cumpla la condición de deadlock.
+Esto se expresa mediante el ``= 0'' en la fórmula \acrshort{CTL*}.
 
-Lastly, we need to consider the temporal aspect.
-To specify that our state property eventually holds and to find a relevant path,
-we can utilize the ``EF'' operators in combination.
-The ``F'' stands for ``eventually''
-and the ``E'' is the existential path quantifier \cite{meyer2020}.
-So the formula reads as:
+Por último, debemos considerar el aspecto temporal.
+Para especificar que nuestra propiedad de
+estado se cumple eventualmente y encontrar un camino relevante, podemos utilizar los
+operadores ``EF'' en combinación. La ``F'' significa ``eventualmente'' y la ``E'' es el cuantificador
+de camino existencial \cite{meyer2020}. Así que la fórmula se lee como:
 
-\emph{``There exists eventually a path such that DEADLOCK (no transition may fire)
-  and the place PROGRAM\_PANIC has zero tokens and the place PROGRAM\_END has zero tokens''}
+\emph{``Existe eventualmente un camino tal que DEADLOCK (ninguna transición puede dispararse) y
+el lugar PROGRAM\_PANIC tiene cero fichas y el lugar PROGRAM\_END tiene cero fichas''}
 
-Other formulas may be constructed to check other properties.
-For this work, we take this formula as a given and
-we leave the user the possibility of checking other properties if she so desires.
-For a brief introduction to \acrshort{CTL*}, see \cite{meyer2020}.
+Se pueden construir otras fórmulas para comprobar otras propiedades. Para este trabajo,
+tomamos esta fórmula como dada y dejamos al usuario la posibilidad de comprobar otras
+propiedades si así lo desea. Para una breve introducción a \acrshort{CTL*}, véase \cite{meyer2020}.
