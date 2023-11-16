@@ -1,53 +1,57 @@
-This thesis has explored the translation of Rust programs into Petri net models
-for the purpose of deadlock and missed signal detection.
-Throughout the study, various aspects of the translation process have been examined,
-including the handling of function calls, threads, mutexes, and condition variables.
-The translator we developed has demonstrated its capability
-to accurately capture the concurrency and
-synchronization behavior of rather simple Rust programs.
+Esta tesis ha explorado la traducción de programas Rust a modelos de redes de Petri con el fin
+de detectar deadlocks y señales perdidas. A lo largo del estudio, se han examinado
+diversos aspectos del proceso de traducción, incluido el manejo de llamadas a funciones,
+hilos, mutexes y variables de condición. El traductor que hemos desarrollado ha demostrado su
+capacidad para capturar con precisión el comportamiento de concurrencia y sincronización de
+programas Rust más bien sencillos.
 
-The translation approach presented in this thesis has shown promising results,
-successfully modeling and detecting deadlocks in a range of test programs,
-comprising even two classical problems of concurrent programming.
-By harnessing the expressive power of Petri nets,
-the translator provides a visual representation of program behavior,
-facilitating the identification of potential synchronization issues.
-Most importantly, the translation produces a model that can be analyzed
-by a myriad of model checking tools,
-leveraging the existing academic work to bring solutions to industry problems.
-The incorporation of a succinct model for condition variables
-enhances the modeling capabilities and enables the detection of missed signals,
-which are a more intricate class of deadlock in concurrent systems.
+El enfoque de traducción presentado en esta tesis ha mostrado resultados prometedores,
+modelando y detectando con éxito bloqueos en una serie de programas de prueba que
+comprenden incluso dos problemas clásicos de la programación concurrente. Aprovechando el
+poder expresivo de las redes de Petri, el traductor proporciona una representación visual del
+comportamiento del programa, facilitando la identificación de posibles problemas de
+sincronización. Y lo que es más importante, la traducción produce un modelo que puede ser
+analizado por una miríada de herramientas de comprobación de modelos,
+dándole una aplicación práctica al trabajo académico existente
+para aportar soluciones a los problemas de la industria.
+La incorporación de un modelo sucinto para las variables de condición mejora las capacidades de
+modelado y permite la detección de señales perdidas que son una clase más intrincada de
+deadlock en los sistemas concurrentes.
 
-Moving forward, there are several avenues for future research and improvement.
-One potential direction is the exploration of more complex programs and real-world applications
-to evaluate the scalability and effectiveness of the translation approach.
-Additionally, further refinement and optimization of the translation algorithms
-could enhance the efficiency of the analysis,
-specially higher-level models that would allow modeling the memory more effectively.
+De cara al futuro, existen varias vías de investigación y mejora.
+Una dirección potencial es la exploración de programas más complejos y aplicaciones del mundo real
+para evaluar la escalabilidad y eficacia del enfoque de traducción.
+Además, un mayor refinamiento y optimización de los algoritmos de traducción
+podría mejorar la eficacia del análisis,
+especialmente modelos de más alto nivel
+que permitirían modelar la memoria con mayor eficacia.
 
-Overall, this thesis has made a significant contribution by developing a translator
-that bridges the gap between Rust programs and Petri nets.
-The insights gained from this research have shed light on the challenges
-and opportunities in modeling and analyzing concurrent systems at compile-time.
-Ideally, a programming language whose compiler detects concurrency problems
-would be a godsend for many applications.
-Building on the strengths of Petri nets, this possibility could be advanced
-further in the Rust programming language.
+En general, esta tesis supone una contribución significativa al desarrollar un traductor
+que tiende un puente entre los programas Rust y las redes de Petri.
+Los conocimientos obtenidos en esta investigación arrojan luz sobre los retos
+y las oportunidades de modelar y analizar sistemas concurrentes en tiempo de compilación.
+Idealmente, un lenguaje de programación cuyo compilador detectara los problemas de concurrencia
+sería una bendición para muchas aplicaciones.
+Construyendo sobre los puntos fuertes de las redes de Petri,
+esta posibilidad podría volverse un poco más real en el lenguaje de programación Rust.
 
-On a different note, the contribution of this thesis extends
-beyond the immediate benefits of the proposed translator and its capabilities.
-By providing a solid, well-documented base for the translation of Rust programs into Petri nets,
-this work aims to make a meaningful contribution to the Rust community as a whole.
-It serves as a stepping stone for future endeavors,
-offering a reliable foundation upon which other tools and research projects can be built.
-It opens up new possibilities for exploring the analysis and verification
-of concurrent Rust programs using Petri nets.
-This, in turn, has the potential to drive further advancements in the field,
-stimulating innovation and promoting a deeper understanding of concurrent programming in Rust.
-With its comprehensive documentation and clear implementation,
-the translator not only facilitates immediate use but also serves as a valuable resource
-for those interested in studying or extending the translation techniques employed.
-Ultimately, this work aspires to ignite curiosity and
-inspire further contributions to the Rust ecosystem,
-fostering collaboration and growth in the community.
+En otro orden de c o s a s , la contribución de esta tesis va
+más allá de los beneficios inmediatos del traductor propuesto y sus capacidades.
+Al proporcionar una base sólida y bien documentada
+para la traducción de programas Rust a redes de Petri, este trabajo pretende hacer una
+contribución significativa a la comunidad Rust en su conjunto.
+Sirve de trampolín para futuros emprendimientos,
+ofreciendo una base fiable sobre la que pueden construirse otras herramientas y
+proyectos de investigación.
+Abre nuevas posibilidades para explorar el análisis y la verificación
+de programas Rust concurrentes utilizando redes de Petri.
+Esto, a su vez, tiene el potencial de impulsar nuevos avances en el campo,
+estimulando la innovación y promoviendo una
+comprensión más profunda de la programación concurrente en Rust.
+Con su documentación completa y su implementación clara,
+el traductor no sólo facilita su uso inmediato,
+sino que también sirve como valioso recurso para quienes estén interesados
+en estudiar o ampliar las técnicas de traducción empleadas.
+En última instancia, este trabajo aspira a encender la curiosidad e
+inspirar nuevas contribuciones al ecosistema Rust,
+fomentando la colaboración y el crecimiento de la comunidad.
