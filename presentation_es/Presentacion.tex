@@ -89,7 +89,6 @@
   En su lugar, utiliza el concepto de \textbf{ownership} (propiedad) y \textbf{borrowing} (préstamo).
 
   \vfill
-  \pause
 
   Evita una gran variedad de clases de errores en tiempo de compilación:
 
@@ -108,70 +107,65 @@
 
 \subsection{¿Por qué Rust?}
 
-\begin{frame}{Memory safety is critical for reliability and security}
-  Empirical investigations have concluded that around 70\% of the vulnerabilities found in
-  large C/C++ codebases are due to memory handling errors. This high figure can be observed in
-  projects such as:
+\begin{frame}{El uso seguro de la memoria es fundamental para la fiabilidad y la seguridad}
+  Investigaciones empíricas han concluido que alrededor del 70\% de las vulnerabilidades encontradas en
+  grandes bases de código en C/C++ se deben a errores de gestión de memoria.
+  Esta elevada cifra puede observarse en proyectos como:
 
   \begin{itemize}
     \item Android Open Source Project \cite{memory-bugs-android},
-    \item the Bluetooth and media components of Android \cite{memory-bugs-android-media-bluetooth},
-    \item the Chromium Projects behind the Chrome web browser \cite{memory-bugs-chrome},
-    \item the CSS component of Firefox \cite{memory-bugs-firefox},
-    \item iOS and macOS \cite{memory-bugs-ios-macos},
-    \item Microsoft products \cite{miller-security-microsoft2019, memory-bugs-microsoft},
+    \item los componentes Bluetooth y multimedia de Android \cite{memory-bugs-android-media-bluetooth},
+    \item el Proyecto Chromium detrás del navegador web Chrome \cite{memory-bugs-chrome},
+    \item el componente CSS de Firefox \cite{memory-bugs-firefox},
+    \item iOS y macOS \cite{memory-bugs-ios-macos},
+    \item productos de Microsoft \cite{miller-security-microsoft2019, memory-bugs-microsoft},
     \item Ubuntu \cite{memory-bugs-ubuntu}
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Rust adoption is increasing fast}
+\begin{frame}{La adopción de Rust aumenta velozmente}
   \scriptsize
   \begin{itemize}
-    \item The Android Open Source Project encourages
-          the use of Rust for the SO components
-          below the ART \cite{stoep2021}.
-    \item The Linux kernel introduces in version 6.1 official tooling
-          support for programming components in Rust \cite{corbet2022,desimone2022}.
-    \item At Mozilla, the Oxidation project was created in 2015
-          to increase the usage of Rust in Firefox and related projects.
-          As of March 2023, the lines of code in Rust represent more than
-          10\% of the total in Firefox Nightly \cite{mozilla-oxidation}.
-    \item At Meta, the use of Rust as a development language server-side
-          is approved and encouraged since July 2022 \cite{garcia2022}.
-    \item At Cloudflare, a new HTTP proxy in Rust was built from scratch
-          to overcome the architectural limitations of NGINX,
-          reducing CPU usage by 70\% and memory usage by 67\% \cite{wu2022}.
-    \item At Discord, reimplementing a crucial service
-          in Rust provided great benefits in performance
-          and solved a performance penalty due to the garbage collection in Go \cite{howarth2020}.
-    \item At npm Inc., the company behind the npm registry, Rust allowed scaling CPU-bound services
-          to more than 1.3 billion downloads per day \cite{rust-npm-case-study}.
-    \item A study of Rust-based code found it runs so efficiently
-          that it uses half as much electricity as a similar program written in Java,
-          a language commonly used at AWS \cite{pereira2017energy}.
+    \item El proyecto Android Open Source fomenta
+          el uso de Rust para los componentes del SO
+          por debajo del ART \cite{stoep2021}.
+    \item El kernel Linux versión 6.1 introduce soporte oficial de las herramientas
+          para programar componentes en Rust \cite{corbet2022,desimone2022}.
+    \item En Mozilla, el proyecto Oxidation se creó en 
+          para aumentar el uso de Rust en Firefox y aplicaciones relacionadas. 
+          En marzo de 2023, las líneas de código en Rust representan
+          más del 10\% del total en Firefox Nightly \cite{mozilla-oxidation}.
+    \item En Meta, el uso de Rust como lenguaje de desarrollo \emph{server-side}
+          está aprobado y se fomenta desde julio de 2022 \cite{garcia2022}.
+    \item En Cloudflare, se construyó desde cero un nuevo proxy HTTP en Rust
+          para superar las limitaciones arquitectónicas de NGINX,
+          reduciendo el uso de CPU en un 70\% y el uso de memoria en un 67\% \cite{wu2022}.
+    \item En Discord, reimplementar un servicio crucial
+          en Rust proporcionó grandes beneficios de performance
+          y solucionó un problema ligado a la recolección de basura en Go \cite{howarth2020}.
+    \item En npm Inc, la empresa detrás del registro npm,
+          Rust permitió escalar los servicios ligados a la CPU
+          a más de 1300 millones de descargas diarias \cite{rust-npm-case-study}.
+    \item Un estudio del código basado en Rust descubrió que se ejecuta tan eficientemente
+          que consume la mitad de electricidad que un programa similar escrito en Java,
+          un lenguaje de uso común en AWS \cite{pereira2017energy}.
   \end{itemize}
 \end{frame}
 
-\begin{frame}{The tooling is great and works out of the box}
+\begin{frame}{Las herramientas son modernas y fáciles de usar}
   \begin{itemize}
     \item \href{https://doc.rust-lang.org/stable/cargo/}{cargo},
-          the official package manager: Format, build, test, lint, update, and publish packages.
-          \pause
+          el gestor de paquetes oficial: Formatear, compilar, testear, lint, actualizar y publicar paquetes.
     \item \href{https://doc.rust-lang.org/book/ch11-00-testing.html}{Test harness}
-          for unit tests, integration tests, and tests in documentation comments (doctests).
-          No third-party libraries needed.
-          \pause
-    \item An official public registry for Rust packages (called ``crates''): \url{https://crates.io/}.
-          \pause
-    \item Automatic generation of a static website from the doc comments of the project.
-          It is published automatically to \url{https://docs.rs/}.
-          \pause
-    \item An official linter included with the default installation that catches even more errors
-          and spots non-idiomatic code: \href{https://github.com/rust-lang/rust-clippy}{clippy}.
-          \pause
-    \item Integration with git, GitHub, VSCode, IntelliJ is great and easy to use.
-          \pause
-    \item A new stable compiler release every 6 weeks \cite{albini2019}.
+          para pruebas unitarias, pruebas de integración y pruebas en comentarios de documentación (doctests).
+          No se necesitan bibliotecas de terceros.
+    \item Un registro público oficial para los paquetes Rust (llamados ``crates''): \url{https://crates.io/}.
+    \item Generación automática de un sitio web estático a partir de los comentarios en el código del proyecto.
+          Se publica automáticamente en \url{https://docs.rs/}.
+    \item Un linter oficial incluido en la instalación por defecto que detecta aún más errores
+          y detecta código no idiomático: \href{https://github.com/rust-lang/rust-clippy}{clippy}.
+    \item La integración con git, GitHub, VSCode, IntelliJ es excelente y fácil de usar.
+    \item Una nueva versión estable del compilador cada 6 semanas \cite{albini2019}.
   \end{itemize}
 \end{frame}
 
@@ -180,10 +174,10 @@
 \subsection{¿Qué es una red de Petri?}
 
 \begin{frame}{Definición informal}
-  A Petri net is a mathematical modeling tool
-  used to describe and analyze the behavior of concurrent systems.
-  It provides a graphical representation of the system's state and its transitions,
-  allowing for visual and formal analysis of complex processes.
+  Una red de Petri es una herramienta de modelado matemático
+  utilizada para describir y analizar el comportamiento de sistemas concurrentes.
+  Proporciona una representación gráfica del estado del sistema y sus transiciones,
+  permitiendo el análisis visual y formal de procesos complejos.
 
   \begin{figure}[!htb]
     \centering
@@ -192,32 +186,34 @@
 
   \scriptsize
   \begin{itemize}
-    \item Places: Represent states in the system (\emph{circles})
-    \item Transitions: Represent usually events or actions that occur in the system (\emph{rectangles})
-    \item Tokens: Marks inside of places that are created
-          and consumed by transitions (\emph{points inside of places})
+    \item Lugares: Representan estados en el sistema (\emph{circles})
+    \item Transiciones: Representan eventos o acciones que ocurren en el sistema (\emph{rectángulos}).
+    \item Tokens: Marcas dentro de lugares que son creadas
+          y consumidas por las transiciones (\emph{puntos dentro de lugares})
   \end{itemize}
 
   \vfill
 \end{frame}
 
-\begin{frame}{Mathematical definition}
-  A Petri net is a 5-tuple, $ PN = (P, T, F, W, M_{0}) $ where:
+\begin{frame}{Definición matemática}
+  Una red de Petri es una 5-tupla, $ PN = (P, T, F, W, M_{0}) $ donde:
 
   \begin{quote}
-    $ P = \{ p_1, p_2, \dots, p_m \} $ is a finite set of places,\\
-    $ T = \{ t_1, t_2, \dots, t_n \} $ is a finite set of transitions,\\
-    $ F \subseteq (P \times T) \cup (T \times P) $ is a set of arcs (flow relation),\\
-    $ W: F \rightarrow \{1, 2, 3, ... \} $ is a weight function for the arcs,\\
-    $ M_{0}: P \rightarrow \{0, 1, 2, 3, .... \} $ is the initial marking,\\
-    $ P \cap T = \varnothing $ and $ P \cup T \neq \varnothing $
+    $ P = \{ p_1, p_2, \dots, p_m \} $ es un conjunto finito de lugares,\\
+    $ T = \{ t_1, t_2, \dots, t_n \} $ es un conjunto finito de transiciones,\\
+    $ F \subseteq (P \times T) \cup (T \times P) $ es un conjunto de arcos (relación de flujo),\\
+    $ W: F \rightarrow \{1, 2, 3, ... \} $ es una función de peso para los arcos,\\
+    $ M_{0}: P \rightarrow \{0, 1, 2, 3, .... \} $ es el marcado inicial,\\
+    $ P \cap T = \varnothing $ y $ P \cup T \neq \varnothing $
   \end{quote}
+  
+  \vfill
 
-  The graph is by definition \emph{bipartite}.
-  There can only be edges:
+  El grafo es por definición \emph{bipartito}.
+  Solo puede haber aristas:
   \begin{itemize}
-    \item from places to transitions or
-    \item from transitions to places
+    \item de lugares a transiciones
+    \item de transiciones a lugares
   \end{itemize}
 
 \end{frame}
