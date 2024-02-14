@@ -65,8 +65,8 @@
   \begin{itemize}
     \item Uso seguro de la memoria (\emph{Memory safe})
     \item Compilado a código máquina, con un \emph{runtime} mínimo
-    \item Expresividad de un lenguaje de alto nivel
-    \item Performance de un lenguaje de bajo nivel (similar a C o C++)
+    \item Expresividad de lenguaje de alto nivel
+    \item Performance de lenguaje de bajo nivel (similar a C o C++)
   \end{itemize}
 \end{frame}
 
@@ -77,7 +77,7 @@
     \item [2015] Primera versión estable 1.0
     \item [2016] Mozilla lanza Servo, un motor de navegador construido con Rust
     \item [2019] Se estabiliza el soporte de \Rustinline{async}/\Rustinline{await}
-    \item [2021] AWS, Huawei, Google, Microsoft y Mozilla crean la Rust Foundation.
+    \item [2021] AWS, Huawei, Google, Microsoft y Mozilla crean la Rust Foundation
     \item [2021] El proyecto Android fomenta el uso de Rust para los componentes del SO por debajo del ART
     \item [2022] El kernel de Linux añade soporte para Rust junto con C
     \item [2023] 8 años consecutivos el lenguaje de programación más querido en la Stack Overflow Developer Survey
@@ -128,44 +128,44 @@
   \begin{itemize}
     \item El proyecto Android Open Source fomenta
           el uso de Rust para los componentes del SO
-          por debajo del ART \cite{stoep2021}.
+          por debajo del ART \cite{stoep2021}
     \item El kernel Linux versión 6.1 introduce soporte oficial de las herramientas
-          para programar componentes en Rust \cite{corbet2022,desimone2022}.
+          para programar componentes en Rust \cite{corbet2022,desimone2022}
     \item En Mozilla, el proyecto Oxidation se creó en 
           para aumentar el uso de Rust en Firefox y aplicaciones relacionadas. 
           En marzo de 2023, las líneas de código en Rust representan
-          más del 10\% del total en Firefox Nightly \cite{mozilla-oxidation}.
+          más del 10\% del total en Firefox Nightly \cite{mozilla-oxidation}
     \item En Meta, el uso de Rust como lenguaje de desarrollo \emph{server-side}
-          está aprobado y se fomenta desde julio de 2022 \cite{garcia2022}.
+          está aprobado y se fomenta desde julio de 2022 \cite{garcia2022}
     \item En Cloudflare, se construyó desde cero un nuevo proxy HTTP en Rust
           para superar las limitaciones arquitectónicas de NGINX,
-          reduciendo el uso de CPU en un 70\% y el uso de memoria en un 67\% \cite{wu2022}.
+          reduciendo el uso de CPU en un 70\% y el uso de memoria en un 67\% \cite{wu2022}
     \item En Discord, reimplementar un servicio crucial
           en Rust proporcionó grandes beneficios de performance
-          y solucionó un problema ligado a la recolección de basura en Go \cite{howarth2020}.
+          y solucionó un problema ligado a la recolección de basura en Go \cite{howarth2020}
     \item En npm Inc, la empresa detrás del registro npm,
           Rust permitió escalar los servicios ligados a la CPU
-          a más de 1300 millones de descargas diarias \cite{rust-npm-case-study}.
+          a más de 1300 millones de descargas diarias \cite{rust-npm-case-study}
     \item Un estudio del código basado en Rust descubrió que se ejecuta tan eficientemente
           que consume la mitad de electricidad que un programa similar escrito en Java,
-          un lenguaje de uso común en AWS \cite{pereira2017energy}.
+          un lenguaje de uso común en AWS \cite{pereira2017energy}
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Las herramientas son modernas y fáciles de usar}
   \begin{itemize}
     \item \href{https://doc.rust-lang.org/stable/cargo/}{cargo},
-          el gestor de paquetes oficial: Formatear, compilar, testear, lint, actualizar y publicar paquetes.
+          el gestor de paquetes oficial: Formatear, compilar, testear, lint, actualizar y publicar paquetes
     \item \href{https://doc.rust-lang.org/book/ch11-00-testing.html}{Test harness}
           para pruebas unitarias, pruebas de integración y pruebas en comentarios de documentación (doctests).
-          No se necesitan bibliotecas de terceros.
-    \item Un registro público oficial para los paquetes Rust (llamados ``crates''): \url{https://crates.io/}.
+          No se necesitan bibliotecas de terceros
+    \item Un registro público oficial para los paquetes Rust (llamados ``crates''): \url{https://crates.io/}
     \item Generación automática de un sitio web estático a partir de los comentarios en el código del proyecto.
-          Se publica automáticamente en \url{https://docs.rs/}.
+          Se publica automáticamente en \url{https://docs.rs/}
     \item Un linter oficial incluido en la instalación por defecto que detecta aún más errores
-          y detecta código no idiomático: \href{https://github.com/rust-lang/rust-clippy}{clippy}.
-    \item La integración con git, GitHub, VSCode, IntelliJ es excelente y fácil de usar.
-    \item Una nueva versión estable del compilador cada 6 semanas \cite{albini2019}.
+          y detecta código no idiomático: \href{https://github.com/rust-lang/rust-clippy}{clippy}
+    \item Integración con git, GitHub, VSCode, IntelliJ, entre otros
+    \item Una nueva versión estable del compilador cada 6 semanas \cite{albini2019}
   \end{itemize}
 \end{frame}
 
@@ -187,7 +187,7 @@
   \scriptsize
   \begin{itemize}
     \item Lugares: Representan estados en el sistema (\emph{circles})
-    \item Transiciones: Representan eventos o acciones que ocurren en el sistema (\emph{rectángulos}).
+    \item Transiciones: Representan eventos o acciones que ocurren en el sistema (\emph{rectángulos})
     \item Tokens: Marcas dentro de lugares que son creadas
           y consumidas por las transiciones (\emph{puntos dentro de lugares})
   \end{itemize}
@@ -241,7 +241,7 @@
   \scriptsize
   Esto es un grafo marcado (\emph{Marked graph}), una subclase de redes de Petri.
   Nótese la concurrencia entre la Tarea 1 y la Tarea 2.
-  Esto no puede modelar con una única máquina de estados finitos.
+  Esto no puede modelarse con una única máquina de estados finitos.
 
   \begin{figure}
     \centering
@@ -251,9 +251,9 @@
 
 \begin{frame}{Procotolos de comunicación: Send with ACK}
   \scriptsize
-  Un protocolo simple en el que el Proceso 1 envía mensajes al Proceso 2 y
-  espera a recibir un acuse de recibo (\emph{acknowledgment}) antes de continuar.
-  Para simplificar, no se ha incluido ningún mecanismo de \emph{timeout}.
+  El Proceso 1 envía mensajes al Proceso 2 y
+  espera a recibir un acuse de recibo (\emph{ACK}) antes de continuar.
+  Por simplicidad, no se ha incluido ningún mecanismo de \emph{timeout}.
 
   \begin{figure}
     \centering
@@ -281,7 +281,7 @@
 
 \begin{frame}{Análisis de alcance}
   Las redes de Petri pueden analizarse utilizando métodos formales para concluir si la red puede alcanzar
-  un deadlock o no. Existe una noción de \emph{liveness} análoga a la que se encuentra en los sistemas informáticos.
+  un deadlock o no. Existe una noción de \emph{liveness} análoga a aquella de los sistemas informáticos.
   
   \vfill
   \pause
@@ -297,7 +297,7 @@
   Traducir el código fuente a una red de Petri se ha hecho antes para otros lenguajes de programación
   \cite{kavi2002modeling,moshtaghi2001} y también para Rust \cite{meyer2020, zhang2022deadlocks}.
   La dificultad reside en soportar más primitivas de sincronización
-  que simples mutexes y traducir código de aplicaciones del mundo real.
+  que solo mutexes y traducir código de aplicaciones del mundo real.
 \end{frame}
 
 \section{Traducción}
@@ -308,7 +308,7 @@
   \begin{itemize}
     \item Lexing: El código fuente se convierte en un flujo de unidades atómicas conocidas como tokens.
           \pause
-    \item Parsing: El flujo de tokens se convierte en un \textbf{Abstract Syntax Tree}.
+    \item Parsing: El flujo de tokens se convierte en un \textbf{Abstract Syntax Tree}
           \pause
     \item High-level Intermediate Representation (HIR):
           \begin{itemize}
@@ -412,24 +412,24 @@
 
   \begin{itemize}
     \item \Rustinline{std::thread::spawn} debe crear un token adicional
-          que modele el \emph{program counter} del segundo hilo.
-    \item El hilo que llama a \emph{join} debe esperar hasta que el otro hilo termine.
+          que modele el \emph{program counter} del segundo hilo
+    \item El hilo que llama a \emph{join} debe esperar a que el otro hilo termine
   \end{itemize}
 \end{frame}
 
-\begin{frame}{Modelo de red de Petri de un thread}
+\begin{frame}{Modelo de red de Petri de un hilo de ejecución}
   \begin{figure}
     \centering
     \includesvg[height=0.85\textheight]{multithreading-example.svg}
   \end{figure}
 \end{frame}
 
-\subsection{Modelado de un mutex}
+\subsection{Modelado de mutex}
 
 \begin{frame}[fragile]{Programa de ejemplo}
   Consideremos un programa simple que llama a \emph{lock} sobre un mutex dos veces.
   La segunda operación de \emph{lock} causará un deadlock
-  porque el \emph{lock handle} devuelto por la primera llamada a \Rustinline{std::sync::Mutex::lock}
+  porque el \emph{lock handle} devuelto por la primera llamada a \Rustinline{Mutex::lock}
   no se libera hasta que sale de scope.
 
   \vfill
@@ -447,9 +447,9 @@
   \vfill
 
   \begin{itemize}
-    \item Debería haber un único lugar que modele el mutex.
-    \item Bloquear el mutex es sacar el token del lugar del mutex.
-    \item Desbloquear el mutex es volver a colocar el token en el lugar del mutex.
+    \item Debería haber un único lugar que modele el mutex
+    \item Bloquear el mutex es sacar el token del lugar del mutex
+    \item Desbloquear el mutex es volver a colocar el token en el lugar del mutex
   \end{itemize}
 \end{frame}
 
@@ -486,9 +486,9 @@
   \end{listing}
 
   \begin{itemize}
-    \item El modelo para la variable de condición debe aparecer en la red de Petri.
-    \item Se coloca un token en el lugar de notificación.
-    \item Pero la señal se consume porque no se ha llamado a \Rustinline{std::sync::Condvar::wait}.
+    \item El modelo para la variable de condición debe aparecer en la red de Petri
+    \item Se coloca un token en el lugar de notificación
+    \item La señal se consume porque no se ha llamado a \Rustinline{Condvar::wait}
   \end{itemize}
 \end{frame}
 
@@ -527,7 +527,7 @@
           Un curso de Rust en tres días desarrollado por el equipo de Android
     \item \href{https://learn.microsoft.com/en-us/training/paths/rust-first-steps/}{Take your first steps with Rust}:
           Un curso sencillo en Microsoft Learn
-    \item \href{https://www.youtube.com/watch?v=MsocPEZBd-M}{Rust Programming Course for Beginners} by freeCodeCamp.org.
+    \item \href{https://www.youtube.com/watch?v=MsocPEZBd-M}{Rust Programming Course for Beginners} by freeCodeCamp.org
   \end{itemize}
 \end{frame}
 
