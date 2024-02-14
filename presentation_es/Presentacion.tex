@@ -302,43 +302,43 @@
 
 \section{Traducción}
 
-\begin{frame}{Compilation stages in \emph{rustc}}
+\begin{frame}{Etapas de compilación en \emph{rustc}}
   \scriptsize
 
   \begin{itemize}
-    \item Lexing: The source text is turned into a stream of atomic source code units known as tokens.
+    \item Lexing: El código fuente se convierte en un flujo de unidades atómicas conocidas como tokens.
           \pause
-    \item Parsing: The stream of tokens is converted into an \textbf{Abstract Syntax Tree}.
+    \item Parsing: El flujo de tokens se convierte en un \textbf{Abstract Syntax Tree}.
           \pause
     \item High-level Intermediate Representation (HIR):
           \begin{itemize}
             \scriptsize
             \setbeamertemplate{itemize items}[circle]
-            \item Desugar loops: \Rustinline[fontsize=\scriptsize]{while} and \Rustinline[fontsize=\scriptsize]{for} to simple \Rustinline[fontsize=\scriptsize]{loop}.
-            \item Type inference: The automatic detection of a type of an expression.
-            \item Trait solving: Ensuring that each implementation block (\Rustinline[fontsize=\scriptsize]{impl}) points to a valid trait.
-            \item Type checking.
+            \item Desugar loops: \Rustinline[fontsize=\scriptsize]{while} y \Rustinline[fontsize=\scriptsize]{for} a simples \Rustinline[fontsize=\scriptsize]{loop}
+            \item Type inference: Detección automática del tipo de una expresión
+            \item Trait solving: Asegurarse que cada bloque (\Rustinline[fontsize=\scriptsize]{impl}) apunta a un trait válido
+            \item Chequeo de tipos
           \end{itemize}
           \pause
     \item Mid-level Intermediate Representation (MIR):
           \begin{itemize}
             \scriptsize
             \setbeamertemplate{itemize items}[circle]
-            \item Checking of exhaustiveness of pattern matching.
-            \item Desugar method calls to function calls\\
-                  (\Rustinline[fontsize=\scriptsize]{x.method(y)} becomes \Rustinline[fontsize=\scriptsize]{Type::method(&x, y)}).
-            \item Add implicit dereferencing operations.
-            \item Borrow checking.
+            \item Chequeo exhaustivo del \emph{pattern matching}
+            \item Desugar method calls to function calls:\\
+                  \Rustinline[fontsize=\scriptsize]{x.method(y)} se convierte en \Rustinline[fontsize=\scriptsize]{Type::method(&x, y)}
+            \item Add implicit dereferencing operations
+            \item Borrow checking
           \end{itemize}
           \pause
     \item Code generation:
           \begin{itemize}
             \scriptsize
             \setbeamertemplate{itemize items}[circle]
-            \item \emph{rustc} relies on LLVM as a backend.
-            \item It leverages many optimizations of the LLVM intermediate representation.
-            \item LLVM takes over from this point on.
-            \item At the end, object files are linked to create an executable.
+            \item \emph{rustc} se apoya en LLVM como backend
+            \item Aprovecha muchas optimizaciones de la representación intermedia de LLVM
+            \item LLVM toma el relevo a partir de este momento
+            \item Al final, los archivos objeto se enlazan para crear un ejecutable
           \end{itemize}
   \end{itemize}
 \end{frame}
@@ -347,8 +347,8 @@
 
 \begin{frame}[fragile]{Hello World in MIR}
   \tiny
-  BB means ``basic block''. Each one is formed by statements and one terminator statement.
-  The terminator statement is the only place where the control flow can jump to another basic block.
+  BB significa ``basic block''. Cada uno está formado por sentencias (\emph{statements}) y una sentencia terminadora.
+  La sentencia terminadora es el único lugar donde el flujo de control puede saltar a otro bloque básico.
 
   \begin{listing}
     \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
@@ -379,8 +379,8 @@
 
 \begin{frame}{MIR como un grafo que muestra el flujo de ejecución}
   \scriptsize
-  The MIR is a form of control flow graph (CFG) used in compilers.
-  In this form, the translation to a Petri net becomes evident.
+  El MIR es un \emph{control flow graph} (CFG) utilizado en compiladores.
+  En esta representación, la traducción a una red de Petri se hace evidente.
 
   \begin{figure}[!htb]
     \centering
@@ -391,8 +391,8 @@
 \subsection{Modelado de hilos de ejecución}
 
 \begin{frame}[fragile]{Programa de ejemplo}
-  Let's consider a trivial program that spawns a thread that does nothing
-  and immediately joins it.
+  Consideremos un programa trivial que inicia un hilo que no hace nada
+  e inmediatamente se une a él.
 
   \vfill
 
@@ -411,9 +411,9 @@
   \vfill
 
   \begin{itemize}
-    \item \Rustinline{std::thread::spawn} should create an additional token
-          that models the program counter of the second thread.
-    \item The joining thread should wait until the spawned thread finishes.
+    \item \Rustinline{std::thread::spawn} debe crear un token adicional
+          que modele el \emph{program counter} del segundo hilo.
+    \item El hilo que llama a \emph{join} debe esperar hasta que el otro hilo termine.
   \end{itemize}
 \end{frame}
 
@@ -427,10 +427,10 @@
 \subsection{Modelado de un mutex}
 
 \begin{frame}[fragile]{Programa de ejemplo}
-  Consider a simple program that locks a mutex twice.
-  The second lock operation will deadlock
-  because the lock handle returned by the first call to \Rustinline{std::sync::Mutex::lock}
-  is not dropped until it falls out of scope.
+  Consideremos un programa simple que llama a \emph{lock} sobre un mutex dos veces.
+  La segunda operación de \emph{lock} causará un deadlock
+  porque el \emph{lock handle} devuelto por la primera llamada a \Rustinline{std::sync::Mutex::lock}
+  no se libera hasta que sale de scope.
 
   \vfill
 
@@ -447,9 +447,9 @@
   \vfill
 
   \begin{itemize}
-    \item There should be a single place that models the mutex.
-    \item Locking the mutex is taking the token from the mutex place.
-    \item Unlocking the mutex is setting the token back in the mutex place.
+    \item Debería haber un único lugar que modele el mutex.
+    \item Bloquear el mutex es sacar el token del lugar del mutex.
+    \item Desbloquear el mutex es volver a colocar el token en el lugar del mutex.
   \end{itemize}
 \end{frame}
 
@@ -470,8 +470,8 @@
 \end{frame}
 
 \begin{frame}[fragile]{Programa de ejemplo}
-  We have to use a very simple example program to keep the net small.
-  In this case, the thread is trying to notify itself, which leads to a lost signal.
+  Tenemos que utilizar un programa de ejemplo muy simple para mantener la red pequeña.
+  En este caso, el hilo está tratando de notificarse a sí mismo, lo que conduce a una señal perdida.
 
   \begin{listing}
     \begin{minted}[fontsize=\scriptsize, frame=none]{Rust}
@@ -486,9 +486,9 @@
   \end{listing}
 
   \begin{itemize}
-    \item The model for the condition variable should appear in the Petri net.
-    \item The notify place should be set.
-    \item But the signal gets consumed because \Rustinline{std::sync::Condvar::wait} was not called.
+    \item El modelo para la variable de condición debe aparecer en la red de Petri.
+    \item Se coloca un token en el lugar de notificación.
+    \item Pero la señal se consume porque no se ha llamado a \Rustinline{std::sync::Condvar::wait}.
   \end{itemize}
 \end{frame}
 
@@ -518,32 +518,30 @@
 \begin{frame}{Recursos para aprender Rust}
   \begin{itemize}
     \item \href{https://doc.rust-lang.org/stable/book/}{The Rust Book}:
-          Available online and locally with the default Rust installation.
+          Disponible en línea y localmente con la instalación por defecto de Rust
     \item \href{https://doc.rust-lang.org/rust-by-example/}{Rust by Example}:
-          Another official book with a more practical approach.
+          Otro libro oficial con un enfoque más práctico
     \item \href{https://github.com/rust-lang/rustlings}{Rustlings}:
-          Small exercises to get you used to reading and writing Rust code!
+          Pequeños ejercicios para acostumbrarse a leer y escribir código Rust
     \item \href{https://google.github.io/comprehensive-rust/}{Comprehensive Rust}:
-          A three-day Rust course developed by the Android team.
+          Un curso de Rust en tres días desarrollado por el equipo de Android
     \item \href{https://learn.microsoft.com/en-us/training/paths/rust-first-steps/}{Take your first steps with Rust}:
-          A simple course on Microsoft Learn.
+          Un curso sencillo en Microsoft Learn
     \item \href{https://www.youtube.com/watch?v=MsocPEZBd-M}{Rust Programming Course for Beginners} by freeCodeCamp.org.
-    \item \href{https://www.youtube.com/\@NoBoilerplate/videos}{No Boilerplate}:
-          A Youtube channel mainly dedicated to topics connected with Rust. Some ideas were used for this presentation.
   \end{itemize}
 \end{frame}
 
 \begin{frame}{Simuladores en línea de redes de Petri}
   \begin{itemize}
-    \item A simple simulator by Igor Kim can be found on \url{https://petri.hp102.ru/}.
-          A tutorial video on Youtube and example nets are included in the tool.
-    \item A complement to this is a series of interactive tutorials by Prof. Wil van der Aalst
-          at the University of Hamburg. These tutorials are Adobe Flash Player files (with extension \texttt{.swf})
-          that modern web browsers cannot execute.
-          Luckily, an online Flash emulator like the one found on \url{https://flashplayer.fullstacks.net/?kind=Flash_Emulator}
-          can be used to upload the files and execute them.
-    \item Another online Petri net editor and simulator is \url{http://www.biregal.com/}.
-          The user can draw the net, add the tokens, and then manually fire transitions.
+    \item Un simulador sencillo construido por Igor Kim en \url{https://petri.hp102.ru/}.
+          La herramienta incluye un vídeo tutorial en Youtube y redes de ejemplo.
+    \item Como complemento, una serie de tutoriales interactivos a cargo del profesor Wil van der Aalst
+          de la Universidad de Hamburgo. Estos tutoriales son archivos de Adobe Flash Player (con extensión \texttt{.swf})
+          que los navegadores web modernos no pueden ejecutar.
+          Por suerte, un emulador de Flash en línea como el que se encuentra en \url{https://flashplayer.fullstacks.net/?kind=Flash_Emulator}
+          se puede usar para cargar los archivos y ejecutarlos.
+    \item Otro editor y simulador de redes de Petri en línea es \url{http://www.biregal.com/}.
+          El usuario puede dibujar la red, añadir los tokens y, a continuación, disparar manualmente las transiciones.
   \end{itemize}
 \end{frame}
 
