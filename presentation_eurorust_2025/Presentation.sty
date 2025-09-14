@@ -1,0 +1,71 @@
+\ProvidesPackage{Presentation}
+% Style file for the presentation %
+% Based on the guide: https://en.wikibooks.org/wiki/LaTeX/Modular_Documents#The_file_mystyle.sty 
+
+% SET THE LANGUAGE TO ENGLISH %
+\usepackage[english]{babel}
+
+% USE TIMES NEW ROMAN AS THE DEFAULT FONT %
+\usepackage{times}
+
+% THEME CONFIGURATION %
+\usetheme{Luebeck}
+\useinnertheme{rectangles}
+\usecolortheme{spruce}
+\useoutertheme{infolines}
+% No controls at the bottom. Source: https://tex.stackexchange.com/questions/54561/how-to-remove-buttons-from-the-bottom-of-madrid-theme
+\setbeamertemplate{navigation symbols}{}
+% Rectangles for items in the same green for the spruce theme
+\setbeamercolor{item}{fg=MSUgreen}
+
+% GRAPHICS CONFIGURATION %
+\usepackage{graphicx}
+\graphicspath{{../images/}}
+
+% ADD SUPPORT FOR SVG FILES %
+\usepackage[notransparent]{svg}
+\svgsetup{inkscape=newer,inkscapelatex=false}
+\svgpath{{../svg/}}
+
+% HYPERLINK CONFIGURATION %
+\usepackage{hyperref}
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  filecolor=blue,
+  citecolor=blue,
+  urlcolor=blue,
+}
+
+\usefonttheme[onlymath]{serif}
+
+% DEFINE HOW CAPTIONS SHOULD BE ADDED % 
+\setbeamertemplate{caption}{\insertcaption}
+
+% CODE LISTINGS WITH SINTAX HIGHLIGHTING %
+% See example: https://www.overleaf.com/learn/latex/Code_Highlighting_with_minted
+% Restart the counter on every chapter
+\usepackage[chapter,newfloat]{minted}
+\setminted{
+  linenos, % Show line numbers
+  numbers=left, % Show the line numbers on the left
+  xleftmargin=0.5cm, % Add marging so that the line numbers show up
+  breaklines, % Wrap lines if necessary
+  autogobble, % Remove whitespace in front of the code
+  frame=lines, % Use lines to create a frame
+  framesep=2mm, % Separation of the frame from the actual code
+  fontsize=\scriptsize % Use a tiny font size
+}
+% Define a new environment for inline Rust code
+\newmintinline{Rust}{
+  fontsize=\small
+}
+
+% FANCY VERBATIM ENVIRONMENT THAT SUPPORTS COLOR %
+% https://tex.stackexchange.com/questions/370334/use-color-in-verbatim-environment
+% Used to format Rust error messages
+\usepackage{fancyvrb}
+\usepackage{xcolor}
+
+% MULTI-COLUMN ENVIRONMENT %
+\usepackage{multicol}
