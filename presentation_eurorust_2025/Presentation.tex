@@ -10,8 +10,7 @@
 \AtBeginSection[]
 {
   \begin{frame}{Agenda}
-  \footnotesize
-    \tableofcontents[currentsection, currentsubsection]
+  \tableofcontents[currentsection, currentsubsection]
   \end{frame}
 }
 
@@ -49,8 +48,8 @@
 \begin{frame}{Informal definition}
   A Petri net is a mathematical modeling tool
   used to describe and analyze the behavior of concurrent systems.
-  It provides a graphical representation of the system's state and its transitions,
-  allowing for visual and formal analysis of complex processes.
+  It is a directed, bipartite graph with a \textit{marking},
+  i.e., an initial assignment of tokens to places.
 
   \centering
   \animategraphics[width=0.5\linewidth]{10}{cycle-net/cycle-net-}{1}{39}
@@ -66,33 +65,13 @@
   \vfill
 \end{frame}
 
-\begin{frame}{Mathematical definition}
-  A Petri net is a 5-tuple, $ PN = (P, T, F, W, M_{0}) $ where:
-
-  \begin{quote}
-    $ P = \{ p_1, p_2, \dots, p_m \} $ is a finite set of places,\\
-    $ T = \{ t_1, t_2, \dots, t_n \} $ is a finite set of transitions,\\
-    $ F \subseteq (P \times T) \cup (T \times P) $ is a set of arcs (flow relation),\\
-    $ W: F \rightarrow \{1, 2, 3, ... \} $ is a weight function for the arcs,\\
-    $ M_{0}: P \rightarrow \{0, 1, 2, 3, .... \} $ is the initial marking,\\
-    $ P \cap T = \varnothing $ and $ P \cup T \neq \varnothing $
-  \end{quote}
-
-  \vfill
-
-  The graph is by definition \emph{bipartite}.
-  There can only be edges:
-  \begin{itemize}
-    \item from places to transitions or
-    \item from transitions to places
-  \end{itemize}
-
-\end{frame}
-
 \begin{frame}{Transition firing rule}
+  \scriptsize
+  A transition may only fire if it is \textit{enabled}: All places pointing to it have a token.
+
   \begin{figure}[!htb]
     \centering
-    \includesvg[width=0.9\linewidth]{petri-net-transition-example.svg}
+    \includesvg[width=0.8\linewidth]{petri-net-transition-example.svg}
   \end{figure}
 \end{frame}
 
@@ -132,22 +111,6 @@
   \end{figure}
 \end{frame}
 
-\begin{frame}{Synchronization control: Readers and writers}
-  \scriptsize
-  A Petri net system with k processes that either read or write a shared value.
-
-  \begin{itemize}
-    \item If one process writes, then no process may read.
-    \item If a process is reading, then no process may write.
-    \item There can only be zero or one process writing at any given time.
-  \end{itemize}
-
-  \begin{figure}
-    \centering
-    \includesvg[width=0.9\linewidth]{readers-writers-example.svg}
-  \end{figure}
-\end{frame}
-
 \subsection{Why Petri nets?}
 
 \begin{frame}{Reachability analysis}
@@ -180,7 +143,6 @@
 
   \begin{itemize}
     \item Lexing: The source text is turned into a stream of atomic source code units known as tokens.
-          \pause
     \item Parsing: The stream of tokens is converted into an \textbf{Abstract Syntax Tree}.
           \pause
     \item High-level Intermediate Representation (HIR):
@@ -370,11 +332,10 @@
   \end{figure}
 \end{frame}
 
-\section{Limitations}
+\section{Pros and cons of the approach}
 
-\subsection{Limitations of the tool}
 
-\begin{frame}{Limitations of the tool}
+\begin{frame}{Limitations of the current version}
 
   It cannot translate everything possible in Rust / MIR...
 
@@ -385,18 +346,24 @@
     \item Async is not supported.
     \item Synchronization mechanisms from external crates such as \texttt{tokio} or \texttt{semaphore} are not supported.
   \end{itemize}
+
+  But we could add these features in the future :)
 \end{frame}
 
-\subsection{Limitations of the approach}
 
 \begin{frame}{Limitations of the approach}
+
+  The state explosion problem: The number of possible program states grows very fast!
+
+  \vfill
+  \pause
 
   Data values are not modelled...
 
   \begin{itemize}
     \item Deadlocks caused by certain user input
     \item Deadlocks that appear only when a specific number of threads is started
-    \item Dynamic code loading and execution
+    \item Dynamic code, foreign function calls, etc
   \end{itemize}
 
   \vfill
@@ -412,9 +379,41 @@
 
 \end{frame}
 
-\section{Bibliography}
 
-\begin{frame}[allowframebreaks]{Bibliography}
+\begin{frame}{Pros of the approach}
+
+  It is a graphical approach and therefore the model is easier to debug.
+
+  \vfill
+
+  There is a clear correspondence between the control flow in the Rust program and the Petri net.
+  The model checkers provide the sequence of transition firings that lead to the deadlock.
+
+  \vfill
+
+  We are far from reaching a performance bottleneck or size limit for this relatively simple approach.
+  Model checkers get better every year and we can put them to use.
+
+  \vfill
+
+  The tool shows how rustc could be extended to detect more bugs at compile-time
+  and make Rust even safer!
+
+\end{frame}
+
+\section{Quick demo}
+
+\begin{frame}
+
+  \huge
+  \centering
+  Quick demo
+
+\end{frame}
+
+\section*{Bibliography}
+
+\begin{frame}{Bibliography}
   \tiny
   \bibliographystyle{ieeetr}
   \bibliography{
@@ -426,7 +425,8 @@
   }
 \end{frame}
 
-\section{Additional resources}
+
+\section*{Additional resources}
 
 \begin{frame}{Online Petri net simulators}
   \begin{itemize}
